@@ -23,11 +23,14 @@ export default function RootLayout({
             <ul className="nav-links">
               <li><Link href="/">My Caseload</Link></li>
               <li><Link href="/cases">Cases</Link></li>
-              <li><Link href="/visits">Visits</Link></li>
-              <li><Link href="/documents">Documents</Link></li>
+              <li><Link href="/supervisor">Supervisor Dashboard</Link></li>
+              <li><Link href="/referrals">Referrals</Link></li>
             </ul>
             <div className="nav-user">
-              Olivia Rodriguez, Caseworker
+              <div className="user-info">
+                <span className="user-name">Olivia Rodriguez</span>
+                <span className="user-role">Caseworker</span>
+              </div>
             </div>
           </div>
         </nav>

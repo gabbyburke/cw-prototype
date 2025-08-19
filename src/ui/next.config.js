@@ -1,13 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
+  output: 'export',
+  trailingSlash: true,
+  images: {
+    unoptimized: true
+  },
+  // Add cache-busting for Firebase hosting
+  generateBuildId: async () => {
+    return `build-${Date.now()}`
+  },
+  // Disable static optimization to ensure fresh builds
   experimental: {
-    outputFileTracingRoot: undefined,
-  },
-  env: {
-    CORE_CASE_MGMT_API_URL: process.env.CORE_CASE_MGMT_API_URL,
-    REFERRAL_INTAKE_API_URL: process.env.REFERRAL_INTAKE_API_URL,
-  },
+    optimizeCss: false
+  }
 }
 
 module.exports = nextConfig
