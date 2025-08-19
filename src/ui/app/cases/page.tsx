@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Case, getCasesByWorker, getCurrentUser, getPersonById } from '../../lib/mockData'
+import { Case, getCasesByWorker, getCurrentUser } from '../../lib/mockData'
 
-export default function CasesPage() {
+export default function SWCMDashboard() {
   const [cases, setCases] = useState<Case[]>([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<'all' | 'active' | 'high-priority'>('all')
+  const [filter, setFilter] = useState<'active' | 'pending-transfer' | 'recently-closed'>('active')
 
   useEffect(() => {
     // Simulate loading delay
@@ -21,190 +21,294 @@ export default function CasesPage() {
 
   const filteredCases = cases.filter(case_ => {
     if (filter === 'active') return case_.status === 'Active'
-    if (filter === 'high-priority') return case_.priority_level === 'High'
+    if (filter === 'pending-transfer') return case_.status === 'Pending Assignment'
+    if (filter === 'recently-closed') return case_.status === 'Closed'
     return true
   })
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority.toLowerCase()) {
-      case 'high': return 'error'
-      case 'medium': return 'secondary'
-      case 'low': return 'tertiary'
-      default: return 'secondary'
+  const getIndicatorIcon = (indicator: string) => {
+    switch (indicator.toLowerCase()) {
+      case 'allergy': return 'medical_services'
+      case 'icwa eligible': return 'diversity_3'
+      case 'runaway': return 'directions_run'
+      case 'worker safety': return 'security'
+      case 'protective order': return 'gavel'
+      case 'icpc': return 'swap_horiz'
+      case 'safe haven': return 'shield'
+      case 'chronic medical condition': return 'local_hospital'
+      default: return 'flag'
     }
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'open': return 'tertiary'
-      case 'investigation': return 'secondary'
-      case 'closed': return 'primary'
-      default: return 'secondary'
+  const getIndicatorColor = (indicator: string) => {
+    switch (indicator.toLowerCase()) {
+      case 'allergy': return 'error'
+      case 'icwa eligible': return 'tertiary'
+      case 'runaway': return 'error'
+      case 'worker safety': return 'error'
+      case 'protective order': return 'secondary'
+      case 'chronic medical condition': return 'secondary'
+      default: return 'primary'
     }
+  }
+
+  const getChildrenNames = (case_: Case) => {
+    return case_.persons
+      .filter(person => person.role === 'child')
+      .map(child => `${child.first_name} ${child.last_name}`)
+      .join(', ')
+  }
+
+  const getAllIndicators = (case_: Case) => {
+    const indicators = new Set<string>()
+    case_.persons.forEach(person => {
+      if (person.indicators) {
+        person.indicators.forEach(indicator => indicators.add(indicator))
+      }
+    })
+    return Array.from(indicators)
   }
 
   if (loading) {
     return (
-      <div>
-        <header>
-          <h1>My Cases</h1>
-          <p>Loading your cases...</p>
-        </header>
+      <div className="page-container">
+        <div className="page-header">
+          <h1 className="page-title">SWCM Dashboard</h1>
+          <p className="page-description">Loading your cases...</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div>
-      <header>
-        <h1>My Cases</h1>
-        <p>Manage your assigned child welfare cases</p>
-      </header>
-
-      {/* Filter Tabs */}
-      <div className="filter-tabs" style={{ marginBottom: 'var(--unit-6)' }}>
-        <button 
-          className={filter === 'all' ? 'active' : ''}
-          onClick={() => setFilter('all')}
-        >
-          All Cases ({cases.length})
-        </button>
-        <button 
-          className={filter === 'active' ? 'active' : ''}
-          onClick={() => setFilter('active')}
-        >
-          Active ({cases.filter((c: Case) => c.status === 'Active').length})
-        </button>
-        <button 
-          className={filter === 'high-priority' ? 'active' : ''}
-          onClick={() => setFilter('high-priority')}
-        >
-          High Priority ({cases.filter((c: Case) => c.priority_level === 'High').length})
-        </button>
+    <div className="page-container">
+      <div className="page-header">
+        <h1 className="page-title">SWCM Dashboard</h1>
+        <p className="page-description">Manage your assigned child welfare cases</p>
       </div>
 
-      {/* Quick Stats */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon primary">
-            <span className="icon">folder_open</span>
-          </div>
-          <div className="stat-content">
-            <h3>{cases.filter((c: Case) => c.status === 'Active').length}</h3>
-            <p>Active Cases</p>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon error">
-            <span className="icon">priority_high</span>
-          </div>
-          <div className="stat-content">
-            <h3>{cases.filter((c: Case) => c.priority_level === 'High').length}</h3>
-            <p>High Priority</p>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon secondary">
-            <span className="icon">schedule</span>
-          </div>
-          <div className="stat-content">
-            <h3>{cases.filter((c: Case) => c.safety_assessment_due).length}</h3>
-            <p>Assessments Due</p>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-icon tertiary">
-            <span className="icon">gavel</span>
-          </div>
-          <div className="stat-content">
-            <h3>{cases.filter((c: Case) => c.next_court_date).length}</h3>
-            <p>Court Hearings</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Case Cards */}
-      <article>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--unit-6)' }}>
-          <h3>My Caseload</h3>
-          <button>
-            <span className="icon" style={{ marginRight: 'var(--unit-2)' }}>add</span>
-            New Case
-          </button>
-        </div>
-
-        <div className="case-grid">
-          {filteredCases.map((caseItem: Case) => {
-            const primaryChild = getPersonById(caseItem.involved_persons[0])
-            return (
-              <div key={caseItem.case_id} className="case-card">
-                <div className="case-header">
-                  <div className="case-title">
-                    <h4>{caseItem.primary_child}</h4>
-                    <p className="case-number">{caseItem.case_number}</p>
-                  </div>
-                  <div className="case-badges">
-                    <span className={`badge ${getPriorityColor(caseItem.priority_level)}`}>
-                      {caseItem.priority_level}
-                    </span>
-                    <span className={`badge ${getStatusColor(caseItem.status)}`}>
-                      {caseItem.status}
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="case-details">
-                  <div className="case-detail">
-                    <span className="icon">report</span>
-                    <span>{caseItem.allegation_type}</span>
-                  </div>
-                  <div className="case-detail">
-                    <span className="icon">schedule</span>
-                    <span>{new Date(caseItem.created_date).toLocaleDateString()}</span>
-                  </div>
-                  {caseItem.safety_assessment_due && (
-                    <div className="case-detail urgent">
-                      <span className="icon">warning</span>
-                      <span>Assessment Due: {new Date(caseItem.safety_assessment_due).toLocaleDateString()}</span>
-                    </div>
-                  )}
-                  {caseItem.next_court_date && (
-                    <div className="case-detail">
-                      <span className="icon">gavel</span>
-                      <span>Court: {new Date(caseItem.next_court_date).toLocaleDateString()}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="case-actions">
-                  <Link href={`/cases/${caseItem.case_id}`} className="action-btn primary">
-                    <span className="icon">visibility</span>
-                    View Details
-                  </Link>
-                  <button className="action-btn secondary">
-                    <span className="icon">note_add</span>
-                    Add Note
-                  </button>
-                  <button className="action-btn tertiary">
-                    <span className="icon">edit</span>
-                    Edit
-                  </button>
-                </div>
+      <div className="content-wrapper">
+        {/* Quick Access Buttons */}
+        <div className="quick-access-section">
+          <h3>Quick Actions</h3>
+          <div className="quick-actions-grid">
+            <button className="quick-action-btn primary">
+              <span className="icon">note_add</span>
+              <div className="action-content">
+                <span className="action-title">Add Case Note</span>
+                <span className="action-desc">Document case activities</span>
               </div>
-            )
-          })}
+            </button>
+            <button className="quick-action-btn secondary">
+              <span className="icon">upload_file</span>
+              <div className="action-content">
+                <span className="action-title">Upload Document</span>
+                <span className="action-desc">Add files to case records</span>
+              </div>
+            </button>
+            <button className="quick-action-btn tertiary">
+              <span className="icon">event</span>
+              <div className="action-content">
+                <span className="action-title">Schedule Appointment</span>
+                <span className="action-desc">Book visits and meetings</span>
+              </div>
+            </button>
+          </div>
         </div>
 
-        {filteredCases.length === 0 && (
-          <div style={{ textAlign: 'center', padding: 'var(--unit-8)', color: 'var(--text-secondary)' }}>
-            <span className="icon" style={{ fontSize: '3rem', marginBottom: 'var(--unit-4)' }}>folder_open</span>
-            <p>No cases match the current filter.</p>
+        {/* Task Summary */}
+        <div className="task-summary-section">
+          <h3>Task Summary</h3>
+          <div className="task-summary-grid">
+            <div className="task-summary-card urgent">
+              <div className="task-icon error">
+                <span className="icon">warning</span>
+              </div>
+              <div className="task-content">
+                <h4>3</h4>
+                <p>Overdue Tasks</p>
+                <span className="task-detail">Safety assessments due</span>
+              </div>
+            </div>
+            <div className="task-summary-card">
+              <div className="task-icon primary">
+                <span className="icon">schedule</span>
+              </div>
+              <div className="task-content">
+                <h4>7</h4>
+                <p>Due Today</p>
+                <span className="task-detail">Various case activities</span>
+              </div>
+            </div>
+            <div className="task-summary-card">
+              <div className="task-icon secondary">
+                <span className="icon">upcoming</span>
+              </div>
+              <div className="task-content">
+                <h4>12</h4>
+                <p>This Week</p>
+                <span className="task-detail">Scheduled activities</span>
+              </div>
+            </div>
+            <div className="task-summary-card">
+              <div className="task-icon tertiary">
+                <span className="icon">gavel</span>
+              </div>
+              <div className="task-content">
+                <h4>2</h4>
+                <p>Court Hearings</p>
+                <span className="task-detail">Next 7 days</span>
+              </div>
+            </div>
           </div>
-        )}
-      </article>
+        </div>
+
+        {/* Filter Tabs */}
+        <div className="tabs-container">
+          <div className="tabs">
+            <button 
+              className={`tab ${filter === 'active' ? 'active' : ''}`}
+              onClick={() => setFilter('active')}
+            >
+              <span className="icon">folder_open</span>
+              Active Cases ({cases.filter(c => c.status === 'Active').length})
+            </button>
+            <button 
+              className={`tab ${filter === 'pending-transfer' ? 'active' : ''}`}
+              onClick={() => setFilter('pending-transfer')}
+            >
+              <span className="icon">swap_horiz</span>
+              Pending Transfer ({cases.filter(c => c.status === 'Pending Assignment').length})
+            </button>
+            <button 
+              className={`tab ${filter === 'recently-closed' ? 'active' : ''}`}
+              onClick={() => setFilter('recently-closed')}
+            >
+              <span className="icon">check_circle</span>
+              Recently Closed ({cases.filter(c => c.status === 'Closed').length})
+            </button>
+          </div>
+        </div>
+
+        {/* Cases List */}
+        <div className="card">
+          <div className="card-header">
+            <h2>
+              {filter === 'active' && 'Active Cases'}
+              {filter === 'pending-transfer' && 'Cases Pending Transfer'}
+              {filter === 'recently-closed' && 'Recently Closed Cases'}
+            </h2>
+            <div className="card-actions">
+              <button className="action-btn secondary">
+                <span className="icon">filter_list</span>
+                Filter
+              </button>
+              <button className="action-btn primary">
+                <span className="icon">refresh</span>
+                Refresh
+              </button>
+            </div>
+          </div>
+          <div className="card-content">
+            {filteredCases.length > 0 ? (
+              <div className="table-container">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Case Name</th>
+                      <th>Intake Date</th>
+                      <th>Key Allegations</th>
+                      <th>Children Involved</th>
+                      <th>Indicators</th>
+                      <th>Assigned Workers</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredCases.map((case_) => (
+                      <tr key={case_.case_id}>
+                        <td>
+                          <div className="case-name-cell">
+                            <Link href={`/cases/${case_.case_id}`} className="case-link">
+                              <strong>{case_.family_name}</strong>
+                            </Link>
+                            <div className="case-number">{case_.case_number}</div>
+                          </div>
+                        </td>
+                        <td>{new Date(case_.created_date).toLocaleDateString()}</td>
+                        <td>
+                          <div className="allegation-cell">
+                            <span className="allegation-type">{case_.allegation_type}</span>
+                            <div className="allegation-desc">{case_.allegation_description}</div>
+                          </div>
+                        </td>
+                        <td>
+                          <div className="children-list">
+                            {getChildrenNames(case_) || 'No children listed'}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="indicators-cell">
+                            {getAllIndicators(case_).slice(0, 3).map((indicator, index) => (
+                              <span 
+                                key={index}
+                                className={`indicator-badge ${getIndicatorColor(indicator)}`}
+                                title={indicator}
+                              >
+                                <span className="icon">{getIndicatorIcon(indicator)}</span>
+                                {indicator}
+                              </span>
+                            ))}
+                            {getAllIndicators(case_).length > 3 && (
+                              <span className="indicator-more">
+                                +{getAllIndicators(case_).length - 3} more
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="workers-cell">
+                            <div className="primary-worker">
+                              <strong>Primary:</strong> {case_.assigned_worker || 'Unassigned'}
+                            </div>
+                            {case_.assigned_supervisor && (
+                              <div className="supervisor">
+                                <strong>Supervisor:</strong> {case_.assigned_supervisor}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="action-buttons">
+                            <Link href={`/cases/${case_.case_id}`} className="action-btn small primary">
+                              <span className="icon">visibility</span>
+                              View
+                            </Link>
+                            <button className="action-btn small secondary">
+                              <span className="icon">note_add</span>
+                              Note
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="empty-state">
+                <span className="icon large">folder_open</span>
+                <h3>No Cases Found</h3>
+                <p>
+                  {filter === 'active' && 'No active cases are currently assigned to you.'}
+                  {filter === 'pending-transfer' && 'No cases are pending transfer.'}
+                  {filter === 'recently-closed' && 'No cases have been recently closed.'}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

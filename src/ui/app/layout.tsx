@@ -3,8 +3,8 @@ import Link from 'next/link'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'CCWIS - Child Welfare Information System',
-  description: 'Comprehensive Child Welfare Information System for state agencies',
+  title: 'VISION - Child Welfare Information System',
+  description: 'VISION - Comprehensive Child Welfare Information System for state agencies',
 }
 
 export default function RootLayout({
@@ -15,28 +15,96 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <nav>
-          <div className="nav-container">
-            <div className="nav-brand">
-              <h1>CCWIS</h1>
+        <div className="app-layout">
+          {/* Left Sidebar Navigation */}
+          <aside className="sidebar">
+            <div className="sidebar-header">
+              <h1 className="sidebar-brand">VISION</h1>
+              <p className="sidebar-subtitle">Child Welfare System</p>
             </div>
-            <ul className="nav-links">
-              <li><Link href="/">My Caseload</Link></li>
-              <li><Link href="/cases">Cases</Link></li>
-              <li><Link href="/supervisor">Supervisor Dashboard</Link></li>
-              <li><Link href="/referrals">Referrals</Link></li>
-            </ul>
-            <div className="nav-user">
+            
+            <nav className="sidebar-nav">
+              <div className="nav-section">
+                <h3 className="nav-section-title">Case Management</h3>
+                <ul className="nav-list">
+                  <li><Link href="/cases" className="nav-link">
+                    <span className="icon">folder</span>
+                    <span>Cases</span>
+                  </Link></li>
+                  <li><Link href="/supervisor" className="nav-link">
+                    <span className="icon">supervisor_account</span>
+                    <span>Supervisor Dashboard</span>
+                  </Link></li>
+                </ul>
+              </div>
+              
+              <div className="nav-section">
+                <h3 className="nav-section-title">Intake & Referrals</h3>
+                <ul className="nav-list">
+                  <li><Link href="/referrals" className="nav-link">
+                    <span className="icon">assignment</span>
+                    <span>Referrals</span>
+                  </Link></li>
+                  <li><Link href="/intake" className="nav-link">
+                    <span className="icon">call</span>
+                    <span>Intake</span>
+                  </Link></li>
+                </ul>
+              </div>
+              
+              <div className="nav-section">
+                <h3 className="nav-section-title">Workflow</h3>
+                <ul className="nav-list">
+                  <li><Link href="/cpw" className="nav-link">
+                    <span className="icon">fact_check</span>
+                    <span>CPW Review</span>
+                  </Link></li>
+                  <li><Link href="/cpw-supervisor" className="nav-link">
+                    <span className="icon">approval</span>
+                    <span>CPW Supervisor</span>
+                  </Link></li>
+                  <li><Link href="/swcm-supervisor" className="nav-link">
+                    <span className="icon">assignment_ind</span>
+                    <span>SWCM Assignment</span>
+                  </Link></li>
+                </ul>
+              </div>
+            </nav>
+            
+            <div className="sidebar-footer">
               <div className="user-info">
-                <span className="user-name">Olivia Rodriguez</span>
-                <span className="user-role">Caseworker</span>
+                <div className="user-avatar">
+                  <span className="icon">person</span>
+                </div>
+                <div className="user-details">
+                  <span className="user-name">Olivia Rodriguez</span>
+                  <span className="user-role">SWCM</span>
+                </div>
               </div>
             </div>
+          </aside>
+          
+          {/* Main Content Area */}
+          <div className="main-layout">
+            <header className="top-header">
+              <div className="header-content">
+                <h1 className="page-title">Dashboard</h1>
+                <div className="header-actions">
+                  <button className="action-btn secondary">
+                    <span className="icon">notifications</span>
+                  </button>
+                  <button className="action-btn secondary">
+                    <span className="icon">settings</span>
+                  </button>
+                </div>
+              </div>
+            </header>
+            
+            <main className="main-content">
+              {children}
+            </main>
           </div>
-        </nav>
-        <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 var(--unit-4)' }}>
-          {children}
-        </main>
+        </div>
       </body>
     </html>
   )
