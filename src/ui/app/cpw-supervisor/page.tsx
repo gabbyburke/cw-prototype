@@ -11,7 +11,7 @@ export default function CPWSupervisorPage() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1 className="page-title">CPW Supervisor Dashboard</h1>
+        <h1 className="page-title">CPW Supervisor View</h1>
         <p className="page-description">Review and approve cases from CPW workers</p>
       </div>
 

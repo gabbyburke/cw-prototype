@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbo",
+    "dev-fast": "next dev --turbo --port 3000",
     "build": "next build",
+    "build-fast": "turbo build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "preview": "next build && next start"
   },
   "dependencies": {
     "next": "14.2.30",
@@ -20,6 +23,7 @@
     "eslint": "^8.57.1",
     "eslint-config-next": "14.2.30",
     "firebase-tools": "^14.12.1",
+    "turbo": "^2.5.6",
     "typescript": "^5.6.3"
   }
 }

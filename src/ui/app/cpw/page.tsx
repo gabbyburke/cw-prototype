@@ -11,7 +11,7 @@ export default function CPWPage() {
   return (
     <div className="page-container">
       <div className="page-header">
-        <h1 className="page-title">CPW Review Dashboard</h1>
+        <h1 className="page-title">CPW Dashboard</h1>
         <p className="page-description">Review and process cases requiring CPW attention</p>
       </div>
 

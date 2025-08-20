@@ -25,47 +25,22 @@ export default function RootLayout({
             
             <nav className="sidebar-nav">
               <div className="nav-section">
-                <h3 className="nav-section-title">Case Management</h3>
                 <ul className="nav-list">
-                  <li><Link href="/cases" className="nav-link">
-                    <span className="icon">folder</span>
-                    <span>Cases</span>
+                  <li><Link href="/" className="nav-link">
+                    <span className="icon">dashboard</span>
+                    <span>SWCM Dashboard</span>
                   </Link></li>
                   <li><Link href="/supervisor" className="nav-link">
                     <span className="icon">supervisor_account</span>
-                    <span>Supervisor Dashboard</span>
+                    <span>SWCM Supervisor View</span>
                   </Link></li>
-                </ul>
-              </div>
-              
-              <div className="nav-section">
-                <h3 className="nav-section-title">Intake & Referrals</h3>
-                <ul className="nav-list">
-                  <li><Link href="/referrals" className="nav-link">
-                    <span className="icon">assignment</span>
-                    <span>Referrals</span>
-                  </Link></li>
-                  <li><Link href="/intake" className="nav-link">
-                    <span className="icon">call</span>
-                    <span>Intake</span>
-                  </Link></li>
-                </ul>
-              </div>
-              
-              <div className="nav-section">
-                <h3 className="nav-section-title">Workflow</h3>
-                <ul className="nav-list">
                   <li><Link href="/cpw" className="nav-link">
                     <span className="icon">fact_check</span>
-                    <span>CPW Review</span>
+                    <span>CPW Dashboard</span>
                   </Link></li>
                   <li><Link href="/cpw-supervisor" className="nav-link">
                     <span className="icon">approval</span>
-                    <span>CPW Supervisor</span>
-                  </Link></li>
-                  <li><Link href="/swcm-supervisor" className="nav-link">
-                    <span className="icon">assignment_ind</span>
-                    <span>SWCM Assignment</span>
+                    <span>CPW Supervisor View</span>
                   </Link></li>
                 </ul>
               </div>
@@ -88,7 +63,7 @@ export default function RootLayout({
           <div className="main-layout">
             <header className="top-header">
               <div className="header-content">
-                <h1 className="page-title">Dashboard</h1>
+                <h1 className="page-title">SWCM Dashboard</h1>
                 <div className="header-actions">
                   <button className="action-btn secondary">
                     <span className="icon">notifications</span>
