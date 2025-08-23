@@ -1,6 +1,6 @@
 /* Fonts */
-@import url(//fonts.googleapis.com/css2?family=Google+Symbols);
-@import url(//fonts.googleapis.com/css2?family=Google+Sans);
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
   --size: 1rem;
@@ -15,8 +15,8 @@
   --unit-8: calc(var(--unit) * 8);
   --unit-9: calc(var(--unit) * 9);
   --unit-10: calc(var(--unit) * 10);
-  --font: "Google Sans", "Open Sans", Helvetica, Arial, sans-serif;
-  --font-icon: "Google Symbols";
+  --font: "Inter", "Open Sans", Helvetica, Arial, sans-serif;
+  --font-icon: "Material Symbols Outlined";
 }
 :root,
 body.light {
@@ -513,7 +513,7 @@ a {
 
 /* Icons */
 .icon {
-  font-family: "Google Symbols";
+  font-family: "Material Symbols Outlined";
 }
 
 /* Buttons */

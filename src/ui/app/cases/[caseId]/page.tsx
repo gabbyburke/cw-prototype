@@ -7,10 +7,8 @@ import {
   Case, 
   Person, 
   TimelineEvent, 
-  getCaseById, 
-  getPersonsByCase, 
-  getTimelineEventsByCase 
-} from '../../../lib/mockData'
+  getCaseById 
+} from '../../../lib/api'
 
 export default function CaseDetailPage() {
   const params = useParams()
@@ -24,19 +22,23 @@ export default function CaseDetailPage() {
 
   useEffect(() => {
     if (caseId) {
-      // Simulate loading delay
-      setTimeout(() => {
-        const case_ = getCaseById(caseId)
-        const casePersons = getPersonsByCase(caseId)
-        const events = getTimelineEventsByCase(caseId)
-        
-        setCaseData(case_ || null)
-        setPersons(casePersons)
-        setTimelineEvents(events)
-        setLoading(false)
-      }, 500)
+      loadCaseData()
     }
   }, [caseId])
+
+  const loadCaseData = async () => {
+    setLoading(true)
+    
+    const response = await getCaseById(caseId)
+    
+    if (response.data) {
+      setCaseData(response.data)
+      setPersons(response.data.persons || [])
+      setTimelineEvents(response.data.timeline_events || [])
+    }
+    
+    setLoading(false)
+  }
 
   const getPriorityColor = (priority: string) => {
     switch (priority.toLowerCase()) {
@@ -156,24 +158,13 @@ export default function CaseDetailPage() {
               <p>{new Date(caseData.created_date).toLocaleDateString()}</p>
             </div>
           </div>
-          {caseData.safety_assessment_due && (
-            <div className="summary-item urgent">
-              <span className="icon">warning</span>
-              <div>
-                <strong>Assessment Due:</strong>
-                <p>{new Date(caseData.safety_assessment_due).toLocaleDateString()}</p>
-              </div>
+          <div className="summary-item">
+            <span className="icon">location_on</span>
+            <div>
+              <strong>County:</strong>
+              <p>{caseData.county}</p>
             </div>
-          )}
-          {caseData.next_court_date && (
-            <div className="summary-item">
-              <span className="icon">gavel</span>
-              <div>
-                <strong>Next Court Date:</strong>
-                <p>{new Date(caseData.next_court_date).toLocaleDateString()}</p>
-              </div>
-            </div>
-          )}
+          </div>
         </div>
       </header>
 
@@ -233,12 +224,10 @@ export default function CaseDetailPage() {
                   <strong>Last Updated:</strong>
                   <p>{new Date(caseData.last_updated).toLocaleDateString()}</p>
                 </div>
-                {caseData.referral_id && (
-                  <div className="detail-item">
-                    <strong>Referral ID:</strong>
-                    <p>{caseData.referral_id}</p>
-                  </div>
-                )}
+                <div className="detail-item">
+                  <strong>Risk Level:</strong>
+                  <p>{caseData.risk_level || 'Not assessed'}</p>
+                </div>
               </div>
             </article>
 
@@ -272,7 +261,7 @@ export default function CaseDetailPage() {
             <article className="overview-section">
               <h3>Recent Case Notes</h3>
               <div className="notes-list">
-                {caseData.case_notes.slice(0, 3).map((note) => (
+                {caseData.case_notes && caseData.case_notes.slice(0, 3).map((note) => (
                   <div key={note.note_id} className="note-item">
                     <div className="note-header">
                       <strong>{note.created_by}</strong>
@@ -283,7 +272,7 @@ export default function CaseDetailPage() {
                     <p>{note.text}</p>
                   </div>
                 ))}
-                {caseData.case_notes.length === 0 && (
+                {(!caseData.case_notes || caseData.case_notes.length === 0) && (
                   <p style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: 'var(--unit-4)' }}>
                     No case notes yet
                   </p>

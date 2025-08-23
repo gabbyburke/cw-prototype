@@ -8,10 +8,6 @@ const nextConfig = {
   // Add cache-busting for Firebase hosting
   generateBuildId: async () => {
     return `build-${Date.now()}`
-  },
-  // Disable static optimization to ensure fresh builds
-  experimental: {
-    optimizeCss: false
   }
 }
 

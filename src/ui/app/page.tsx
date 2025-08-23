@@ -2,22 +2,34 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Case, getCasesByWorker, getCurrentUser } from '../lib/mockData'
+import { Case, getCasesByWorker } from '../lib/api'
+import { getCurrentUser } from '../lib/mockData'
 
 export default function SWCMDashboard() {
   const [cases, setCases] = useState<Case[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<'active' | 'pending-transfer' | 'recently-closed'>('active')
 
   useEffect(() => {
-    // Simulate loading delay
-    setTimeout(() => {
-      const currentUser = getCurrentUser()
-      const userCases = getCasesByWorker(currentUser.name)
-      setCases(userCases)
-      setLoading(false)
-    }, 500)
+    loadCases()
   }, [])
+
+  const loadCases = async () => {
+    setLoading(true)
+    setError(null)
+    
+    const currentUser = getCurrentUser()
+    const response = await getCasesByWorker(currentUser.name)
+    
+    if (response.error) {
+      setError(response.error)
+    } else if (response.data) {
+      setCases(response.data.cases)
+    }
+    
+    setLoading(false)
+  }
 
   const filteredCases = cases.filter(case_ => {
     if (filter === 'active') return case_.status === 'Active'
@@ -53,6 +65,7 @@ export default function SWCMDashboard() {
   }
 
   const getChildrenNames = (case_: Case) => {
+    if (!case_.persons) return ''
     return case_.persons
       .filter(person => person.role === 'child')
       .map(child => `${child.first_name} ${child.last_name}`)
@@ -61,11 +74,13 @@ export default function SWCMDashboard() {
 
   const getAllIndicators = (case_: Case) => {
     const indicators = new Set<string>()
-    case_.persons.forEach(person => {
-      if (person.indicators) {
-        person.indicators.forEach(indicator => indicators.add(indicator))
-      }
-    })
+    if (case_.persons) {
+      case_.persons.forEach(person => {
+        if (person.indicators) {
+          person.indicators.forEach(indicator => indicators.add(indicator))
+        }
+      })
+    }
     return Array.from(indicators)
   }
 

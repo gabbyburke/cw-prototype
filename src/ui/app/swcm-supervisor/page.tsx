@@ -1,13 +1,107 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { getCasesPendingSWCMAssignment, mockUsers } from '@/lib/mockData'
+import { Case, getCasesPendingAssignment, assignCaseToSWCM } from '../../lib/api'
+import { mockUsers } from '../../lib/mockData'
+
+interface CaseAssignmentActionsProps {
+  case_: Case
+  swcmWorkers: any[]
+  onAssign: (caseId: string, assignedWorker: string) => void
+  isAssigning: boolean
+}
+
+function CaseAssignmentActions({ case_, swcmWorkers, onAssign, isAssigning }: CaseAssignmentActionsProps) {
+  const [selectedWorker, setSelectedWorker] = useState('')
+
+  const handleAssign = () => {
+    if (selectedWorker) {
+      onAssign(case_.case_id, selectedWorker)
+      setSelectedWorker('')
+    }
+  }
+
+  return (
+    <div className="action-buttons">
+      <select 
+        className="form-control small"
+        value={selectedWorker}
+        onChange={(e) => setSelectedWorker(e.target.value)}
+        disabled={isAssigning}
+      >
+        <option value="">Assign to...</option>
+        {swcmWorkers.map(worker => (
+          <option key={worker.user_id} value={worker.name}>
+            {worker.name}
+          </option>
+        ))}
+      </select>
+      <button 
+        className="action-btn small primary"
+        onClick={handleAssign}
+        disabled={!selectedWorker || isAssigning}
+      >
+        <span className="icon">
+          {isAssigning ? 'hourglass_empty' : 'assignment'}
+        </span>
+        {isAssigning ? 'Assigning...' : 'Assign'}
+      </button>
+      <Link href={`/cases/${case_.case_id}`} className="action-btn small secondary">
+        <span className="icon">visibility</span>
+        Review
+      </Link>
+    </div>
+  )
+}
 
 export default function SWCMSupervisorPage() {
   const [activeTab, setActiveTab] = useState('assignment')
-  const pendingAssignmentCases = getCasesPendingSWCMAssignment()
+  const [pendingCases, setPendingCases] = useState<Case[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [assigningCases, setAssigningCases] = useState<Set<string>>(new Set())
   const swcmWorkers = mockUsers.filter(user => user.role === 'caseworker')
+
+  useEffect(() => {
+    loadPendingCases()
+  }, [])
+
+  const loadPendingCases = async () => {
+    setLoading(true)
+    setError(null)
+    
+    const response = await getCasesPendingAssignment()
+    
+    if (response.error) {
+      setError(response.error)
+    } else if (response.data) {
+      setPendingCases(response.data.cases)
+    }
+    
+    setLoading(false)
+  }
+
+  const handleAssignCase = async (caseId: string, assignedWorker: string) => {
+    if (!assignedWorker) return
+
+    setAssigningCases(prev => new Set(prev).add(caseId))
+    
+    const response = await assignCaseToSWCM(caseId, assignedWorker, 'Sarah Williams')
+    
+    if (response.error) {
+      setError(response.error)
+    } else {
+      // Remove the assigned case from the pending list
+      setPendingCases(prev => prev.filter(case_ => case_.case_id !== caseId))
+    }
+    
+    setAssigningCases(prev => {
+      const newSet = new Set(prev)
+      newSet.delete(caseId)
+      return newSet
+    })
+  }
 
   return (
     <div className="page-container">
@@ -24,7 +118,7 @@ export default function SWCMSupervisorPage() {
               onClick={() => setActiveTab('assignment')}
             >
               <span className="icon">assignment_ind</span>
-              Pending Assignment ({pendingAssignmentCases.length})
+              Pending Assignment ({pendingCases.length})
             </button>
             <button 
               className={`tab ${activeTab === 'workload' ? 'active' : ''}`}
@@ -60,7 +154,22 @@ export default function SWCMSupervisorPage() {
                 </div>
               </div>
               <div className="card-content">
-                {pendingAssignmentCases.length > 0 ? (
+                {error && (
+                  <div className="error-message">
+                    <span className="icon">error</span>
+                    <p>Error loading cases: {error}</p>
+                    <button onClick={loadPendingCases} className="action-btn primary">
+                      Retry
+                    </button>
+                  </div>
+                )}
+                
+                {loading ? (
+                  <div className="loading-state">
+                    <span className="icon large">hourglass_empty</span>
+                    <p>Loading pending cases...</p>
+                  </div>
+                ) : pendingCases.length > 0 ? (
                   <div className="table-container">
                     <table className="data-table">
                       <thead>
@@ -70,60 +179,42 @@ export default function SWCMSupervisorPage() {
                           <th>County</th>
                           <th>Risk Level</th>
                           <th>Allegation Type</th>
-                          <th>Approved Date</th>
+                          <th>Created Date</th>
                           <th>Days Pending</th>
                           <th>Actions</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {pendingAssignmentCases.map((case_) => (
+                        {pendingCases.map((case_: Case) => (
                           <tr key={case_.case_id}>
                             <td>
                               <Link href={`/cases/${case_.case_id}`} className="case-link">
-                                {case_.case_id}
+                                {case_.case_number || case_.case_id}
                               </Link>
                             </td>
                             <td>{case_.family_name}</td>
                             <td>{case_.county}</td>
                             <td>
-                              <span className={`risk-badge ${case_.risk_level?.toLowerCase()}`}>
-                                {case_.risk_level}
+                              <span className={`risk-badge ${case_.risk_level?.toLowerCase() || 'medium'}`}>
+                                {case_.risk_level || 'Medium'}
                               </span>
                             </td>
                             <td>{case_.allegation_type}</td>
                             <td>
-                              {case_.workflow_status.cpw_supervisor_approved_date 
-                                ? new Date(case_.workflow_status.cpw_supervisor_approved_date).toLocaleDateString()
-                                : 'N/A'
-                              }
+                              {new Date(case_.created_date).toLocaleDateString()}
                             </td>
                             <td>
                               <span className="days-pending">
-                                {case_.workflow_status.cpw_supervisor_approved_date
-                                  ? Math.floor((Date.now() - new Date(case_.workflow_status.cpw_supervisor_approved_date).getTime()) / (1000 * 60 * 60 * 24))
-                                  : 0
-                                }
+                                {Math.floor((Date.now() - new Date(case_.created_date).getTime()) / (1000 * 60 * 60 * 24))}
                               </span>
                             </td>
                             <td>
-                              <div className="action-buttons">
-                                <select className="form-control small">
-                                  <option value="">Assign to...</option>
-                                  {swcmWorkers.map(worker => (
-                                    <option key={worker.user_id} value={worker.name}>
-                                      {worker.name}
-                                    </option>
-                                  ))}
-                                </select>
-                                <button className="action-btn small primary">
-                                  <span className="icon">assignment</span>
-                                  Assign
-                                </button>
-                                <button className="action-btn small secondary">
-                                  <span className="icon">visibility</span>
-                                  Review
-                                </button>
-                              </div>
+                              <CaseAssignmentActions 
+                                case_={case_}
+                                swcmWorkers={swcmWorkers}
+                                onAssign={handleAssignCase}
+                                isAssigning={assigningCases.has(case_.case_id)}
+                              />
                             </td>
                           </tr>
                         ))}
