@@ -30,29 +30,35 @@ steps:
           echo "Successfully built and pushed $image_name"
         }
         
-        # Find all directories with Dockerfiles and build them
-        find src -name "Dockerfile" -type f | while read dockerfile; do
-          # Get the directory containing the Dockerfile
-          dir_path=$(dirname "$dockerfile")
+        # Build images for known services
+        declare -a services=("core-case-mgmt" "referral-intake" "ui")
+        declare -a build_pids=()
+        
+        for service in "${services[@]}"; do
+          # Convert service name to directory path
+          service_dir=$(echo "$service" | tr '-' '_')
           
-          # Extract the folder name and convert underscores to dashes
-          folder_name=$(basename "$dir_path")
-          resource_name=$(echo "$folder_name" | tr '_' '-')
-          
-          echo "Found Dockerfile in: $dir_path"
-          echo "Resource name: $resource_name"
-          
-          # Check if we should build this image
-          if [[ "${_BUILD_IMAGES}" == "all" ]] || [[ "${_BUILD_IMAGES}" == *"$resource_name"* ]]; then
-            echo "Building image for $resource_name..."
-            build_and_push_image "$dir_path" "$resource_name" &
+          # Determine the correct path
+          if [[ "$service" == "ui" ]]; then
+            dir_path="src/ui"
           else
-            echo "Skipping $resource_name (not in BUILD_IMAGES list)"
+            dir_path="src/apis/$service_dir"
+          fi
+          
+          # Check if Dockerfile exists and if we should build this image
+          if [[ -f "$dir_path/Dockerfile" ]] && ([[ "${_BUILD_IMAGES}" == "all" ]] || [[ "${_BUILD_IMAGES}" == *"$service"* ]]); then
+            echo "Building image for $service from $dir_path..."
+            build_and_push_image "$dir_path" "$service" &
+            build_pids+=($!)
+          else
+            echo "Skipping $service (Dockerfile not found or not in BUILD_IMAGES list)"
           fi
         done
         
         # Wait for all background builds to complete
-        wait
+        for pid in "${build_pids[@]}"; do
+          wait "$pid"
+        done
         echo "All Docker builds completed"
 
   # Terraform Init
@@ -102,35 +108,36 @@ steps:
           echo "Deploying new revision for service: $service_name"
           echo "Using image: $image_name"
           
-          # Base deploy command
-          local deploy_cmd="gcloud beta run deploy $service_name --image=${_DOCKER_REPO_PATH}/$image_name --region=${_REGION} --project=${_PROJECT_ID} --quiet"
-          
-          # Add IAP flag for UI service
+          # Execute the deployment with conditional IAP flag
           if [[ "$resource_name" == "ui" ]]; then
-            deploy_cmd="$deploy_cmd --iap"
-            echo "Adding --iap flag for UI service"
+            echo "Deploying UI service with IAP enabled"
+            gcloud beta run deploy "$service_name" \
+              --image="${_DOCKER_REPO_PATH}/$image_name" \
+              --region="${_REGION}" \
+              --project="${_PROJECT_ID}" \
+              --iap \
+              --quiet
+          else
+            echo "Deploying API service"
+            gcloud beta run deploy "$service_name" \
+              --image="${_DOCKER_REPO_PATH}/$image_name" \
+              --region="${_REGION}" \
+              --project="${_PROJECT_ID}" \
+              --quiet
           fi
-          
-          # Execute the deployment
-          eval "$deploy_cmd"
           echo "Successfully deployed $service_name"
         }
         
-        # Find all directories with Dockerfiles and deploy new revisions for built images
-        find src -name "Dockerfile" -type f | while read dockerfile; do
-          # Get the directory containing the Dockerfile
-          dir_path=$(dirname "$dockerfile")
-          
-          # Extract the folder name and convert underscores to dashes
-          folder_name=$(basename "$dir_path")
-          resource_name=$(echo "$folder_name" | tr '_' '-')
-          
+        # Deploy revisions for known services that were built
+        declare -a services=("core-case-mgmt" "referral-intake" "ui")
+        
+        for service in "${services[@]}"; do
           # Check if we built this image
-          if [[ "${_BUILD_IMAGES}" == "all" ]] || [[ "${_BUILD_IMAGES}" == *"$resource_name"* ]]; then
-            echo "Deploying new revision for $resource_name..."
-            deploy_revision "$resource_name"
+          if [[ "${_BUILD_IMAGES}" == "all" ]] || [[ "${_BUILD_IMAGES}" == *"$service"* ]]; then
+            echo "Deploying new revision for $service..."
+            deploy_revision "$service"
           else
-            echo "Skipping deployment for $resource_name (image not built)"
+            echo "Skipping deployment for $service (image not built)"
           fi
         done
         

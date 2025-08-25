@@ -50,3 +50,9 @@ variable "ui_service_account_email" {
   type        = string
   default     = null
 }
+
+variable "firestore_database" {
+  description = "The Firestore database name."
+  type        = string
+  default     = "(default)"
+}

@@ -33,8 +33,8 @@ module "core_case_mgmt_api" {
   environment_variables = {
     ENV = var.env
     PROJECT_ID = var.project_id
-    FIRESTORE_DATABASE = "(default)"
-    BIGQUERY_DATASET = "${var.project_base_name}${var.unique_id}_${var.env}_ccwis"
+    FIRESTORE_DATABASE = var.firestore_database
+    BIGQUERY_DATASET = "cw_case_notes"
   }
   
   # Service account roles
@@ -87,7 +87,7 @@ module "referral_intake_api" {
   environment_variables = {
     ENV = var.env
     PROJECT_ID = var.project_id
-    FIRESTORE_DATABASE = "(default)"
+    FIRESTORE_DATABASE = var.firestore_database
     CORE_CASE_MGMT_API_URL = module.core_case_mgmt_api.service_url
   }
   
@@ -108,7 +108,7 @@ module "referral_intake_api" {
 
 # Pub/Sub topic for referral events
 resource "google_pubsub_topic" "referral_events" {
-  name    = "${var.project_base_name}${var.unique_id}-${var.env}-referral-events"
+  name    = "${var.project_base_name}${var.unique_id}-${var.env}-referral-events-topic"
   project = var.project_id
   
   labels = {
@@ -120,7 +120,7 @@ resource "google_pubsub_topic" "referral_events" {
 
 # Pub/Sub subscription for case creation
 resource "google_pubsub_subscription" "case_creation" {
-  name    = "${var.project_base_name}${var.unique_id}-${var.env}-case-creation-sub"
+  name    = "${var.project_base_name}${var.unique_id}-${var.env}-case-creation-subscription"
   topic   = google_pubsub_topic.referral_events.name
   project = var.project_id
   

@@ -18,6 +18,7 @@ export default function CaseDetailPage() {
   const [persons, setPersons] = useState<Person[]>([])
   const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'overview' | 'timeline' | 'persons' | 'documents'>('overview')
 
   useEffect(() => {
@@ -28,13 +29,22 @@ export default function CaseDetailPage() {
 
   const loadCaseData = async () => {
     setLoading(true)
+    setError(null)
     
-    const response = await getCaseById(caseId)
-    
-    if (response.data) {
-      setCaseData(response.data)
-      setPersons(response.data.persons || [])
-      setTimelineEvents(response.data.timeline_events || [])
+    try {
+      const response = await getCaseById(caseId)
+      
+      if (response.error) {
+        setError(response.error)
+      } else if (response.data) {
+        setCaseData(response.data)
+        setPersons(response.data.persons || [])
+        setTimelineEvents(response.data.timeline_events || [])
+      } else {
+        setError('Case not found')
+      }
+    } catch (err) {
+      setError('Failed to load case data')
     }
     
     setLoading(false)
@@ -82,38 +92,62 @@ export default function CaseDetailPage() {
 
   if (loading) {
     return (
-      <div>
-        <header>
-          <h1>Loading Case Details...</h1>
-        </header>
+      <div className="page-container">
+        <div className="page-header">
+          <h1 className="page-title">Loading Case Details...</h1>
+          <p className="page-description">Please wait while we load the case information.</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="page-container">
+        <div className="page-header">
+          <h1 className="page-title">Error Loading Case</h1>
+          <p className="page-description">{error}</p>
+        </div>
+        <div className="content-wrapper">
+          <div className="error-message">
+            <span className="icon">error</span>
+            <p>Unable to load case details. Please try again or contact support if the problem persists.</p>
+          </div>
+          <Link href="/" className="action-btn primary">
+            <span className="icon">arrow_back</span>
+            Back to Dashboard
+          </Link>
+        </div>
       </div>
     )
   }
 
   if (!caseData) {
     return (
-      <div>
-        <header>
-          <h1>Case Not Found</h1>
-          <p>The requested case could not be found.</p>
-        </header>
-        <Link href="/cases" className="action-btn primary">
-          <span className="icon">arrow_back</span>
-          Back to Cases
-        </Link>
+      <div className="page-container">
+        <div className="page-header">
+          <h1 className="page-title">Case Not Found</h1>
+          <p className="page-description">The requested case could not be found.</p>
+        </div>
+        <div className="content-wrapper">
+          <Link href="/" className="action-btn primary">
+            <span className="icon">arrow_back</span>
+            Back to Dashboard
+          </Link>
+        </div>
       </div>
     )
   }
 
   return (
-    <div>
+    <div className="page-container">
       {/* Case Header */}
-      <header style={{ marginBottom: 'var(--unit-6)' }}>
+      <div className="page-header">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--unit-4)' }}>
           <div>
-            <h1>{caseData.primary_child}</h1>
-            <p className="case-number" style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', marginBottom: 'var(--unit-2)' }}>
-              {caseData.case_number}
+            <h1 className="page-title">{caseData.case_display_name || caseData.family_name}</h1>
+            <p className="page-description" style={{ fontSize: '1.1rem', marginBottom: 'var(--unit-2)' }}>
+              {caseData.case_number} • Primary Child: {caseData.primary_child}
             </p>
             <div style={{ display: 'flex', gap: 'var(--unit-2)', marginBottom: 'var(--unit-2)' }}>
               <span className={`badge ${getPriorityColor(caseData.priority_level)}`}>
@@ -125,9 +159,9 @@ export default function CaseDetailPage() {
             </div>
           </div>
           <div style={{ display: 'flex', gap: 'var(--unit-2)' }}>
-            <Link href="/cases" className="action-btn secondary">
+            <Link href="/" className="action-btn secondary">
               <span className="icon">arrow_back</span>
-              Back to Cases
+              Back to Dashboard
             </Link>
             <button className="action-btn primary">
               <span className="icon">edit</span>
@@ -166,7 +200,7 @@ export default function CaseDetailPage() {
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Tab Navigation */}
       <div className="tab-navigation" style={{ marginBottom: 'var(--unit-6)' }}>

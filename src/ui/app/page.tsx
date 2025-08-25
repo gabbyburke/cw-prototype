@@ -2,14 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Case, getCasesByWorker } from '../lib/api'
+import { Case, getCasesByWorker, updateCase } from '../lib/api'
 import { getCurrentUser } from '../lib/mockData'
+import AddCaseNoteModal from '../components/AddCaseNoteModal'
 
 export default function SWCMDashboard() {
   const [cases, setCases] = useState<Case[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [filter, setFilter] = useState<'active' | 'pending-transfer' | 'recently-closed'>('active')
+  const [filter, setFilter] = useState<'active' | 'case-setup' | 'recently-closed'>('active')
+  const [isAddNoteModalOpen, setIsAddNoteModalOpen] = useState(false)
+  const [editingCase, setEditingCase] = useState<string | null>(null)
+  const [editValues, setEditValues] = useState<{[key: string]: any}>({})
 
   useEffect(() => {
     loadCases()
@@ -19,8 +23,8 @@ export default function SWCMDashboard() {
     setLoading(true)
     setError(null)
     
-    const currentUser = getCurrentUser()
-    const response = await getCasesByWorker(currentUser.name)
+    // For demo: show unassigned cases since no workers are assigned yet in the workflow
+    const response = await getCasesByWorker('unassigned')
     
     if (response.error) {
       setError(response.error)
@@ -31,9 +35,46 @@ export default function SWCMDashboard() {
     setLoading(false)
   }
 
+  const handleAddNoteSuccess = () => {
+    // Optionally reload cases to show updated data
+    loadCases()
+  }
+
+  const handleEditCase = (caseId: string, field: string, currentValue: any) => {
+    setEditingCase(caseId)
+    setEditValues({ [field]: currentValue })
+  }
+
+  const handleSaveEdit = async (caseId: string) => {
+    try {
+      const response = await updateCase(caseId, editValues)
+      if (response.error) {
+        setError(response.error)
+      } else {
+        // Update local state
+        setCases(prevCases => 
+          prevCases.map(case_ => 
+            case_.case_id === caseId 
+              ? { ...case_, ...editValues }
+              : case_
+          )
+        )
+        setEditingCase(null)
+        setEditValues({})
+      }
+    } catch (err) {
+      setError('Failed to update case')
+    }
+  }
+
+  const handleCancelEdit = () => {
+    setEditingCase(null)
+    setEditValues({})
+  }
+
   const filteredCases = cases.filter(case_ => {
     if (filter === 'active') return case_.status === 'Active'
-    if (filter === 'pending-transfer') return case_.status === 'Pending Assignment'
+    if (filter === 'case-setup') return case_.status === 'Case Setup'
     if (filter === 'recently-closed') return case_.status === 'Closed'
     return true
   })
@@ -107,7 +148,10 @@ export default function SWCMDashboard() {
         <div className="quick-access-section">
           <h3>Quick Actions</h3>
           <div className="quick-actions-grid">
-            <button className="quick-action-btn primary">
+            <button 
+              className="quick-action-btn primary"
+              onClick={() => setIsAddNoteModalOpen(true)}
+            >
               <span className="icon">note_add</span>
               <div className="action-content">
                 <span className="action-title">Add Case Note</span>
@@ -189,11 +233,11 @@ export default function SWCMDashboard() {
               Active Cases ({cases.filter(c => c.status === 'Active').length})
             </button>
             <button 
-              className={`tab ${filter === 'pending-transfer' ? 'active' : ''}`}
-              onClick={() => setFilter('pending-transfer')}
+              className={`tab ${filter === 'case-setup' ? 'active' : ''}`}
+              onClick={() => setFilter('case-setup')}
             >
-              <span className="icon">swap_horiz</span>
-              Pending Transfer ({cases.filter(c => c.status === 'Pending Assignment').length})
+              <span className="icon">settings</span>
+              Case Setup ({cases.filter(c => c.status === 'Case Setup').length})
             </button>
             <button 
               className={`tab ${filter === 'recently-closed' ? 'active' : ''}`}
@@ -210,7 +254,7 @@ export default function SWCMDashboard() {
           <div className="card-header">
             <h2>
               {filter === 'active' && 'Active Cases'}
-              {filter === 'pending-transfer' && 'Cases Pending Transfer'}
+              {filter === 'case-setup' && 'Case Setup'}
               {filter === 'recently-closed' && 'Recently Closed Cases'}
             </h2>
             <div className="card-actions">
@@ -244,9 +288,44 @@ export default function SWCMDashboard() {
                       <tr key={case_.case_id}>
                         <td>
                           <div className="case-name-cell">
-                            <Link href={`/cases/${case_.case_id}`} className="case-link">
-                              <strong>{case_.family_name}</strong>
-                            </Link>
+                            {editingCase === case_.case_id ? (
+                              <div className="edit-field">
+                                <input
+                                  type="text"
+                                  value={editValues.case_display_name || ''}
+                                  onChange={(e) => setEditValues({...editValues, case_display_name: e.target.value})}
+                                  className="edit-input"
+                                  autoFocus
+                                />
+                                <div className="edit-actions">
+                                  <button 
+                                    onClick={() => handleSaveEdit(case_.case_id)}
+                                    className="action-btn small primary"
+                                  >
+                                    <span className="icon">check</span>
+                                  </button>
+                                  <button 
+                                    onClick={handleCancelEdit}
+                                    className="action-btn small secondary"
+                                  >
+                                    <span className="icon">close</span>
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="case-name-display">
+                                <Link href={`/cases/${case_.case_id}`} className="case-link">
+                                  <strong>{case_.case_display_name || case_.family_name}</strong>
+                                </Link>
+                                <button 
+                                  onClick={() => handleEditCase(case_.case_id, 'case_display_name', case_.case_display_name || case_.family_name)}
+                                  className="edit-btn"
+                                  title="Edit case name"
+                                >
+                                  <span className="icon">edit</span>
+                                </button>
+                              </div>
+                            )}
                             <div className="case-number">{case_.case_number}</div>
                           </div>
                         </td>
@@ -299,7 +378,10 @@ export default function SWCMDashboard() {
                               <span className="icon">visibility</span>
                               View
                             </Link>
-                            <button className="action-btn small secondary">
+                            <button 
+                              className="action-btn small secondary"
+                              onClick={() => setIsAddNoteModalOpen(true)}
+                            >
                               <span className="icon">note_add</span>
                               Note
                             </button>
@@ -316,7 +398,7 @@ export default function SWCMDashboard() {
                 <h3>No Cases Found</h3>
                 <p>
                   {filter === 'active' && 'No active cases are currently assigned to you.'}
-                  {filter === 'pending-transfer' && 'No cases are pending transfer.'}
+                  {filter === 'case-setup' && 'No cases require setup at this time.'}
                   {filter === 'recently-closed' && 'No cases have been recently closed.'}
                 </p>
               </div>
@@ -324,6 +406,13 @@ export default function SWCMDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Add Case Note Modal */}
+      <AddCaseNoteModal
+        isOpen={isAddNoteModalOpen}
+        onClose={() => setIsAddNoteModalOpen(false)}
+        onSuccess={handleAddNoteSuccess}
+      />
     </div>
   )
 }
