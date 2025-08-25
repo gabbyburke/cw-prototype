@@ -3,7 +3,10 @@
 # Child Welfare Prototype - Firebase Deployment Script
 # This script builds and deploys the prototype with cache-busting
 
-echo "🔨 Building Next.js application..."
+echo "🔨 Building Next.js application with cache busting..."
+# Add timestamp to force cache invalidation
+export BUILD_ID=$(date +%s)
+echo "Build ID: $BUILD_ID"
 npm run build
 
 if [ $? -eq 0 ]; then
