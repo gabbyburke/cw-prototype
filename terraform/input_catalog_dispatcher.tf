@@ -15,7 +15,7 @@
 data "archive_file" "input_catalog_dispatcher_tarball" {
   type        = "tar.gz"
   output_path = "${path.module}/input_catalog_dispatcher.tar.gz"
-  source_dir  = "${path.module}/dispatcher"
+  source_dir  = "../src/dispatcher"
 }
 
 locals {

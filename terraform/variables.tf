@@ -34,16 +34,6 @@ variable "common_labels" {
   description = "Map of generic labels to assign to all resources that accept labels."
 }
 
-variable "lightcast_client_id" {
-  type        = string
-  description = "Lightcast client ID."
-}
-
-variable "lightcast_client_secret" {
-  type        = string
-  description = "Lightcast client secret."
-}
-
 variable "add_random_suffix" {
   type        = bool
   default     = false

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 locals {
-  schema_dir   = "${path.module}/src/scripts/bq_schemas"
+  schema_dir   = "${path.module}/../src/scripts/bq_schemas"
   schema_files = fileset(local.schema_dir, "*.json")
   table_schemas = {
     for file_name in local.schema_files :
