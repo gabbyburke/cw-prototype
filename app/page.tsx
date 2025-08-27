@@ -138,9 +138,21 @@ export default function SWCMDashboard() {
 
   return (
     <div className="page-container">
-      <div className="page-header">
-        <h1 className="page-title">SWCM Dashboard</h1>
-        <p className="page-description">Manage your assigned child welfare cases</p>
+      <div className="page-header modern-header">
+        <h1 className="greeting-title">Hi Olivia! What can I help you with today?</h1>
+        <div className="search-container">
+          <div className="search-bar">
+            <span className="search-icon icon">search</span>
+            <input 
+              type="text" 
+              className="search-input" 
+              placeholder="Ask me anything about your cases, or search for specific information..."
+            />
+            <button className="search-submit">
+              <span className="icon">send</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="content-wrapper">

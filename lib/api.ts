@@ -34,6 +34,8 @@ export interface Case {
   }
   risk_level?: string
   safety_factors?: string[]
+  safety_assessment_due?: string
+  assessment_notes?: string
   persons?: Person[]
   timeline_events?: TimelineEvent[]
   case_notes?: CaseNote[]
@@ -192,6 +194,11 @@ class ApiClient {
     return this.request<{ persons: Person[] }>(`/persons/search?q=${encodeURIComponent(query)}`)
   }
 
+  // Get person by ID
+  async getPersonById(personId: string): Promise<ApiResponse<Person>> {
+    return this.request<Person>(`/persons/${personId}`)
+  }
+
   // Health check
   async healthCheck(): Promise<ApiResponse<{ status: string; service: string }>> {
     return this.request<{ status: string; service: string }>('/health')
@@ -214,4 +221,5 @@ export const addCaseNote = (caseId: string, noteText: string, noteType?: string)
 export const updateCase = (caseId: string, updates: Partial<Case>) => 
   apiClient.updateCase(caseId, updates)
 export const searchPersons = (query: string) => apiClient.searchPersons(query)
+export const getPersonById = (personId: string) => apiClient.getPersonById(personId)
 export const healthCheck = () => apiClient.healthCheck()

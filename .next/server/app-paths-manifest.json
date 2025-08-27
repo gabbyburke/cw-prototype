@@ -1,0 +1,7 @@
+{
+  "/page": "app/page.js",
+  "/cpw/page": "app/cpw/page.js",
+  "/cpw-supervisor/page": "app/cpw-supervisor/page.js",
+  "/cases/[caseId]/page": "app/cases/[caseId]/page.js",
+  "/swcm-supervisor/page": "app/swcm-supervisor/page.js"
+}

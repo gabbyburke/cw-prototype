@@ -26,8 +26,9 @@ interface SavedSetupData {
     description: string
   }
   assessments: {
-    risk_level: 'Low' | 'Medium' | 'High'
+    risk_level: 'Low' | 'Medium' | 'High' | 'Very High'
     safety_factors: string[]
+    assessment_notes: string
     risk_confirmed: boolean
     safety_confirmed: boolean
   }
@@ -67,11 +68,31 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
   
   // Step 3: Assessments
   const [assessments, setAssessments] = useState({
-    risk_level: 'Medium' as 'Low' | 'Medium' | 'High',
+    risk_level: 'Medium' as 'Low' | 'Medium' | 'High' | 'Very High',
     safety_factors: [] as string[],
+    assessment_notes: '',
     risk_confirmed: false,
     safety_confirmed: false
   })
+  
+  // Common safety factors for quick selection
+  const commonSafetyFactors = [
+    'Physical injury to child',
+    'Sexual abuse allegation',
+    'Domestic violence',
+    'Substance abuse concerns',
+    'Inadequate supervision',
+    'Unsafe living conditions',
+    'Mental health concerns',
+    'Medical neglect',
+    'Educational neglect',
+    'Child disclosure',
+    'Perpetrator has access',
+    'Young child age',
+    'Chronic health conditions'
+  ]
+  
+  const [newSafetyFactor, setNewSafetyFactor] = useState('')
   
   // Step 4: Final confirmation
   const [finalConfirmation, setFinalConfirmation] = useState({
@@ -164,8 +185,9 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
           description: case_.allegation_description || ''
         })
         setAssessments({
-          risk_level: (case_.risk_level as 'Low' | 'Medium' | 'High') || 'Medium',
+          risk_level: (case_.risk_level as 'Low' | 'Medium' | 'High' | 'Very High') || 'Medium',
           safety_factors: case_.safety_factors || [],
+          assessment_notes: case_.assessment_notes || '',
           risk_confirmed: false,
           safety_confirmed: false
         })
@@ -179,11 +201,11 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
     }
   }, [isOpen, case_])
 
-  // Auto-save progress when data changes
+  // Auto-save progress when data changes (but only save to localStorage, not to API)
   useEffect(() => {
     if (isOpen && case_) {
       const timeoutId = setTimeout(() => {
-        saveProgress()
+        saveProgress() // This only saves to localStorage, not to the API
       }, 1000) // Auto-save after 1 second of inactivity
 
       return () => clearTimeout(timeoutId)
@@ -306,6 +328,9 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
       const updates = {
         allegation_type: allegations.type,
         allegation_description: allegations.description,
+        risk_level: assessments.risk_level,
+        safety_factors: assessments.safety_factors,
+        assessment_notes: assessments.assessment_notes,
         status: 'Pending Assignment'
       }
 
@@ -328,9 +353,15 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
 
   if (!isOpen || !case_) return null
 
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose()
+    }
+  }
+
   return (
-    <div className="modal-overlay">
-      <div className="modal-container large">
+    <div className="modal-overlay" onClick={handleOverlayClick}>
+      <div className="modal-container large scrollable">
         <div className="modal-header">
           <h2>CPW Case Setup - {case_.case_display_name || `Case ${case_.case_id}`}</h2>
           <button onClick={onClose} className="modal-close">
@@ -338,25 +369,27 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
           </button>
         </div>
 
-        {/* Progress Steps */}
-        <div className="setup-progress">
-          {steps.map((step) => (
-            <div 
-              key={step.id} 
-              className={`progress-step ${currentStep === step.id ? 'active' : ''} ${step.completed ? 'completed' : ''}`}
-            >
-              <div className="step-number">
-                {step.completed ? <span className="icon">check</span> : step.id}
+        <div className="modal-body">
+          {/* Progress Steps */}
+          <div className="setup-progress">
+            {steps.map((step) => (
+              <div 
+                key={step.id} 
+                className={`progress-step ${currentStep === step.id ? 'active' : ''} ${step.completed ? 'completed' : ''} clickable`}
+                onClick={() => setCurrentStep(step.id)}
+              >
+                <div className="step-number">
+                  {step.completed ? <span className="icon">check</span> : step.id}
+                </div>
+                <div className="step-info">
+                  <h4>{step.title}</h4>
+                  <p>{step.description}</p>
+                </div>
               </div>
-              <div className="step-info">
-                <h4>{step.title}</h4>
-                <p>{step.description}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        <div className="modal-content">
+          <div className="modal-content">
           {error && (
             <div className="error-message">
               <span className="icon">error</span>
@@ -623,6 +656,15 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
               <h3>Step 3: Confirm Risk and Safety Assessments</h3>
               <p>Review the risk and safety assessments for this case.</p>
               
+              {/* Safety Assessment Due Date */}
+              {case_?.safety_assessment_due && (
+                <div className="assessment-due-notice">
+                  <span className="icon">schedule</span>
+                  <strong>Safety Assessment Due: </strong>
+                  {new Date(case_.safety_assessment_due).toLocaleDateString()} at {new Date(case_.safety_assessment_due).toLocaleTimeString()}
+                </div>
+              )}
+              
               <div className="assessment-section">
                 <h4>Risk Assessment</h4>
                 <div className="form-group">
@@ -634,6 +676,7 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
                     <option value="Low">Low Risk</option>
                     <option value="Medium">Medium Risk</option>
                     <option value="High">High Risk</option>
+                    <option value="Very High">Very High Risk</option>
                   </select>
                 </div>
                 <div className="form-group">
@@ -650,6 +693,76 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
 
               <div className="assessment-section">
                 <h4>Safety Assessment</h4>
+                
+                <div className="form-group">
+                  <label>Safety Factors</label>
+                  <div className="safety-factors-list">
+                    {assessments.safety_factors.map((factor, index) => (
+                      <div key={index} className="safety-factor-item">
+                        <span>{factor}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newFactors = assessments.safety_factors.filter((_, i) => i !== index)
+                            setAssessments({...assessments, safety_factors: newFactors})
+                          }}
+                          className="remove-factor-btn"
+                        >
+                          <span className="icon">close</span>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="add-safety-factor">
+                    <select
+                      value=""
+                      onChange={(e) => {
+                        if (e.target.value && !assessments.safety_factors.includes(e.target.value)) {
+                          setAssessments({
+                            ...assessments, 
+                            safety_factors: [...assessments.safety_factors, e.target.value]
+                          })
+                        }
+                      }}
+                    >
+                      <option value="">Select a common safety factor...</option>
+                      {commonSafetyFactors
+                        .filter(factor => !assessments.safety_factors.includes(factor))
+                        .map(factor => (
+                          <option key={factor} value={factor}>{factor}</option>
+                        ))
+                      }
+                    </select>
+                    
+                    <div className="custom-factor-input">
+                      <input
+                        type="text"
+                        value={newSafetyFactor}
+                        onChange={(e) => setNewSafetyFactor(e.target.value)}
+                        placeholder="Or add a custom safety factor..."
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (newSafetyFactor.trim() && !assessments.safety_factors.includes(newSafetyFactor.trim())) {
+                            setAssessments({
+                              ...assessments, 
+                              safety_factors: [...assessments.safety_factors, newSafetyFactor.trim()]
+                            })
+                            setNewSafetyFactor('')
+                          }
+                        }}
+                        className="action-btn small primary"
+                        disabled={!newSafetyFactor.trim()}
+                      >
+                        <span className="icon">add</span>
+                        Add
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
                 <div className="form-group">
                   <label>
                     <input
@@ -659,6 +772,19 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
                     />
                     I confirm the safety assessment is accurate and complete
                   </label>
+                </div>
+              </div>
+
+              <div className="assessment-section">
+                <h4>Assessment Notes</h4>
+                <div className="form-group">
+                  <label>Additional Assessment Notes (Optional)</label>
+                  <textarea
+                    value={assessments.assessment_notes}
+                    onChange={(e) => setAssessments({...assessments, assessment_notes: e.target.value})}
+                    placeholder="Provide any additional notes about the risk and safety assessment..."
+                    rows={3}
+                  />
                 </div>
               </div>
             </div>
@@ -708,6 +834,7 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
               </div>
             </div>
           )}
+          </div>
         </div>
 
         <div className="modal-footer">
@@ -732,7 +859,6 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
               <button 
                 onClick={handleNextStep} 
                 className="action-btn primary"
-                disabled={!steps[currentStep - 1].completed}
               >
                 Next
                 <span className="icon">arrow_forward</span>

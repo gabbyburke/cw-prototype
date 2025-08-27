@@ -61,11 +61,18 @@ export default function CPWPage() {
   }
 
   const getChildrenNames = (case_: Case) => {
-    if (!case_.persons) return ''
-    return case_.persons
-      .filter(person => person.role === 'child')
-      .map(child => `${child.first_name} ${child.last_name}`)
-      .join(', ')
+    if (!case_.persons) return null
+    const children = case_.persons.filter(person => person.role === 'Client')
+    if (children.length === 0) return null
+    
+    return children.map((child, index) => (
+      <span key={child.person_id}>
+        <Link href={`/persons/${child.person_id}`} className="child-link">
+          {child.first_name} {child.last_name}
+        </Link>
+        {index < children.length - 1 && ', '}
+      </span>
+    ))
   }
 
   const getAllIndicators = (case_: Case) => {
@@ -126,9 +133,21 @@ export default function CPWPage() {
 
   return (
     <div className="page-container">
-      <div className="page-header">
-        <h1 className="page-title">CPW Dashboard</h1>
-        <p className="page-description">Review and process cases requiring CPW attention</p>
+      <div className="page-header modern-header">
+        <h1 className="greeting-title">Hi Dana! What can I help you with today?</h1>
+        <div className="search-container">
+          <div className="search-bar">
+            <span className="search-icon icon">search</span>
+            <input 
+              type="text" 
+              className="search-input" 
+              placeholder="Ask me anything about your cases, or search for specific information..."
+            />
+            <button className="search-submit">
+              <span className="icon">send</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="content-wrapper">
@@ -258,10 +277,6 @@ export default function CPWPage() {
                                 >
                                   <span className="icon">{hasSavedProgress(case_.case_id) ? 'play_arrow' : 'settings'}</span>
                                   {hasSavedProgress(case_.case_id) ? 'Resume' : 'Setup'}
-                                </button>
-                                <button className="action-btn small secondary">
-                                  <span className="icon">assignment</span>
-                                  Assign
                                 </button>
                               </div>
                             </td>

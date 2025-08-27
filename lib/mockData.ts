@@ -91,6 +91,7 @@ export interface Case {
   intake_worker?: string
   risk_level?: 'Low' | 'Moderate' | 'High' | 'Very High'
   safety_factors?: string[]
+  assessment_notes?: string
 }
 
 export interface User {
