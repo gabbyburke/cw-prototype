@@ -22,6 +22,12 @@ locals {
       "terraform-module" = "network"
     }
   )
+  firewall_rules = var.disable_default_firewall_rules ? toset([
+    "rdp",
+    "ssh",
+    "icmp",
+    "internal",
+  ]) : toset([])
 }
 
 data "google_client_config" "current" {}
@@ -101,12 +107,7 @@ resource "google_compute_router_nat" "nat" {
 }
 
 module "default_firewall" {
-  for_each = var.disable_default_firewall_rules ? toset([
-    "rdp",
-    "ssh",
-    "icmp",
-    "internal",
-  ]) : toset([])
+  for_each = local.firewall_rules
   source  = "terraform-google-modules/gcloud/google"
   version = "~> 3.4"
 
