@@ -13,7 +13,7 @@
 # limitations under the License.
 
 module "network" {
-  source                         = "./modules/network"
+  source                         = "../modules/network"
   prefix                         = local.prefix
   enable_cloud_nat               = true
   disable_default_firewall_rules = true
