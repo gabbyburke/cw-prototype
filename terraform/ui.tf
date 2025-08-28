@@ -63,7 +63,7 @@ resource "google_project_iam_member" "ui_runtime_sa" {
     "roles/logging.logWriter",
     "roles/monitoring.metricWriter",
   ])
-  project = data.google_project.current.project_id
+  project = google_project.this.project_id
   role    = each.value
   member  = google_service_account.ui_runtime_sa.member
 }
@@ -163,7 +163,7 @@ resource "google_cloud_run_v2_service" "ui" {
         for_each = {
           NEXT_PUBLIC_FIREBASE_API_KEY             = data.google_firebase_web_app_config.ccwis_case_management.api_key
           NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN         = data.google_firebase_web_app_config.ccwis_case_management.auth_domain
-          NEXT_PUBLIC_FIREBASE_PROJECT_ID          = data.google_project.current.project_id
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID          = google_project.this.project_id
           NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET      = google_firebase_storage_bucket.ccwis_case_management.bucket_id
           NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID = data.google_firebase_web_app_config.ccwis_case_management.messaging_sender_id
           NEXT_PUBLIC_FIREBASE_APP_ID              = data.google_firebase_web_app_config.ccwis_case_management.web_app_id

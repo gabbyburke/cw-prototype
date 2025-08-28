@@ -14,5 +14,5 @@
 
 # import {
 #     to = google_firebaserules_release.firestore
-#     id = "projects/${data.google_project.current.project_id}/releases/cloud.firestore"
+#     id = "projects/${google_project.this.project_id}/releases/cloud.firestore"
 # }

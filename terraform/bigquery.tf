@@ -40,7 +40,7 @@ module "bigquery" {
   source     = "terraform-google-modules/bigquery/google"
   version    = "10.1.1"
   dataset_id = var.add_random_suffix ? "${each.key}_${random_string.suffix.result}" : each.key
-  project_id = data.google_project.current.project_id
+  project_id = google_project.this.project_id
 
   tables = [
     for table_name, table_config in each.value.tables : {
@@ -75,7 +75,7 @@ module "bigquery" {
 
 resource "google_bigquery_connection" "this" {
   connection_id = "models"
-  project       = data.google_project.current.project_id
+  project       = google_project.this.project_id
   location      = module.bigquery["cw_case_notes"].bigquery_dataset.location
   cloud_resource {}
 }
@@ -84,7 +84,7 @@ resource "google_project_iam_member" "vertex_ai_user" {
   for_each = toset([
     "roles/aiplatform.user",
   ])
-  project = data.google_project.current.project_id
+  project = google_project.this.project_id
   role    = each.value
   member  = "serviceAccount:${google_bigquery_connection.this.cloud_resource[0].service_account_id}"
 }

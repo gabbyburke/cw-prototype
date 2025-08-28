@@ -23,7 +23,7 @@ resource "google_project_iam_member" "cloud_build_deployer" {
   for_each = toset([
     "roles/cloudbuild.builds.builder",
   ])
-  project = data.google_project.current.project_id
+  project = google_project.this.project_id
   role    = each.value
   member  = google_service_account.cloud_build_deployer.member
 }
@@ -45,7 +45,7 @@ data "google_compute_default_service_account" "default" {}
 
 resource "google_project_iam_member_remove" "default_compute_service_account" {
   role    = "roles/editor"
-  project = data.google_project.current.project_id
+  project = google_project.this.project_id
   member  = data.google_compute_default_service_account.default.member
 }
 
@@ -62,9 +62,9 @@ resource "google_project_iam_member" "cloudbuild_service_agent_role" {
     "roles/cloudbuild.serviceAgent",
     "roles/pubsub.subscriber",
   ])
-  project = data.google_project.current.project_id
+  project = google_project.this.project_id
   role    = each.value
-  member  = "serviceAccount:service-${data.google_project.current.number}@gcp-sa-cloudbuild.iam.gserviceaccount.com"
+  member  = "serviceAccount:service-${google_project.this.number}@gcp-sa-cloudbuild.iam.gserviceaccount.com"
   depends_on = [
     google_project_service.services["cloudbuild.googleapis.com"]
   ]

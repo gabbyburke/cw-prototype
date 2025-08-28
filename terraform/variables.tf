@@ -23,6 +23,11 @@ variable "project_id" {
   description = "Project where the environment will be created."
 }
 
+variable "deployment_project_id" {
+  type        = string
+  description = "Project where the terraform is being deployed from."
+}
+
 variable "environment" {
   type        = string
   description = "Environment where resources will be created (e.g. dev/uat/prod). This is also used as a prefix for resource names."

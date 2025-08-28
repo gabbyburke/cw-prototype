@@ -42,7 +42,7 @@ locals {
     "/",
     [
       "${google_artifact_registry_repository.docker.location}-docker.pkg.dev",
-      data.google_project.current.project_id,
+      google_project.this.project_id,
       google_artifact_registry_repository.docker.repository_id,
     ]
   )
