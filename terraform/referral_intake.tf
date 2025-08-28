@@ -46,6 +46,12 @@ resource "google_pubsub_topic" "referral_intake_source_upload" {
   name = "referral-intake-source-upload${local.random_suffix}"
 }
 
+resource "google_pubsub_topic_iam_member" "referral_intake_gcs_pubsub_publisher" {
+  topic  = google_pubsub_topic.referral_intake_source_upload.name
+  role   = "roles/pubsub.publisher"
+  member = data.google_storage_project_service_account.gcs_service_account.member
+}
+
 resource "google_service_account_iam_member" "referral_intake_sa_user" {
   service_account_id = google_service_account.referral_intake_runtime_sa.name
   role               = "roles/iam.serviceAccountUser"

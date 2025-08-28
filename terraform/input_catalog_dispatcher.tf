@@ -93,6 +93,12 @@ resource "google_pubsub_topic" "input_catalog_dispatcher_source_upload" {
   name = "input-catalog-dispatcher-source-upload${local.random_suffix}"
 }
 
+resource "google_pubsub_topic_iam_member" "input_catalog_dispatcher_gcs_pubsub_publisher" {
+  topic  = google_pubsub_topic.input_catalog_dispatcher_source_upload.name
+  role   = "roles/pubsub.publisher"
+  member = data.google_storage_project_service_account.gcs_service_account.member
+}
+
 locals {
   # Use first 12 characters of source hash as tag - only changes when source changes
   input_catalog_dispatcher_computed_image_tag = substr(data.archive_file.input_catalog_dispatcher_tarball.output_sha256, 0, 12)
