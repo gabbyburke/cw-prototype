@@ -234,6 +234,7 @@ dist
 .terraform.lock.hcl
 *.tfplan
 *.tfvars
+**/backend.hcl
 
 # IDE
 .vscode/
