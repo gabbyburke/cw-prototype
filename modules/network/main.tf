@@ -1,78 +1,206 @@
-# Local values for resource naming
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 locals {
-  vpc_name = "${var.project_base_name}${var.unique_id}-${var.env}-vpc"
-  subnet_name = "${var.project_base_name}${var.unique_id}-${var.env}-net"
-  vpc_connector_name = "${var.project_base_name}${var.unique_id}-${var.env}-vpccon"
+  # add hyphen to prefix and suffix if not already present
+  prefix = can(regex("^.*-$|^$", var.prefix)) ? var.prefix : "${var.prefix}-"
+  suffix = can(regex("^-.*$|^$", var.suffix)) ? var.suffix : "-${var.suffix}"
+  labels = merge(
+    var.labels,
+    {
+      "terraform-module" = "network"
+    }
+  )
 }
 
-# VPC Network
-resource "google_compute_network" "vpc" {
-  name                    = local.vpc_name
-  auto_create_subnetworks = false
-  project                 = var.project_id
+data "google_project" "current" {}
+
+data "google_client_config" "current" {}
+
+resource "google_compute_network" "this" {
+  name                            = var.network_name == null ? "${local.prefix}main${local.suffix}" : var.network_name
+  auto_create_subnetworks         = false
+  delete_default_routes_on_create = false
 }
 
-# Subnet
-resource "google_compute_subnetwork" "subnet" {
-  name          = local.subnet_name
-  ip_cidr_range = "10.0.0.0/24"
-  region        = var.region
-  network       = google_compute_network.vpc.id
-  project       = var.project_id
-  
-  # Enable private Google access for serverless services
+resource "google_compute_subnetwork" "subnets" {
+  count                    = var.subnetwork_cidr == null ? 0 : 1
+  name                     = "${local.prefix}subnetwork${local.suffix}"
+  ip_cidr_range            = var.subnetwork_cidr
+  region                   = data.google_client_config.current.region
+  network                  = google_compute_network.this.id
   private_ip_google_access = true
+
+  dynamic "secondary_ip_range" {
+    for_each = var.secondary_subnets
+    content {
+      range_name    = secondary_ip_range.key
+      ip_cidr_range = secondary_ip_range.value
+    }
+  }
+  log_config {
+    aggregation_interval = "INTERVAL_10_MIN"
+    flow_sampling        = 0.5
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
 }
 
-# Serverless VPC Access Connector
-resource "google_vpc_access_connector" "connector" {
-  name          = local.vpc_connector_name
-  project       = var.project_id
-  region        = var.region
-  ip_cidr_range = "10.0.1.0/28"
-  network       = google_compute_network.vpc.name
-  
-  depends_on = [google_compute_network.vpc]
-}
-
-# Firewall rule to allow internal communication
-resource "google_compute_firewall" "allow_internal" {
-  name    = "${local.vpc_name}-allow-internal"
-  network = google_compute_network.vpc.name
-  project = var.project_id
-
-  allow {
-    protocol = "tcp"
-    ports    = ["0-65535"]
-  }
-
-  allow {
-    protocol = "udp"
-    ports    = ["0-65535"]
-  }
-
-  allow {
-    protocol = "icmp"
-  }
-
-  source_ranges = ["10.0.0.0/16"]
-}
-
-# Firewall rule to allow health checks
-resource "google_compute_firewall" "allow_health_checks" {
-  name    = "${local.vpc_name}-allow-health-checks"
-  network = google_compute_network.vpc.name
-  project = var.project_id
-
-  allow {
-    protocol = "tcp"
-    ports    = ["8080", "8443"]
-  }
-
-  source_ranges = [
-    "130.211.0.0/22",
-    "35.191.0.0/16"
+resource "time_sleep" "wait_x_seconds" {
+  count = var.subnetwork_cidr == null ? 0 : 1
+  depends_on = [
+    google_compute_subnetwork.subnets[0],
   ]
-  
-  target_tags = ["health-check"]
+  create_duration = "60s"
+}
+
+resource "google_dns_policy" "this" {
+  name                      = "${google_compute_network.this.name}-policy"
+  enable_inbound_forwarding = true
+  enable_logging            = true
+  networks {
+    network_url = google_compute_network.this.id
+  }
+}
+
+resource "google_compute_router" "router" {
+  count   = var.enable_cloud_nat ? 1 : 0
+  name    = "${local.prefix}router${local.suffix}"
+  region  = data.google_client_config.current.region
+  network = google_compute_network.this.id
+}
+
+resource "google_compute_address" "nat" {
+  count        = var.enable_cloud_nat ? 1 : 0
+  name         = "${local.prefix}nat-ip${local.suffix}"
+  address_type = "EXTERNAL"
+  region       = data.google_client_config.current.region
+  labels       = local.labels
+}
+
+resource "google_compute_router_nat" "nat" {
+  count                              = var.enable_cloud_nat ? 1 : 0
+  name                               = "${local.prefix}router-nat${local.suffix}"
+  router                             = google_compute_router.router[0].name
+  region                             = google_compute_router.router[0].region
+  nat_ip_allocate_option             = "MANUAL_ONLY"
+  nat_ips                            = [google_compute_address.nat[0].self_link]
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+  log_config {
+    enable = true
+    filter = "ERRORS_ONLY"
+  }
+}
+
+module "default_firewall" {
+  for_each = var.disable_default_firewall_rules ? toset([
+    "rdp",
+    "ssh",
+    "icmp",
+    "internal",
+  ]) : toset([])
+  source  = "terraform-google-modules/gcloud/google"
+  version = "~> 3.4"
+
+  platform = "linux"
+
+  create_cmd_entrypoint  = "gcloud"
+  create_cmd_body        = "compute firewall-rules update default-allow-${each.key} --enable-logging --disabled --quiet || true"
+  destroy_cmd_entrypoint = "gcloud"
+  destroy_cmd_body       = "compute firewall-rules update default-allow-${each.key} --enable-logging --no-disabled --quiet || true"
+}
+
+resource "google_project_iam_audit_config" "all_services" {
+  count   = var.enable_all_services_audit_logs ? 1 : 0
+  project = data.google_project.current.project_id
+  service = "allServices"
+  audit_log_config {
+    log_type = "ADMIN_READ"
+  }
+  audit_log_config {
+    log_type = "DATA_READ"
+  }
+  audit_log_config {
+    log_type = "DATA_WRITE"
+  }
+}
+
+resource "google_logging_project_bucket_config" "default" {
+  count            = var.enable_all_services_audit_logs ? 1 : 0
+  project          = data.google_project.current.project_id
+  location         = "global"
+  retention_days   = 365
+  enable_analytics = true
+  bucket_id        = "_Default"
+}
+
+resource "random_string" "random" {
+  length  = 6
+  special = false
+  upper   = false
+}
+
+resource "google_storage_bucket" "logs" {
+  name                        = "${local.prefix}bucket-access-logs-${random_string.random.result}"
+  location                    = "US"
+  storage_class               = var.logs_storage_class
+  force_destroy               = var.force_destroy_logs_buckets
+  uniform_bucket_level_access = true
+}
+
+# https://cloud.google.com/storage/docs/access-logs
+resource "google_storage_bucket_iam_binding" "logs" {
+  bucket  = google_storage_bucket.logs.name
+  role    = "roles/storage.objectCreator"
+  members = ["group:cloud-storage-analytics@google.com"]
+}
+
+resource "google_storage_bucket" "logs_archive" {
+  name                        = "${local.prefix}logs-archive-${random_string.random.result}"
+  location                    = "US"
+  storage_class               = var.logs_storage_class
+  public_access_prevention    = "enforced"
+  force_destroy               = var.force_destroy_logs_buckets
+  uniform_bucket_level_access = true
+  labels                      = local.labels
+  logging {
+    log_bucket        = google_storage_bucket.logs.name
+    log_object_prefix = "${local.prefix}logs-archive/"
+  }
+  retention_policy {
+    retention_period = var.log_retention_seconds
+    is_locked        = var.log_retention_policy_locked
+  }
+}
+
+resource "google_logging_project_bucket_config" "gcs" {
+  count            = var.enable_all_services_audit_logs ? 1 : 0
+  project          = data.google_project.current.project_id
+  location         = "global"
+  retention_days   = var.log_retention_days
+  enable_analytics = true
+  bucket_id        = google_storage_bucket.logs_archive.id
+}
+
+resource "google_logging_project_sink" "all_logs" {
+  name                   = "${local.prefix}logs-archive-${random_string.random.result}"
+  description            = "Exports all logs for long-term storage"
+  destination            = "storage.googleapis.com/${google_storage_bucket.logs_archive.name}"
+  unique_writer_identity = true
+}
+
+resource "google_project_iam_binding" "all_logs_writer" {
+  project = data.google_project.current.project_id
+  role    = "roles/storage.objectCreator"
+  members = [google_logging_project_sink.all_logs.writer_identity]
 }
