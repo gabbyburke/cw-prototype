@@ -25,5 +25,13 @@ if [ -n "${ORG_ID:-}" ]; then
         --role="roles/resourcemanager.projectCreator"
 fi
 
+gcs_bucket="tf-state-${GOOGLE_CLOUD_PROJECT}"
+gcloud storage buckets create "gs://${gcs_bucket}"
+
+cat > ./config/backend.hcl <<EOF
+bucket = ${gcs_bucket}
+prefix = "terraform/state"
+EOF
+
 # Export for Terraform
 export GOOGLE_IMPERSONATE_SERVICE_ACCOUNT=${SERVICE_ACCOUNT_EMAIL}
