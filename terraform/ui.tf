@@ -161,13 +161,13 @@ resource "google_cloud_run_v2_service" "ui" {
       # Regular environment variables
       dynamic "env" {
         for_each = {
-          NEXT_PUBLIC_FIREBASE_API_KEY             = google_firebase_web_app.ccwis_case_management.api_key
-          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN         = google_firebase_web_app.ccwis_case_management.auth_domain
+          NEXT_PUBLIC_FIREBASE_API_KEY             = data.google_firebase_web_app_config.ccwis_case_management.api_key
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN         = data.google_firebase_web_app_config.ccwis_case_management.auth_domain
           NEXT_PUBLIC_FIREBASE_PROJECT_ID          = google_project.this.project_id
           NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET      = google_firebase_storage_bucket.ccwis_case_management.bucket_id
-          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID = google_firebase_web_app.ccwis_case_management.messaging_sender_id
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID = data.google_firebase_web_app_config.ccwis_case_management.messaging_sender_id
           NEXT_PUBLIC_FIREBASE_APP_ID              = google_firebase_web_app.ccwis_case_management.app_id
-          NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID      = google_firebase_web_app.ccwis_case_management.measurement_id
+          NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID      = data.google_firebase_web_app_config.ccwis_case_management.measurement_id
           # Add backend URLs here if needed
           # NEXT_PUBLIC_CORE_CASE_MGMT_URL = google_cloud_run_v2_service.core_case_mgmt.uri
           # NEXT_PUBLIC_REFERRAL_INTAKE_URL = google_cloud_run_v2_service.referral_intake.uri

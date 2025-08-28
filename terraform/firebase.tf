@@ -32,6 +32,13 @@ resource "google_firebase_storage_bucket" "ccwis_case_management" {
   bucket_id = google_storage_bucket.firebase_storage.id
 }
 
+# Data source to retrieve Firebase web app configuration
+data "google_firebase_web_app_config" "ccwis_case_management" {
+  provider   = google-beta
+  project    = google_project.this.project_id
+  web_app_id = google_firebase_web_app.ccwis_case_management.app_id
+}
+
 resource "google_identity_platform_config" "this" {
   project = google_project.this.project_id
   authorized_domains = concat([
