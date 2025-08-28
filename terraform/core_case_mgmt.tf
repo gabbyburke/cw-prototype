@@ -121,8 +121,8 @@ module "wait_for_core_case_mgmt_build" {
   version = "~> 3.0"
 
   platform              = "linux"
-  create_cmd_entrypoint = "${path.module}/wait_for_build.sh"
-  create_cmd_body       = "${google_cloudbuild_trigger.core_case_mgmt_build_trigger.location} core-case-mgmt ${local.core_case_mgmt_image_url} 5"
+  create_cmd_entrypoint = "bash"
+  create_cmd_body       = "${path.module}/../files/wait_for_build.sh ${google_cloudbuild_trigger.core_case_mgmt_build_trigger.location} core-case-mgmt ${local.core_case_mgmt_image_url} 5"
 
   destroy_cmd_entrypoint = "echo"
   destroy_cmd_body       = "Build wait completed"

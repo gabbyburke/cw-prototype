@@ -149,8 +149,8 @@ module "wait_for_input_catalog_build" {
   version = "~> 3.0"
 
   platform              = "linux"
-  create_cmd_entrypoint = "${path.module}/wait_for_build.sh"
-  create_cmd_body       = "${google_cloudbuild_trigger.input_catalog_build_trigger.location} input-catalog ${local.input_catalog_image_url} 5"
+  create_cmd_entrypoint = "bash"
+  create_cmd_body       = "${path.module}/../files/wait_for_build.sh ${google_cloudbuild_trigger.input_catalog_build_trigger.location} input-catalog ${local.input_catalog_image_url} 5"
 
   destroy_cmd_entrypoint = "echo"
   destroy_cmd_body       = "Build wait completed"
