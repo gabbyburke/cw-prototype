@@ -14,7 +14,10 @@
 
 terraform {
   required_version = ">= 1.5.7"
-  backend "gcs" {}
+  backend "gcs" {
+    bucket = google_storage_bucket.tfstate.name
+    prefix = "terraform/state"
+  }
   required_providers {
     google = {
       source  = "hashicorp/google"

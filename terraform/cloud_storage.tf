@@ -12,6 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+resource "google_storage_bucket" "tfstate" {
+  name                        = "${local.prefix}tfstate-${random_string.suffix.result}"
+  location                    = "US"
+  storage_class               = "STANDARD"
+  public_access_prevention    = "enforced"
+  force_destroy               = var.environment == "prod" ? false : true
+  uniform_bucket_level_access = true
+  versioning {
+    enabled = true
+  }
+}
+
 resource "google_storage_bucket" "course_catalog" {
   name                        = "${local.prefix}course-catalog-${random_string.suffix.result}"
   location                    = "US"
