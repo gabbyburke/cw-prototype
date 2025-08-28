@@ -26,7 +26,11 @@ if [ -n "${ORG_ID:-}" ]; then
 fi
 
 gcs_bucket="tf-state-${GOOGLE_CLOUD_PROJECT}"
-gcloud storage buckets create "gs://${gcs_bucket}"
+if gcloud storage buckets list | grep -q "gs://${gcs_bucket}/"; then
+    echo "GCS bucket ${gcs_bucket} already exists."
+else
+    gcloud storage buckets create "gs://${gcs_bucket}"
+fi
 
 cat > ./config/backend.hcl <<EOF
 bucket = ${gcs_bucket}
