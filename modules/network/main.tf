@@ -24,8 +24,6 @@ locals {
   )
 }
 
-data "google_project" "current" {}
-
 data "google_client_config" "current" {}
 
 resource "google_compute_network" "this" {
@@ -122,7 +120,7 @@ module "default_firewall" {
 
 resource "google_project_iam_audit_config" "all_services" {
   count   = var.enable_all_services_audit_logs ? 1 : 0
-  project = data.google_project.current.project_id
+  project = var.project_id
   service = "allServices"
   audit_log_config {
     log_type = "ADMIN_READ"
@@ -137,7 +135,7 @@ resource "google_project_iam_audit_config" "all_services" {
 
 resource "google_logging_project_bucket_config" "default" {
   count            = var.enable_all_services_audit_logs ? 1 : 0
-  project          = data.google_project.current.project_id
+  project          = var.project_id
   location         = "global"
   retention_days   = 365
   enable_analytics = true
@@ -185,7 +183,7 @@ resource "google_storage_bucket" "logs_archive" {
 
 resource "google_logging_project_bucket_config" "gcs" {
   count            = var.enable_all_services_audit_logs ? 1 : 0
-  project          = data.google_project.current.project_id
+  project          = var.project_id
   location         = "global"
   retention_days   = var.log_retention_days
   enable_analytics = true
@@ -200,7 +198,7 @@ resource "google_logging_project_sink" "all_logs" {
 }
 
 resource "google_project_iam_binding" "all_logs_writer" {
-  project = data.google_project.current.project_id
+  project = var.project_id
   role    = "roles/storage.objectCreator"
   members = [google_logging_project_sink.all_logs.writer_identity]
 }
