@@ -111,6 +111,7 @@ resource "google_compute_firewall" "default" {
   name     = "default-allow-${each.key}"
   network  = google_compute_network.this.name
   disabled = true
+  source_ranges = ["0.0.0.0/0"]
 
   allow {
     protocol = each.key
