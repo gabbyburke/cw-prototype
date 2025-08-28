@@ -126,7 +126,7 @@ module "wait_for_ui_build" {
 
   platform = "linux"
 
-  create_cmd_entrypoint = "${path.module}/files/wait_for_build.sh"
+  create_cmd_entrypoint = "${path.module}/../files/wait_for_build.sh"
   create_cmd_body       = "${google_cloudbuild_trigger.ui.location} ui ${local.ui_image_url} 20"
 
   destroy_cmd_entrypoint = "echo"
