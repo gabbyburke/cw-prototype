@@ -28,6 +28,9 @@ resource "google_firebase_web_app" "ccwis_case_management" {
 }
 
 data "google_firebase_web_app_config" "ccwis_case_management" {
+  depends_on = [
+    google_firebase_web_app.ccwis_case_management
+  ]
   provider   = google-beta
   web_app_id = google_firebase_web_app.ccwis_case_management.app_id
 }
