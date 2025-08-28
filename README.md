@@ -71,11 +71,14 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ### 2. Deploy Infrastructure
 
+To use the `dev.tfvars` file for variable definitions, you need to specify it using the `-var-file` flag. The `config` directory is the correct location for this file.
+
+The backend configuration is defined in `config/backend-dev.hcl`. You need to specify this file during initialization.
+
 ```bash
-cd envs/dev
-terraform init
-terraform plan
-terraform apply
+terraform init -backend-config=./config/backend.hcl
+terraform plan -var-file=./config/dev.tfvars
+terraform apply -var-file=./config/dev.tfvars
 ```
 
 ### 3. Build and Deploy Applications

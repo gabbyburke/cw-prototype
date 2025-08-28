@@ -34,7 +34,7 @@ resource "google_identity_platform_config" "this" {
     "localhost",
     "${data.google_project.current.project_id}.firebaseapp.com",
     "${data.google_project.current.project_id}.web.app",
-    ], [for url in google_cloud_run_v2_service.ccwis_case_management.urls : trimprefix(url, "https://")],
+    ], [for url in google_cloud_run_v2_service.ui.urls : trimprefix(url, "https://")],
     var.custom_domain_list,
   )
   autodelete_anonymous_users = false

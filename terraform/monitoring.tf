@@ -29,7 +29,7 @@ resource "google_monitoring_alert_policy" "http_errors" {
     condition_matched_log {
       filter = <<-EOT
                 resource.type = "cloud_run_revision"
-                resource.labels.service_name = "${google_cloud_run_v2_service.ccwis_case_management.name}"
+                resource.labels.service_name = "${google_cloud_run_v2_service.ui.name}"
                 httpRequest.status >= 400
             EOT
       label_extractors = {

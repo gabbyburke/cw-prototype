@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-output "ccwis_case_management_url" {
-  value = google_cloud_run_v2_service.ccwis_case_management.uri
+output "ui_url" {
+  value = google_cloud_run_v2_service.ui.uri
 }
