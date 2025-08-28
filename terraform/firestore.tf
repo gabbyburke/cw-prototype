@@ -55,7 +55,7 @@ resource "google_firebaserules_ruleset" "firestore" {
   ]
   source {
     files {
-      content = file("files/firestore.rules")
+      content = file("../files/firestore.rules")
       name    = "firestore.rules"
     }
   }
