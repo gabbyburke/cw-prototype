@@ -33,7 +33,7 @@ else
 fi
 
 cat > ./config/backend.hcl <<EOF
-bucket = ${gcs_bucket}
+bucket = "${gcs_bucket}"
 prefix = "terraform/state"
 EOF
 
