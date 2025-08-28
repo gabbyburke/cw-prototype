@@ -27,14 +27,6 @@ resource "google_firebase_web_app" "ccwis_case_management" {
   deletion_policy = "ABANDON"
 }
 
-data "google_firebase_web_app_config" "ccwis_case_management" {
-  depends_on = [
-    google_firebase_web_app.ccwis_case_management
-  ]
-  provider   = google-beta
-  web_app_id = google_firebase_web_app.ccwis_case_management.app_id
-}
-
 resource "google_firebase_storage_bucket" "ccwis_case_management" {
   provider  = google-beta
   bucket_id = google_storage_bucket.firebase_storage.id
