@@ -43,6 +43,7 @@ locals {
     "eventarc.googleapis.com",
     "firebase.googleapis.com",
     "firestore.googleapis.com",
+    "firebaserules.googleapis.com",
     "firebasehosting.googleapis.com",
     "firebasestorage.googleapis.com",
     "identitytoolkit.googleapis.com",

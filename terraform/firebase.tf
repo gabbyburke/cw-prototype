@@ -13,6 +13,9 @@
 # limitations under the License.
 
 resource "google_firebase_web_app" "ccwis_case_management" {
+  depends_on = [
+    google_project_service.services["firebase.googleapis.com"]
+  ]
   provider        = google-beta
   project         = google_project.this.project_id
   display_name    = var.add_random_suffix ? "CCWIS Case Management - ${random_string.suffix.result}" : "CCWIS Case Management"

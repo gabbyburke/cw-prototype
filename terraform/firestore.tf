@@ -13,6 +13,9 @@
 # limitations under the License.
 
 resource "google_firestore_database" "this" {
+  depends_on = [
+    google_project_service.services["firestore.googleapis.com"]
+  ]
   name        = var.add_random_suffix ? "ccwis-case-management${local.random_suffix}" : "(default)"
   location_id = "nam5"
   type        = "FIRESTORE_NATIVE"
@@ -47,6 +50,9 @@ resource "google_firestore_index" "this" {
 }
 
 resource "google_firebaserules_ruleset" "firestore" {
+  depends_on = [
+    google_project_service.services["firebaserules.googleapis.com"]
+  ]
   source {
     files {
       content = file("files/firestore.rules")

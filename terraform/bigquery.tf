@@ -36,6 +36,9 @@ locals {
 }
 
 module "bigquery" {
+  depends_on = [
+    google_project_service.services["bigquery.googleapis.com"]
+  ]
   for_each   = local.datasets
   source     = "terraform-google-modules/bigquery/google"
   version    = "10.1.1"

@@ -42,6 +42,9 @@ resource "google_storage_notification" "input_catalog_dispatcher_tarball" {
 }
 
 resource "google_cloud_tasks_queue" "input_catalog_dispatcher" {
+  depends_on = [
+    google_project_service.services["cloudtasks.googleapis.com"]
+  ]
   name     = "input-catalog-dispatch"
   location = data.google_compute_zones.available.region
   rate_limits {

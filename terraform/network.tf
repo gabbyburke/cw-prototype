@@ -13,6 +13,9 @@
 # limitations under the License.
 
 module "network" {
+  depends_on = [
+    time_sleep.wait_for_iam_propagation
+  ]
   source                         = "../modules/network"
   prefix                         = local.prefix
   enable_cloud_nat               = true

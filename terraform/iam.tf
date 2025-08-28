@@ -58,6 +58,9 @@ resource "google_project_service_identity" "cloudbuild" {
 }
 
 resource "google_project_iam_member" "cloudbuild_service_agent_role" {
+  depends_on = [
+    google_project_service.services["cloudbuild.googleapis.com"]
+  ]
   for_each = toset([
     "roles/cloudbuild.serviceAgent",
     "roles/pubsub.subscriber",
@@ -65,9 +68,6 @@ resource "google_project_iam_member" "cloudbuild_service_agent_role" {
   project = google_project.this.project_id
   role    = each.value
   member  = "serviceAccount:service-${google_project.this.number}@gcp-sa-cloudbuild.iam.gserviceaccount.com"
-  depends_on = [
-    google_project_service.services["cloudbuild.googleapis.com"]
-  ]
 }
 
 resource "time_sleep" "wait_for_iam_propagation" {

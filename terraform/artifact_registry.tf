@@ -14,7 +14,7 @@
 
 resource "google_artifact_registry_repository" "docker" {
   location               = data.google_compute_zones.available.region
-  repository_id          = "${local.prefix}ccwis(-)case(-)management"
+  repository_id          = "${local.prefix}ccwis-case-management"
   description            = "CCWIS Case Management"
   format                 = "DOCKER"
   cleanup_policy_dry_run = false
