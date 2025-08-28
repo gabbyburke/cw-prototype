@@ -106,17 +106,15 @@ resource "google_compute_router_nat" "nat" {
   }
 }
 
-module "default_firewall" {
+resource "google_compute_firewall" "default" {
   for_each = local.firewall_rules
-  source  = "terraform-google-modules/gcloud/google"
-  version = "~> 3.4"
+  name     = "default-allow-${each.key}"
+  network  = google_compute_network.this.name
+  disabled = true
 
-  platform = "linux"
-
-  create_cmd_entrypoint  = "gcloud"
-  create_cmd_body        = "compute firewall-rules update default-allow-${each.key} --enable-logging --disabled --quiet || true"
-  destroy_cmd_entrypoint = "gcloud"
-  destroy_cmd_body       = "compute firewall-rules update default-allow-${each.key} --enable-logging --no-disabled --quiet || true"
+  allow {
+    protocol = each.key
+  }
 }
 
 resource "google_project_iam_audit_config" "all_services" {
