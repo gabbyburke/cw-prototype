@@ -8,6 +8,7 @@ TARGET_PROJECT_ID="${2:-}"  # Optional: create new or use existing
 
 # Enable APIs in deployment project
 gcloud services enable \
+    compute.googleapis.com \
     cloudresourcemanager.googleapis.com \
     cloudbilling.googleapis.com \
     serviceusage.googleapis.com \
@@ -33,6 +34,7 @@ else
 fi
 
 cat > ./config/backend.hcl <<EOF
+deployment_project_id = "${GOOGLE_CLOUD_PROJECT}"
 bucket = "${gcs_bucket}"
 prefix = "terraform/state"
 EOF
