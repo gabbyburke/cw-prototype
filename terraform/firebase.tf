@@ -12,9 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+resource "google_firebase_project" "this" {
+  provider = google-beta
+  project  = google_project.this.project_id
+}
+
 resource "google_firebase_web_app" "ccwis_case_management" {
   depends_on = [
-    google_project_service.services["firebase.googleapis.com"]
+    google_firebase_project.this
   ]
   provider        = google-beta
   project         = google_project.this.project_id
