@@ -77,6 +77,7 @@ resource "time_sleep" "wait_for_iam_propagation" {
   # This map triggers a re-sleep whenever any of these IAM resources change.
   triggers = {
     gcs_publisher_id                 = values(google_pubsub_topic_iam_member.gcs_pubsub_publisher)[0].id
+    core_case_mgmt_publisher_id      = google_pubsub_topic_iam_member.core_case_mgmt_gcs_pubsub_publisher.id
     eventarc_receiver_id             = values(google_project_iam_member.eventarc_trigger)[0].id
     runtime_sa_perms_id              = values(google_project_iam_member.input_catalog)[0].id
     cloudbuild_service_agent_role_id = values(google_project_iam_member.cloudbuild_service_agent_role)[0].id
