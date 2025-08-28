@@ -53,13 +53,14 @@ resource "google_project_service_identity" "cloudbuild" {
   provider = google-beta
   service  = "cloudbuild.googleapis.com"
   provisioner "local-exec" {
-    command = "sleep 30"
+    command = "sleep 60"
   }
 }
 
 resource "google_project_iam_member" "cloudbuild_service_agent_role" {
   depends_on = [
-    google_project_service.services["cloudbuild.googleapis.com"]
+    google_project_service.services["cloudbuild.googleapis.com"],
+    google_project_service_identity.cloudbuild
   ]
   for_each = toset([
     "roles/cloudbuild.serviceAgent",
@@ -67,7 +68,7 @@ resource "google_project_iam_member" "cloudbuild_service_agent_role" {
   ])
   project = google_project.this.project_id
   role    = each.value
-  member  = "serviceAccount:service-${google_project.this.number}@gcp-sa-cloudbuild.iam.gserviceaccount.com"
+  member  = google_project_service_identity.cloudbuild.member
 }
 
 resource "time_sleep" "wait_for_iam_propagation" {
