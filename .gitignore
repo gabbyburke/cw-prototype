@@ -255,3 +255,4 @@ Thumbs.db
 # Project specific
 .setup_config
 *.zip
+terraform/config/backend.hcl
