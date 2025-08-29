@@ -9,6 +9,7 @@ import {
   TimelineEvent, 
   getCaseById 
 } from '../../../lib/api'
+import CaseSetupView from '../../../components/CaseSetupView'
 
 export default function CaseDetailPage() {
   const params = useParams()
@@ -144,6 +145,12 @@ export default function CaseDetailPage() {
     )
   }
 
+  // Route to CaseSetupView for cases in setup mode
+  if (caseData.status === 'Case Setup') {
+    return <CaseSetupView case_={caseData} onProgressUpdate={loadCaseData} />
+  }
+
+  // Regular case view for all other statuses
   return (
     <div className="page-container">
       {/* Case Header */}
@@ -254,6 +261,7 @@ export default function CaseDetailPage() {
         <button 
           className={activeTab === 'people' ? 'active' : ''}
           onClick={() => setActiveTab('people')}
+          data-tab="people"
         >
           <span className="icon">people</span>
           People & Associations ({persons.length})
@@ -261,6 +269,7 @@ export default function CaseDetailPage() {
         <button 
           className={activeTab === 'case-management' ? 'active' : ''}
           onClick={() => setActiveTab('case-management')}
+          data-tab="case-management"
         >
           <span className="icon">work</span>
           Case Management
@@ -268,6 +277,7 @@ export default function CaseDetailPage() {
         <button 
           className={activeTab === 'legal' ? 'active' : ''}
           onClick={() => setActiveTab('legal')}
+          data-tab="legal"
         >
           <span className="icon">gavel</span>
           Legal & Documentation
@@ -455,6 +465,7 @@ export default function CaseDetailPage() {
               <button 
                 className={`sub-tab ${activeSubTab['people'] === 'associations' ? 'active' : ''}`}
                 onClick={() => setActiveSubTab({...activeSubTab, 'people': 'associations'})}
+                data-subtab="associations"
                 style={{
                   padding: '12px 16px',
                   border: 'none',

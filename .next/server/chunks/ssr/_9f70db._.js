@@ -17,6 +17,7 @@ __turbopack_esm__({
     "getPersonById": ()=>getPersonById,
     "getPersonsByCase": ()=>getPersonsByCase,
     "healthCheck": ()=>healthCheck,
+    "searchMagicButtonData": ()=>searchMagicButtonData,
     "searchPersons": ()=>searchPersons,
     "updateCase": ()=>updateCase
 });
@@ -118,6 +119,80 @@ const updateCase = (caseId, updates)=>apiClient.updateCase(caseId, updates);
 const searchPersons = (query)=>apiClient.searchPersons(query);
 const getPersonById = (personId)=>apiClient.getPersonById(personId);
 const healthCheck = ()=>apiClient.healthCheck();
+const searchMagicButtonData = async (query)=>{
+    // Mock implementation - replace with real API call when backend is ready
+    await new Promise((resolve)=>setTimeout(resolve, 400));
+    // Mock data for development
+    const mockIncidents = [
+        {
+            incident_number: "INC-2024-001234",
+            child_first_names: "Emma",
+            child_last_names: "Johnson",
+            parent_first_names: "Michael, Sarah",
+            parent_last_names: "Johnson, Johnson",
+            cps_worker: "Dana Wilson",
+            due_date: "2024-09-15",
+            county_of_assessment: "King County",
+            intake_date: "2024-08-15",
+            reported_native_american_heritage: "No",
+            perpetrators: "Michael Johnson",
+            perpetrator_first_name: "Michael",
+            perpetrator_last_name: "Johnson",
+            findings: "Substantiated",
+            allegations: "Physical abuse",
+            victims: "Emma Johnson",
+            victim_first_name: "Emma",
+            victim_last_name: "Johnson",
+            person_id: "12345",
+            role: "Client",
+            gender: "Female",
+            age_calculated: 8,
+            prior_workers: "None",
+            current_address: "123 Main St",
+            address_type: "Residential",
+            residence_county: "King County",
+            date_of_birth: "2016-03-12",
+            phone_number: "206-555-0123",
+            phone_type: "Home",
+            address: "123 Main St",
+            city: "Seattle",
+            state: "WA",
+            zip_code: 98101,
+            non_custodial_parent: false,
+            non_custodial_parent_person_id: "",
+            non_custodial_parent_first_name: "",
+            non_custodial_parent_last_name: "",
+            non_custodial_parent_middle_name: "",
+            non_custodial_parent_dob: "",
+            non_custodial_parent_ssn: "",
+            non_custodial_parent_suffix: "",
+            non_custodial_parent_sex: "",
+            non_custodial_parent_race: "",
+            non_custodial_parent_ethnicity: "",
+            legal_custodian: "Sarah Johnson",
+            guardian: "",
+            prior_assessment: "None",
+            type_of_appointment: "",
+            clinic_name: "",
+            appointment_date: ""
+        }
+    ];
+    if (!query || query.length < 2) {
+        return {
+            data: {
+                incidents: []
+            },
+            error: undefined
+        };
+    }
+    const filteredIncidents = mockIncidents.filter((incident)=>incident.incident_number.toLowerCase().includes(query.toLowerCase()) || incident.child_first_names.toLowerCase().includes(query.toLowerCase()) || incident.child_last_names.toLowerCase().includes(query.toLowerCase()) || incident.allegations.toLowerCase().includes(query.toLowerCase()));
+    return {
+        data: {
+            incidents: filteredIncidents
+        },
+        error: undefined
+    };
+};
 
 })()),
 "[project]/app/cases/[caseId]/page.tsx [app-ssr] (ecmascript)": (({ r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, g: global, __dirname, x: __turbopack_external_require__, y: __turbopack_external_import__ }) => (() => {
@@ -131,8 +206,10 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/link.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/navigation.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$api$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/lib/api.ts [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$CaseSetupTracker$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/components/CaseSetupTracker.tsx [app-ssr] (ecmascript)");
 "__TURBOPACK__ecmascript__hoisting__location__";
 'use client';
+;
 ;
 ;
 ;
@@ -245,7 +322,7 @@ function CaseDetailPage() {
                         children: "Loading Case Details..."
                     }, void 0, false, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 102,
+                        lineNumber: 103,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -253,18 +330,18 @@ function CaseDetailPage() {
                         children: "Please wait while we load the case information."
                     }, void 0, false, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 103,
+                        lineNumber: 104,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                lineNumber: 101,
+                lineNumber: 102,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/app/cases/[caseId]/page.tsx",
-            lineNumber: 100,
+            lineNumber: 101,
             columnNumber: 7
         }, this);
     }
@@ -280,7 +357,7 @@ function CaseDetailPage() {
                             children: "Error Loading Case"
                         }, void 0, false, {
                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                            lineNumber: 113,
+                            lineNumber: 114,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -288,13 +365,13 @@ function CaseDetailPage() {
                             children: error
                         }, void 0, false, {
                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                            lineNumber: 114,
+                            lineNumber: 115,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                    lineNumber: 112,
+                    lineNumber: 113,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -308,20 +385,20 @@ function CaseDetailPage() {
                                     children: "error"
                                 }, void 0, false, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 118,
+                                    lineNumber: 119,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                     children: "Unable to load case details. Please try again or contact support if the problem persists."
                                 }, void 0, false, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 119,
+                                    lineNumber: 120,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                            lineNumber: 117,
+                            lineNumber: 118,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -333,26 +410,26 @@ function CaseDetailPage() {
                                     children: "arrow_back"
                                 }, void 0, false, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 122,
+                                    lineNumber: 123,
                                     columnNumber: 13
                                 }, this),
                                 "Back to Dashboard"
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                            lineNumber: 121,
+                            lineNumber: 122,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                    lineNumber: 116,
+                    lineNumber: 117,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/cases/[caseId]/page.tsx",
-            lineNumber: 111,
+            lineNumber: 112,
             columnNumber: 7
         }, this);
     }
@@ -368,7 +445,7 @@ function CaseDetailPage() {
                             children: "Case Not Found"
                         }, void 0, false, {
                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                            lineNumber: 134,
+                            lineNumber: 135,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -376,13 +453,13 @@ function CaseDetailPage() {
                             children: "The requested case could not be found."
                         }, void 0, false, {
                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                            lineNumber: 135,
+                            lineNumber: 136,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                    lineNumber: 133,
+                    lineNumber: 134,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -396,25 +473,25 @@ function CaseDetailPage() {
                                 children: "arrow_back"
                             }, void 0, false, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 139,
+                                lineNumber: 140,
                                 columnNumber: 13
                             }, this),
                             "Back to Dashboard"
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 138,
+                        lineNumber: 139,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                    lineNumber: 137,
+                    lineNumber: 138,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/cases/[caseId]/page.tsx",
-            lineNumber: 132,
+            lineNumber: 133,
             columnNumber: 7
         }, this);
     }
@@ -439,7 +516,7 @@ function CaseDetailPage() {
                                         children: caseData.case_display_name || caseData.family_name
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 153,
+                                        lineNumber: 154,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -455,7 +532,7 @@ function CaseDetailPage() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 154,
+                                        lineNumber: 155,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -469,18 +546,126 @@ function CaseDetailPage() {
                                             children: caseData.status
                                         }, void 0, false, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 158,
+                                            lineNumber: 159,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 157,
+                                        lineNumber: 158,
                                         columnNumber: 13
+                                    }, this),
+                                    caseData.status === 'Case Setup' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "case-setup-progress",
+                                        style: {
+                                            marginBottom: 'var(--unit-4)'
+                                        },
+                                        children: (()=>{
+                                            const getSetupProgress = (caseId)=>{
+                                                try {
+                                                    const saved = localStorage.getItem(`cpw_setup_${caseId}`);
+                                                    if (!saved) return {
+                                                        step: 0,
+                                                        total: 4,
+                                                        percentage: 0
+                                                    };
+                                                    const data = JSON.parse(saved);
+                                                    const currentStep = data.currentStep || 1;
+                                                    const total = 4;
+                                                    const percentage = Math.round(currentStep / total * 100);
+                                                    return {
+                                                        step: currentStep,
+                                                        total,
+                                                        percentage
+                                                    };
+                                                } catch (error) {
+                                                    return {
+                                                        step: 0,
+                                                        total: 4,
+                                                        percentage: 0
+                                                    };
+                                                }
+                                            };
+                                            const progress = getSetupProgress(caseData.case_id);
+                                            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        style: {
+                                                            display: 'flex',
+                                                            justifyContent: 'space-between',
+                                                            alignItems: 'center',
+                                                            marginBottom: '8px'
+                                                        },
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
+                                                                style: {
+                                                                    margin: 0,
+                                                                    fontSize: '0.9rem',
+                                                                    color: 'var(--text-secondary)'
+                                                                },
+                                                                children: "Case Setup Progress"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                                                lineNumber: 188,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                style: {
+                                                                    fontSize: '0.8rem',
+                                                                    color: 'var(--text-secondary)'
+                                                                },
+                                                                children: progress.step > 0 ? `Step ${progress.step} of ${progress.total}` : 'Not Started'
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                                                lineNumber: 191,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                                        lineNumber: 187,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        style: {
+                                                            width: '100%',
+                                                            height: '8px',
+                                                            backgroundColor: '#e2e8f0',
+                                                            borderRadius: '4px',
+                                                            overflow: 'hidden'
+                                                        },
+                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            style: {
+                                                                width: `${progress.percentage}%`,
+                                                                height: '100%',
+                                                                backgroundColor: progress.percentage > 0 ? '#3b82f6' : '#e2e8f0',
+                                                                transition: 'width 0.3s ease'
+                                                            }
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                                            lineNumber: 202,
+                                                            columnNumber: 25
+                                                        }, this)
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                                        lineNumber: 195,
+                                                        columnNumber: 23
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                                lineNumber: 186,
+                                                columnNumber: 21
+                                            }, this);
+                                        })()
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                        lineNumber: 166,
+                                        columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 152,
+                                lineNumber: 153,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -498,14 +683,14 @@ function CaseDetailPage() {
                                                 children: "arrow_back"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                lineNumber: 165,
+                                                lineNumber: 217,
                                                 columnNumber: 15
                                             }, this),
                                             "Back to Dashboard"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 164,
+                                        lineNumber: 216,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -516,26 +701,26 @@ function CaseDetailPage() {
                                                 children: "edit"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                lineNumber: 169,
+                                                lineNumber: 221,
                                                 columnNumber: 15
                                             }, this),
                                             "Edit Case"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 168,
+                                        lineNumber: 220,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 163,
+                                lineNumber: 215,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 151,
+                        lineNumber: 152,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -549,7 +734,7 @@ function CaseDetailPage() {
                                         children: "schedule"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 177,
+                                        lineNumber: 229,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -558,213 +743,11 @@ function CaseDetailPage() {
                                                 children: "Intake Date:"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                lineNumber: 179,
-                                                columnNumber: 15
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                children: new Date(caseData.created_date).toLocaleDateString()
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                lineNumber: 180,
-                                                columnNumber: 15
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 178,
-                                        columnNumber: 13
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 176,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "summary-item",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        className: "icon",
-                                        children: "assignment_turned_in"
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 184,
-                                        columnNumber: 13
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                children: "Assessment Approval Date:"
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                lineNumber: 186,
-                                                columnNumber: 15
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                children: caseData.workflow_status?.cpw_supervisor_approved ? new Date(caseData.last_updated).toLocaleDateString() : 'Pending'
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                lineNumber: 187,
-                                                columnNumber: 15
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 185,
-                                        columnNumber: 13
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 183,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "summary-item",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        className: "icon",
-                                        children: "report"
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 191,
-                                        columnNumber: 13
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                children: "Allegation(s):"
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                lineNumber: 193,
-                                                columnNumber: 15
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                children: caseData.allegation_type
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                lineNumber: 194,
-                                                columnNumber: 15
-                                            }, this),
-                                            caseData.allegation_description && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                style: {
-                                                    fontSize: '0.9rem',
-                                                    color: 'var(--text-secondary)',
-                                                    marginTop: '4px'
-                                                },
-                                                children: caseData.allegation_description
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                lineNumber: 196,
-                                                columnNumber: 17
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 192,
-                                        columnNumber: 13
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 190,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "summary-item",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        className: "icon",
-                                        children: "child_care"
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 203,
-                                        columnNumber: 13
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                children: "Child(ren):"
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                lineNumber: 205,
-                                                columnNumber: 15
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                children: persons.filter((person)=>person.role === 'Client' || person.role === 'child').length > 0 ? persons.filter((person)=>person.role === 'Client' || person.role === 'child').map((child, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
-                                                                href: `/persons/${child.person_id}`,
-                                                                className: "child-link",
-                                                                style: {
-                                                                    color: 'var(--primary)',
-                                                                    textDecoration: 'none'
-                                                                },
-                                                                children: [
-                                                                    child.first_name,
-                                                                    " ",
-                                                                    child.last_name
-                                                                ]
-                                                            }, void 0, true, {
-                                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                                lineNumber: 212,
-                                                                columnNumber: 25
-                                                            }, this),
-                                                            index < persons.filter((person)=>person.role === 'Client' || person.role === 'child').length - 1 && ', '
-                                                        ]
-                                                    }, child.person_id, true, {
-                                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                        lineNumber: 211,
-                                                        columnNumber: 23
-                                                    }, this)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    style: {
-                                                        color: 'var(--text-secondary)'
-                                                    },
-                                                    children: "No children listed"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                    lineNumber: 223,
-                                                    columnNumber: 19
-                                                }, this)
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                lineNumber: 206,
-                                                columnNumber: 15
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 204,
-                                        columnNumber: 13
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 202,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "summary-item",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        className: "icon",
-                                        children: "person"
-                                    }, void 0, false, {
-                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 229,
-                                        columnNumber: 13
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                children: "Assigned Worker:"
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
                                                 lineNumber: 231,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                children: caseData.assigned_worker || 'Unassigned'
+                                                children: new Date(caseData.created_date).toLocaleDateString()
                                             }, void 0, false, {
                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
                                                 lineNumber: 232,
@@ -787,7 +770,7 @@ function CaseDetailPage() {
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         className: "icon",
-                                        children: "location_on"
+                                        children: "assignment_turned_in"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
                                         lineNumber: 236,
@@ -796,14 +779,14 @@ function CaseDetailPage() {
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                children: "County:"
+                                                children: "Assessment Approval Date:"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
                                                 lineNumber: 238,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                children: caseData.county
+                                                children: caseData.workflow_status?.cpw_supervisor_approved ? new Date(caseData.last_updated).toLocaleDateString() : 'Pending'
                                             }, void 0, false, {
                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
                                                 lineNumber: 239,
@@ -820,18 +803,237 @@ function CaseDetailPage() {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
                                 lineNumber: 235,
                                 columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "summary-item",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "icon",
+                                        children: "report"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                        lineNumber: 243,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                children: "Allegation(s):"
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                                lineNumber: 245,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                children: caseData.allegation_type
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                                lineNumber: 246,
+                                                columnNumber: 15
+                                            }, this),
+                                            caseData.allegation_description && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                style: {
+                                                    fontSize: '0.9rem',
+                                                    color: 'var(--text-secondary)',
+                                                    marginTop: '4px'
+                                                },
+                                                children: caseData.allegation_description
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                                lineNumber: 248,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                        lineNumber: 244,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                lineNumber: 242,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "summary-item",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "icon",
+                                        children: "child_care"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                        lineNumber: 255,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                children: "Child(ren):"
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                                lineNumber: 257,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                children: persons.filter((person)=>person.role === 'Client' || person.role === 'child').length > 0 ? persons.filter((person)=>person.role === 'Client' || person.role === 'child').map((child, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                                href: `/persons/${child.person_id}`,
+                                                                className: "child-link",
+                                                                style: {
+                                                                    color: 'var(--primary)',
+                                                                    textDecoration: 'none'
+                                                                },
+                                                                children: [
+                                                                    child.first_name,
+                                                                    " ",
+                                                                    child.last_name
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                                                lineNumber: 264,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            index < persons.filter((person)=>person.role === 'Client' || person.role === 'child').length - 1 && ', '
+                                                        ]
+                                                    }, child.person_id, true, {
+                                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                                        lineNumber: 263,
+                                                        columnNumber: 23
+                                                    }, this)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    style: {
+                                                        color: 'var(--text-secondary)'
+                                                    },
+                                                    children: "No children listed"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                                    lineNumber: 275,
+                                                    columnNumber: 19
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                                lineNumber: 258,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                        lineNumber: 256,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                lineNumber: 254,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "summary-item",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "icon",
+                                        children: "person"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                        lineNumber: 281,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                children: "Assigned Worker:"
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                                lineNumber: 283,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                children: caseData.assigned_worker || 'Unassigned'
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                                lineNumber: 284,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                        lineNumber: 282,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                lineNumber: 280,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "summary-item",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "icon",
+                                        children: "location_on"
+                                    }, void 0, false, {
+                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                        lineNumber: 288,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                children: "County:"
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                                lineNumber: 290,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                children: caseData.county
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                                lineNumber: 291,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                        lineNumber: 289,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/app/cases/[caseId]/page.tsx",
+                                lineNumber: 287,
+                                columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 175,
+                        lineNumber: 227,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                lineNumber: 150,
+                lineNumber: 151,
                 columnNumber: 7
+            }, this),
+            caseData.status === 'Case Setup' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                style: {
+                    marginBottom: 'var(--unit-6)'
+                },
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$CaseSetupTracker$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                    case_: caseData,
+                    onProgressUpdate: loadCaseData
+                }, void 0, false, {
+                    fileName: "[project]/app/cases/[caseId]/page.tsx",
+                    lineNumber: 300,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
+                fileName: "[project]/app/cases/[caseId]/page.tsx",
+                lineNumber: 299,
+                columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "tab-navigation",
@@ -848,14 +1050,14 @@ function CaseDetailPage() {
                                 children: "dashboard"
                             }, void 0, false, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 251,
+                                lineNumber: 313,
                                 columnNumber: 11
                             }, this),
                             "Overview"
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 247,
+                        lineNumber: 309,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -867,7 +1069,7 @@ function CaseDetailPage() {
                                 children: "people"
                             }, void 0, false, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 258,
+                                lineNumber: 320,
                                 columnNumber: 11
                             }, this),
                             "People & Associations (",
@@ -876,7 +1078,7 @@ function CaseDetailPage() {
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 254,
+                        lineNumber: 316,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -888,14 +1090,14 @@ function CaseDetailPage() {
                                 children: "work"
                             }, void 0, false, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 265,
+                                lineNumber: 327,
                                 columnNumber: 11
                             }, this),
                             "Case Management"
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 261,
+                        lineNumber: 323,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -907,14 +1109,14 @@ function CaseDetailPage() {
                                 children: "gavel"
                             }, void 0, false, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 272,
+                                lineNumber: 334,
                                 columnNumber: 11
                             }, this),
                             "Legal & Documentation"
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 268,
+                        lineNumber: 330,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -926,7 +1128,7 @@ function CaseDetailPage() {
                                 children: "timeline"
                             }, void 0, false, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 279,
+                                lineNumber: 341,
                                 columnNumber: 11
                             }, this),
                             "Timeline (",
@@ -935,13 +1137,13 @@ function CaseDetailPage() {
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 275,
+                        lineNumber: 337,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                lineNumber: 246,
+                lineNumber: 308,
                 columnNumber: 7
             }, this),
             activeTab === 'overview' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -956,7 +1158,7 @@ function CaseDetailPage() {
                                     children: "Case Information"
                                 }, void 0, false, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 290,
+                                    lineNumber: 352,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -969,20 +1171,20 @@ function CaseDetailPage() {
                                                     children: "Allegation Description:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                    lineNumber: 293,
+                                                    lineNumber: 355,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                     children: caseData.allegation_description
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                    lineNumber: 294,
+                                                    lineNumber: 356,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 292,
+                                            lineNumber: 354,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -992,20 +1194,20 @@ function CaseDetailPage() {
                                                     children: "Status:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                    lineNumber: 297,
+                                                    lineNumber: 359,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                     children: caseData.status
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                    lineNumber: 298,
+                                                    lineNumber: 360,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 296,
+                                            lineNumber: 358,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1015,20 +1217,20 @@ function CaseDetailPage() {
                                                     children: "Priority Level:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                    lineNumber: 301,
+                                                    lineNumber: 363,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                     children: caseData.priority_level
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                    lineNumber: 302,
+                                                    lineNumber: 364,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 300,
+                                            lineNumber: 362,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1038,20 +1240,20 @@ function CaseDetailPage() {
                                                     children: "Last Updated:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                    lineNumber: 305,
+                                                    lineNumber: 367,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                     children: new Date(caseData.last_updated).toLocaleDateString()
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                    lineNumber: 306,
+                                                    lineNumber: 368,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 304,
+                                            lineNumber: 366,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1061,32 +1263,32 @@ function CaseDetailPage() {
                                                     children: "Risk Level:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                    lineNumber: 309,
+                                                    lineNumber: 371,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                     children: caseData.risk_level || 'Not assessed'
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                    lineNumber: 310,
+                                                    lineNumber: 372,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 308,
+                                            lineNumber: 370,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 291,
+                                    lineNumber: 353,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                            lineNumber: 289,
+                            lineNumber: 351,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("article", {
@@ -1096,7 +1298,7 @@ function CaseDetailPage() {
                                     children: "Recent Activity"
                                 }, void 0, false, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 317,
+                                    lineNumber: 379,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1112,12 +1314,12 @@ function CaseDetailPage() {
                                                             children: getEventIcon(event.event_type)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                            lineNumber: 322,
+                                                            lineNumber: 384,
                                                             columnNumber: 23
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                        lineNumber: 321,
+                                                        lineNumber: 383,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1127,14 +1329,14 @@ function CaseDetailPage() {
                                                                 children: event.title
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                                lineNumber: 325,
+                                                                lineNumber: 387,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                                 children: event.description
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                                lineNumber: 326,
+                                                                lineNumber: 388,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1146,19 +1348,19 @@ function CaseDetailPage() {
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                                lineNumber: 327,
+                                                                lineNumber: 389,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                        lineNumber: 324,
+                                                        lineNumber: 386,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, event.event_id, true, {
                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                lineNumber: 320,
+                                                lineNumber: 382,
                                                 columnNumber: 19
                                             }, this)),
                                         timelineEvents.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1170,19 +1372,19 @@ function CaseDetailPage() {
                                             children: "No recent activity"
                                         }, void 0, false, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 334,
+                                            lineNumber: 396,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 318,
+                                    lineNumber: 380,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                            lineNumber: 316,
+                            lineNumber: 378,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("article", {
@@ -1192,7 +1394,7 @@ function CaseDetailPage() {
                                     children: "Recent Case Notes"
                                 }, void 0, false, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 343,
+                                    lineNumber: 405,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1208,7 +1410,7 @@ function CaseDetailPage() {
                                                                 children: note.created_by
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                                lineNumber: 348,
+                                                                lineNumber: 410,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1216,26 +1418,26 @@ function CaseDetailPage() {
                                                                 children: new Date(note.created_date).toLocaleDateString()
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                                lineNumber: 349,
+                                                                lineNumber: 411,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                        lineNumber: 347,
+                                                        lineNumber: 409,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                         children: note.text
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                        lineNumber: 353,
+                                                        lineNumber: 415,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, note.note_id, true, {
                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                lineNumber: 346,
+                                                lineNumber: 408,
                                                 columnNumber: 19
                                             }, this)),
                                         (!caseData.case_notes || caseData.case_notes.length === 0) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1247,13 +1449,13 @@ function CaseDetailPage() {
                                             children: "No case notes yet"
                                         }, void 0, false, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 357,
+                                            lineNumber: 419,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 344,
+                                    lineNumber: 406,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1267,31 +1469,31 @@ function CaseDetailPage() {
                                             children: "note_add"
                                         }, void 0, false, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 363,
+                                            lineNumber: 425,
                                             columnNumber: 17
                                         }, this),
                                         "Add Case Note"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 362,
+                                    lineNumber: 424,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                            lineNumber: 342,
+                            lineNumber: 404,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                    lineNumber: 287,
+                    lineNumber: 349,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                lineNumber: 286,
+                lineNumber: 348,
                 columnNumber: 9
             }, this),
             activeTab === 'timeline' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1310,7 +1512,7 @@ function CaseDetailPage() {
                                     children: "Case Timeline"
                                 }, void 0, false, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 375,
+                                    lineNumber: 437,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1321,20 +1523,20 @@ function CaseDetailPage() {
                                             children: "add"
                                         }, void 0, false, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 377,
+                                            lineNumber: 439,
                                             columnNumber: 17
                                         }, this),
                                         "Add Event"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 376,
+                                    lineNumber: 438,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                            lineNumber: 374,
+                            lineNumber: 436,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1350,12 +1552,12 @@ function CaseDetailPage() {
                                                     children: getEventIcon(event.event_type)
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                    lineNumber: 386,
+                                                    lineNumber: 448,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                lineNumber: 385,
+                                                lineNumber: 447,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1368,7 +1570,7 @@ function CaseDetailPage() {
                                                                 children: event.title
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                                lineNumber: 390,
+                                                                lineNumber: 452,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1380,20 +1582,20 @@ function CaseDetailPage() {
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                                lineNumber: 391,
+                                                                lineNumber: 453,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                        lineNumber: 389,
+                                                        lineNumber: 451,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                         children: event.description
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                        lineNumber: 395,
+                                                        lineNumber: 457,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1407,7 +1609,7 @@ function CaseDetailPage() {
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                                lineNumber: 397,
+                                                                lineNumber: 459,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1415,25 +1617,25 @@ function CaseDetailPage() {
                                                                 children: event.event_type.replace('_', ' ').toUpperCase()
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                                lineNumber: 398,
+                                                                lineNumber: 460,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                        lineNumber: 396,
+                                                        lineNumber: 458,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                lineNumber: 388,
+                                                lineNumber: 450,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, event.event_id, true, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 384,
+                                        lineNumber: 446,
                                         columnNumber: 17
                                     }, this)),
                                 timelineEvents.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1452,37 +1654,37 @@ function CaseDetailPage() {
                                             children: "timeline"
                                         }, void 0, false, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 408,
+                                            lineNumber: 470,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                             children: "No timeline events yet"
                                         }, void 0, false, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 409,
+                                            lineNumber: 471,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 407,
+                                    lineNumber: 469,
                                     columnNumber: 17
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                            lineNumber: 382,
+                            lineNumber: 444,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                    lineNumber: 373,
+                    lineNumber: 435,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                lineNumber: 372,
+                lineNumber: 434,
                 columnNumber: 9
             }, this),
             activeTab === 'people' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1534,14 +1736,14 @@ function CaseDetailPage() {
                                             children: "people"
                                         }, void 0, false, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 452,
+                                            lineNumber: 514,
                                             columnNumber: 17
                                         }, this),
                                         "People"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 433,
+                                    lineNumber: 495,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1574,14 +1776,14 @@ function CaseDetailPage() {
                                             children: "family_restroom"
                                         }, void 0, false, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 474,
+                                            lineNumber: 536,
                                             columnNumber: 17
                                         }, this),
                                         "Associations"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 455,
+                                    lineNumber: 517,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1614,14 +1816,14 @@ function CaseDetailPage() {
                                             children: "medical_services"
                                         }, void 0, false, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 496,
+                                            lineNumber: 558,
                                             columnNumber: 17
                                         }, this),
                                         "Health"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 477,
+                                    lineNumber: 539,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1654,25 +1856,25 @@ function CaseDetailPage() {
                                             children: "school"
                                         }, void 0, false, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 518,
+                                            lineNumber: 580,
                                             columnNumber: 17
                                         }, this),
                                         "Education/Income"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 499,
+                                    lineNumber: 561,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                            lineNumber: 427,
+                            lineNumber: 489,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 420,
+                        lineNumber: 482,
                         columnNumber: 11
                     }, this),
                     activeSubTab['people'] === 'people' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("article", {
@@ -1689,7 +1891,7 @@ function CaseDetailPage() {
                                         children: "People Involved"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 527,
+                                        lineNumber: 589,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1713,20 +1915,20 @@ function CaseDetailPage() {
                                                 children: "person_add"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                lineNumber: 541,
+                                                lineNumber: 603,
                                                 columnNumber: 19
                                             }, this),
                                             "Add Person"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 528,
+                                        lineNumber: 590,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 526,
+                                lineNumber: 588,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1749,7 +1951,7 @@ function CaseDetailPage() {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                                    lineNumber: 551,
+                                                                    lineNumber: 613,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1757,7 +1959,7 @@ function CaseDetailPage() {
                                                                     children: person.role.charAt(0).toUpperCase() + person.role.slice(1)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                                    lineNumber: 552,
+                                                                    lineNumber: 614,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1768,13 +1970,13 @@ function CaseDetailPage() {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                                    lineNumber: 553,
+                                                                    lineNumber: 615,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                            lineNumber: 550,
+                                                            lineNumber: 612,
                                                             columnNumber: 23
                                                         }, this),
                                                         person.indicators && person.indicators.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1784,18 +1986,18 @@ function CaseDetailPage() {
                                                                     children: indicator
                                                                 }, index, false, {
                                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                                    lineNumber: 560,
+                                                                    lineNumber: 622,
                                                                     columnNumber: 29
                                                                 }, this))
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                            lineNumber: 558,
+                                                            lineNumber: 620,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                    lineNumber: 549,
+                                                    lineNumber: 611,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1809,20 +2011,20 @@ function CaseDetailPage() {
                                                                     children: "phone"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                                    lineNumber: 571,
+                                                                    lineNumber: 633,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                     children: person.contact_info.phone
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                                    lineNumber: 572,
+                                                                    lineNumber: 634,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                            lineNumber: 570,
+                                                            lineNumber: 632,
                                                             columnNumber: 25
                                                         }, this),
                                                         person.contact_info.address && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1833,26 +2035,26 @@ function CaseDetailPage() {
                                                                     children: "location_on"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                                    lineNumber: 577,
+                                                                    lineNumber: 639,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                     children: person.contact_info.address
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                                    lineNumber: 578,
+                                                                    lineNumber: 640,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                            lineNumber: 576,
+                                                            lineNumber: 638,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                    lineNumber: 568,
+                                                    lineNumber: 630,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1866,14 +2068,14 @@ function CaseDetailPage() {
                                                                     children: "visibility"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                                    lineNumber: 585,
+                                                                    lineNumber: 647,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 "View Profile"
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                            lineNumber: 584,
+                                                            lineNumber: 646,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1884,26 +2086,26 @@ function CaseDetailPage() {
                                                                     children: "edit"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                                    lineNumber: 589,
+                                                                    lineNumber: 651,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 "Edit"
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                            lineNumber: 588,
+                                                            lineNumber: 650,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                    lineNumber: 583,
+                                                    lineNumber: 645,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, person.person_id, true, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 548,
+                                            lineNumber: 610,
                                             columnNumber: 19
                                         }, this)),
                                     persons.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1923,32 +2125,32 @@ function CaseDetailPage() {
                                                 children: "people"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                lineNumber: 598,
+                                                lineNumber: 660,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                 children: "No people added to this case yet"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                lineNumber: 599,
+                                                lineNumber: 661,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 597,
+                                        lineNumber: 659,
                                         columnNumber: 19
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 546,
+                                lineNumber: 608,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 525,
+                        lineNumber: 587,
                         columnNumber: 13
                     }, this),
                     activeSubTab['people'] === 'associations' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("article", {
@@ -1957,7 +2159,7 @@ function CaseDetailPage() {
                                 children: "Family Associations & Relationships"
                             }, void 0, false, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 608,
+                                lineNumber: 670,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1976,26 +2178,26 @@ function CaseDetailPage() {
                                         children: "family_restroom"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 610,
+                                        lineNumber: 672,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                         children: "Association management feature coming soon"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 611,
+                                        lineNumber: 673,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 609,
+                                lineNumber: 671,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 607,
+                        lineNumber: 669,
                         columnNumber: 13
                     }, this),
                     activeSubTab['people'] === 'health' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("article", {
@@ -2004,7 +2206,7 @@ function CaseDetailPage() {
                                 children: "Health Information"
                             }, void 0, false, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 618,
+                                lineNumber: 680,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2023,26 +2225,26 @@ function CaseDetailPage() {
                                         children: "medical_services"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 620,
+                                        lineNumber: 682,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                         children: "Health information management feature coming soon"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 621,
+                                        lineNumber: 683,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 619,
+                                lineNumber: 681,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 617,
+                        lineNumber: 679,
                         columnNumber: 13
                     }, this),
                     activeSubTab['people'] === 'education' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("article", {
@@ -2051,7 +2253,7 @@ function CaseDetailPage() {
                                 children: "Education & Income Information"
                             }, void 0, false, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 628,
+                                lineNumber: 690,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2070,32 +2272,32 @@ function CaseDetailPage() {
                                         children: "school"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 630,
+                                        lineNumber: 692,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                         children: "Education and income tracking feature coming soon"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 631,
+                                        lineNumber: 693,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 629,
+                                lineNumber: 691,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 627,
+                        lineNumber: 689,
                         columnNumber: 13
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                lineNumber: 418,
+                lineNumber: 480,
                 columnNumber: 9
             }, this),
             activeTab === 'case-management' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2147,14 +2349,14 @@ function CaseDetailPage() {
                                             children: "support"
                                         }, void 0, false, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 673,
+                                            lineNumber: 735,
                                             columnNumber: 17
                                         }, this),
                                         "Services"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 654,
+                                    lineNumber: 716,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2187,14 +2389,14 @@ function CaseDetailPage() {
                                             children: "home"
                                         }, void 0, false, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 695,
+                                            lineNumber: 757,
                                             columnNumber: 17
                                         }, this),
                                         "Living Arrangements"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 676,
+                                    lineNumber: 738,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2227,25 +2429,25 @@ function CaseDetailPage() {
                                             children: "note"
                                         }, void 0, false, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 717,
+                                            lineNumber: 779,
                                             columnNumber: 17
                                         }, this),
                                         "Notes"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 698,
+                                    lineNumber: 760,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                            lineNumber: 648,
+                            lineNumber: 710,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 641,
+                        lineNumber: 703,
                         columnNumber: 11
                     }, this),
                     activeSubTab['case-management'] === 'services' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("article", {
@@ -2254,7 +2456,7 @@ function CaseDetailPage() {
                                 children: "Services & Support"
                             }, void 0, false, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 725,
+                                lineNumber: 787,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2273,26 +2475,26 @@ function CaseDetailPage() {
                                         children: "support"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 727,
+                                        lineNumber: 789,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                         children: "Services management feature coming soon"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 728,
+                                        lineNumber: 790,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 726,
+                                lineNumber: 788,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 724,
+                        lineNumber: 786,
                         columnNumber: 13
                     }, this),
                     activeSubTab['case-management'] === 'living' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("article", {
@@ -2301,7 +2503,7 @@ function CaseDetailPage() {
                                 children: "Living Arrangements & Placements"
                             }, void 0, false, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 735,
+                                lineNumber: 797,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2320,26 +2522,26 @@ function CaseDetailPage() {
                                         children: "home"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 737,
+                                        lineNumber: 799,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                         children: "Living arrangements tracking feature coming soon"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 738,
+                                        lineNumber: 800,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 736,
+                                lineNumber: 798,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 734,
+                        lineNumber: 796,
                         columnNumber: 13
                     }, this),
                     activeSubTab['case-management'] === 'notes' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("article", {
@@ -2356,7 +2558,7 @@ function CaseDetailPage() {
                                         children: "Case Notes"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 746,
+                                        lineNumber: 808,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2367,20 +2569,20 @@ function CaseDetailPage() {
                                                 children: "note_add"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                lineNumber: 748,
+                                                lineNumber: 810,
                                                 columnNumber: 19
                                             }, this),
                                             "Add Note"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 747,
+                                        lineNumber: 809,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 745,
+                                lineNumber: 807,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2396,7 +2598,7 @@ function CaseDetailPage() {
                                                             children: note.created_by
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                            lineNumber: 757,
+                                                            lineNumber: 819,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2404,26 +2606,26 @@ function CaseDetailPage() {
                                                             children: new Date(note.created_date).toLocaleDateString()
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                            lineNumber: 758,
+                                                            lineNumber: 820,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                    lineNumber: 756,
+                                                    lineNumber: 818,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                     children: note.text
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                    lineNumber: 762,
+                                                    lineNumber: 824,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, note.note_id, true, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 755,
+                                            lineNumber: 817,
                                             columnNumber: 19
                                         }, this)),
                                     (!caseData.case_notes || caseData.case_notes.length === 0) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2435,25 +2637,25 @@ function CaseDetailPage() {
                                         children: "No case notes yet"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 766,
+                                        lineNumber: 828,
                                         columnNumber: 19
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 753,
+                                lineNumber: 815,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 744,
+                        lineNumber: 806,
                         columnNumber: 13
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                lineNumber: 639,
+                lineNumber: 701,
                 columnNumber: 9
             }, this),
             activeTab === 'legal' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2505,14 +2707,14 @@ function CaseDetailPage() {
                                             children: "gavel"
                                         }, void 0, false, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 811,
+                                            lineNumber: 873,
                                             columnNumber: 17
                                         }, this),
                                         "Court"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 792,
+                                    lineNumber: 854,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2545,25 +2747,25 @@ function CaseDetailPage() {
                                             children: "folder"
                                         }, void 0, false, {
                                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                            lineNumber: 833,
+                                            lineNumber: 895,
                                             columnNumber: 17
                                         }, this),
                                         "Electronic Case File"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                    lineNumber: 814,
+                                    lineNumber: 876,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/cases/[caseId]/page.tsx",
-                            lineNumber: 786,
+                            lineNumber: 848,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 779,
+                        lineNumber: 841,
                         columnNumber: 11
                     }, this),
                     activeSubTab['legal'] === 'court' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("article", {
@@ -2572,7 +2774,7 @@ function CaseDetailPage() {
                                 children: "Court Information & Legal Documents"
                             }, void 0, false, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 841,
+                                lineNumber: 903,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2591,26 +2793,26 @@ function CaseDetailPage() {
                                         children: "gavel"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 843,
+                                        lineNumber: 905,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                         children: "Court management feature coming soon"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 844,
+                                        lineNumber: 906,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 842,
+                                lineNumber: 904,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 840,
+                        lineNumber: 902,
                         columnNumber: 13
                     }, this),
                     activeSubTab['legal'] === 'documents' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("article", {
@@ -2627,7 +2829,7 @@ function CaseDetailPage() {
                                         children: "Electronic Case File (ECF)"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 852,
+                                        lineNumber: 914,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2638,20 +2840,20 @@ function CaseDetailPage() {
                                                 children: "upload_file"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                                lineNumber: 854,
+                                                lineNumber: 916,
                                                 columnNumber: 19
                                             }, this),
                                             "Upload Document"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 853,
+                                        lineNumber: 915,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 851,
+                                lineNumber: 913,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2670,14 +2872,14 @@ function CaseDetailPage() {
                                         children: "folder_open"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 860,
+                                        lineNumber: 922,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                         children: "Document management feature coming soon"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 861,
+                                        lineNumber: 923,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$future$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2688,31 +2890,31 @@ function CaseDetailPage() {
                                         children: "This will include document upload, categorization, and management capabilities"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                        lineNumber: 862,
+                                        lineNumber: 924,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                                lineNumber: 859,
+                                lineNumber: 921,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/cases/[caseId]/page.tsx",
-                        lineNumber: 850,
+                        lineNumber: 912,
                         columnNumber: 13
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/cases/[caseId]/page.tsx",
-                lineNumber: 777,
+                lineNumber: 839,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/cases/[caseId]/page.tsx",
-        lineNumber: 148,
+        lineNumber: 149,
         columnNumber: 5
     }, this);
 }

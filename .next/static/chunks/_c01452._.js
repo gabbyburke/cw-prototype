@@ -17,6 +17,7 @@ __turbopack_esm__({
     "getPersonById": ()=>getPersonById,
     "getPersonsByCase": ()=>getPersonsByCase,
     "healthCheck": ()=>healthCheck,
+    "searchMagicButtonData": ()=>searchMagicButtonData,
     "searchPersons": ()=>searchPersons,
     "updateCase": ()=>updateCase
 });
@@ -118,6 +119,80 @@ const updateCase = (caseId, updates)=>apiClient.updateCase(caseId, updates);
 const searchPersons = (query)=>apiClient.searchPersons(query);
 const getPersonById = (personId)=>apiClient.getPersonById(personId);
 const healthCheck = ()=>apiClient.healthCheck();
+const searchMagicButtonData = async (query)=>{
+    // Mock implementation - replace with real API call when backend is ready
+    await new Promise((resolve)=>setTimeout(resolve, 400));
+    // Mock data for development
+    const mockIncidents = [
+        {
+            incident_number: "INC-2024-001234",
+            child_first_names: "Emma",
+            child_last_names: "Johnson",
+            parent_first_names: "Michael, Sarah",
+            parent_last_names: "Johnson, Johnson",
+            cps_worker: "Dana Wilson",
+            due_date: "2024-09-15",
+            county_of_assessment: "King County",
+            intake_date: "2024-08-15",
+            reported_native_american_heritage: "No",
+            perpetrators: "Michael Johnson",
+            perpetrator_first_name: "Michael",
+            perpetrator_last_name: "Johnson",
+            findings: "Substantiated",
+            allegations: "Physical abuse",
+            victims: "Emma Johnson",
+            victim_first_name: "Emma",
+            victim_last_name: "Johnson",
+            person_id: "12345",
+            role: "Client",
+            gender: "Female",
+            age_calculated: 8,
+            prior_workers: "None",
+            current_address: "123 Main St",
+            address_type: "Residential",
+            residence_county: "King County",
+            date_of_birth: "2016-03-12",
+            phone_number: "206-555-0123",
+            phone_type: "Home",
+            address: "123 Main St",
+            city: "Seattle",
+            state: "WA",
+            zip_code: 98101,
+            non_custodial_parent: false,
+            non_custodial_parent_person_id: "",
+            non_custodial_parent_first_name: "",
+            non_custodial_parent_last_name: "",
+            non_custodial_parent_middle_name: "",
+            non_custodial_parent_dob: "",
+            non_custodial_parent_ssn: "",
+            non_custodial_parent_suffix: "",
+            non_custodial_parent_sex: "",
+            non_custodial_parent_race: "",
+            non_custodial_parent_ethnicity: "",
+            legal_custodian: "Sarah Johnson",
+            guardian: "",
+            prior_assessment: "None",
+            type_of_appointment: "",
+            clinic_name: "",
+            appointment_date: ""
+        }
+    ];
+    if (!query || query.length < 2) {
+        return {
+            data: {
+                incidents: []
+            },
+            error: undefined
+        };
+    }
+    const filteredIncidents = mockIncidents.filter((incident)=>incident.incident_number.toLowerCase().includes(query.toLowerCase()) || incident.child_first_names.toLowerCase().includes(query.toLowerCase()) || incident.child_last_names.toLowerCase().includes(query.toLowerCase()) || incident.allegations.toLowerCase().includes(query.toLowerCase()));
+    return {
+        data: {
+            incidents: filteredIncidents
+        },
+        error: undefined
+    };
+};
 
 })()),
 "[project]/components/CPWCaseSetupModal.tsx [app-client] (ecmascript)": (({ r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, g: global, __dirname, k: __turbopack_refresh__ }) => (() => {
@@ -193,20 +268,20 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
     const steps = [
         {
             id: 1,
+            title: 'Review Case Details',
+            description: 'Name case, add safety concerns, and review case information',
+            completed: allegations.type !== '' && allegations.description !== ''
+        },
+        {
+            id: 2,
             title: 'Verify Case Membership',
             description: 'Review and add people involved in the case',
             completed: casePersons.length > 0
         },
         {
-            id: 2,
-            title: 'Confirm Allegations',
-            description: 'Review and update case allegations',
-            completed: allegations.type !== '' && allegations.description !== ''
-        },
-        {
             id: 3,
-            title: 'Confirm Assessments',
-            description: 'Review risk and safety assessments',
+            title: 'Update Living Arrangements',
+            description: 'Set living arrangements for all children/clients',
             completed: assessments.risk_confirmed && assessments.safety_confirmed
         },
         {
@@ -217,7 +292,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
         }
     ];
     // Save/Resume functionality
-    const getStorageKey = (caseId)=>`cpw_setup_${caseId}`;
+    const getStorageKey = (caseId)=>`cpw_assignment_${caseId}`;
     const saveProgress = ()=>{
         if (!case_) return;
         const savedData = {
@@ -428,7 +503,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                 onClose();
             }
         } catch (err) {
-            setError('Failed to complete case setup');
+            setError('Failed to request SWCM assignment');
         } finally{
             setLoading(false);
         }
@@ -450,7 +525,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
                             children: [
-                                "CPW Case Setup - ",
+                                "Request SWCM Assignment - ",
                                 case_.case_display_name || `Case ${case_.case_id}`
                             ]
                         }, void 0, true, {
@@ -484,6 +559,47 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                     className: "modal-body",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "progress-bar-container",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "progress-bar",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "progress-fill",
+                                        style: {
+                                            width: `${currentStep / steps.length * 100}%`
+                                        }
+                                    }, void 0, false, {
+                                        fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                        lineNumber: 376,
+                                        columnNumber: 15
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                    lineNumber: 375,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "progress-text",
+                                    children: [
+                                        "Step ",
+                                        currentStep,
+                                        " of ",
+                                        steps.length,
+                                        ": ",
+                                        steps[currentStep - 1]?.title
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                    lineNumber: 381,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                            lineNumber: 374,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "setup-progress",
                             children: steps.map((step)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: `progress-step ${currentStep === step.id ? 'active' : ''} ${step.completed ? 'completed' : ''} clickable`,
@@ -496,12 +612,12 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                 children: "check"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                lineNumber: 382,
+                                                lineNumber: 395,
                                                 columnNumber: 37
                                             }, this) : step.id
                                         }, void 0, false, {
                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 381,
+                                            lineNumber: 394,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -511,31 +627,31 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                     children: step.title
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 385,
+                                                    lineNumber: 398,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                     children: step.description
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 386,
+                                                    lineNumber: 399,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 384,
+                                            lineNumber: 397,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, step.id, true, {
                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                    lineNumber: 376,
+                                    lineNumber: 389,
                                     columnNumber: 15
                                 }, this))
                         }, void 0, false, {
                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                            lineNumber: 374,
+                            lineNumber: 387,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -549,31 +665,458 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                             children: "error"
                                         }, void 0, false, {
                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 395,
+                                            lineNumber: 408,
                                             columnNumber: 15
                                         }, this),
                                         error
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                    lineNumber: 394,
+                                    lineNumber: 407,
                                     columnNumber: 13
                                 }, this),
                                 currentStep === 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "setup-step",
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                            children: "Step 1: Verify Case Membership"
+                                            children: "Step 1: Review Case Details"
                                         }, void 0, false, {
                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 403,
+                                            lineNumber: 416,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            children: "Review the people involved in this case and add any missing individuals."
+                                            children: "Name this case, add family safety concerns, and review case information before requesting SWCM assignment."
                                         }, void 0, false, {
                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 404,
+                                            lineNumber: 417,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "form-group",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                    children: "Name this case *"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                    lineNumber: 420,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                    type: "text",
+                                                    value: allegations.description,
+                                                    onChange: (e)=>setAllegations({
+                                                            ...allegations,
+                                                            description: e.target.value
+                                                        }),
+                                                    placeholder: "Enter a descriptive name for this case..."
+                                                }, void 0, false, {
+                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                    lineNumber: 421,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                            lineNumber: 419,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "form-group",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                    children: "Add family safety concerns"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                    lineNumber: 430,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
+                                                    value: assessments.assessment_notes,
+                                                    onChange: (e)=>setAssessments({
+                                                            ...assessments,
+                                                            assessment_notes: e.target.value
+                                                        }),
+                                                    placeholder: "Describe any family safety concerns...",
+                                                    rows: 3
+                                                }, void 0, false, {
+                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                    lineNumber: 431,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                            lineNumber: 429,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "form-grid",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "form-group",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                            children: "Safety Plan"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                            lineNumber: 441,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "radio-group",
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                            type: "radio",
+                                                                            name: "safety_plan",
+                                                                            value: "yes",
+                                                                            checked: assessments.safety_factors.includes('Safety Plan Required'),
+                                                                            onChange: (e)=>{
+                                                                                if (e.target.checked) {
+                                                                                    setAssessments({
+                                                                                        ...assessments,
+                                                                                        safety_factors: [
+                                                                                            ...assessments.safety_factors.filter((f)=>!f.includes('Safety Plan')),
+                                                                                            'Safety Plan Required'
+                                                                                        ]
+                                                                                    });
+                                                                                }
+                                                                            }
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                            lineNumber: 444,
+                                                                            columnNumber: 23
+                                                                        }, this),
+                                                                        "Yes"
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                    lineNumber: 443,
+                                                                    columnNumber: 21
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                            type: "radio",
+                                                                            name: "safety_plan",
+                                                                            value: "no",
+                                                                            checked: !assessments.safety_factors.includes('Safety Plan Required'),
+                                                                            onChange: (e)=>{
+                                                                                if (e.target.checked) {
+                                                                                    setAssessments({
+                                                                                        ...assessments,
+                                                                                        safety_factors: assessments.safety_factors.filter((f)=>!f.includes('Safety Plan'))
+                                                                                    });
+                                                                                }
+                                                                            }
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                            lineNumber: 461,
+                                                                            columnNumber: 23
+                                                                        }, this),
+                                                                        "No"
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                    lineNumber: 460,
+                                                                    columnNumber: 21
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                            lineNumber: 442,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                    lineNumber: 440,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "form-group",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                            children: "Family Preservation"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                            lineNumber: 481,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "radio-group",
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                            type: "radio",
+                                                                            name: "family_preservation",
+                                                                            value: "yes",
+                                                                            checked: assessments.safety_factors.includes('Family Preservation Services'),
+                                                                            onChange: (e)=>{
+                                                                                if (e.target.checked) {
+                                                                                    setAssessments({
+                                                                                        ...assessments,
+                                                                                        safety_factors: [
+                                                                                            ...assessments.safety_factors.filter((f)=>!f.includes('Family Preservation')),
+                                                                                            'Family Preservation Services'
+                                                                                        ]
+                                                                                    });
+                                                                                }
+                                                                            }
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                            lineNumber: 484,
+                                                                            columnNumber: 23
+                                                                        }, this),
+                                                                        "Yes"
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                    lineNumber: 483,
+                                                                    columnNumber: 21
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                            type: "radio",
+                                                                            name: "family_preservation",
+                                                                            value: "no",
+                                                                            checked: !assessments.safety_factors.includes('Family Preservation Services'),
+                                                                            onChange: (e)=>{
+                                                                                if (e.target.checked) {
+                                                                                    setAssessments({
+                                                                                        ...assessments,
+                                                                                        safety_factors: assessments.safety_factors.filter((f)=>!f.includes('Family Preservation'))
+                                                                                    });
+                                                                                }
+                                                                            }
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                            lineNumber: 501,
+                                                                            columnNumber: 23
+                                                                        }, this),
+                                                                        "No"
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                    lineNumber: 500,
+                                                                    columnNumber: 21
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                            lineNumber: 482,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                    lineNumber: 480,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "form-group",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                            children: "Prior Service Case"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                            lineNumber: 521,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "radio-group",
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                            type: "radio",
+                                                                            name: "prior_service",
+                                                                            value: "yes",
+                                                                            checked: assessments.safety_factors.includes('Prior Service Case'),
+                                                                            onChange: (e)=>{
+                                                                                if (e.target.checked) {
+                                                                                    setAssessments({
+                                                                                        ...assessments,
+                                                                                        safety_factors: [
+                                                                                            ...assessments.safety_factors.filter((f)=>!f.includes('Prior Service')),
+                                                                                            'Prior Service Case'
+                                                                                        ]
+                                                                                    });
+                                                                                }
+                                                                            }
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                            lineNumber: 524,
+                                                                            columnNumber: 23
+                                                                        }, this),
+                                                                        "Yes"
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                    lineNumber: 523,
+                                                                    columnNumber: 21
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                            type: "radio",
+                                                                            name: "prior_service",
+                                                                            value: "no",
+                                                                            checked: !assessments.safety_factors.includes('Prior Service Case'),
+                                                                            onChange: (e)=>{
+                                                                                if (e.target.checked) {
+                                                                                    setAssessments({
+                                                                                        ...assessments,
+                                                                                        safety_factors: assessments.safety_factors.filter((f)=>!f.includes('Prior Service'))
+                                                                                    });
+                                                                                }
+                                                                            }
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                            lineNumber: 541,
+                                                                            columnNumber: 23
+                                                                        }, this),
+                                                                        "No"
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                    lineNumber: 540,
+                                                                    columnNumber: 21
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                            lineNumber: 522,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                    lineNumber: 520,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                            lineNumber: 439,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "form-grid",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "form-group",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                            children: "Service Area Assigned"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                            lineNumber: 563,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                            type: "text",
+                                                            value: allegations.type,
+                                                            onChange: (e)=>setAllegations({
+                                                                    ...allegations,
+                                                                    type: e.target.value
+                                                                }),
+                                                            placeholder: "Will be pre-filled from Magic Button",
+                                                            disabled: true
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                            lineNumber: 564,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                    lineNumber: 562,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "form-group",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                            children: "Residence County"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                            lineNumber: 574,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                            type: "text",
+                                                            value: case_?.county || '',
+                                                            placeholder: "Will be pre-filled from Magic Button",
+                                                            disabled: true
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                            lineNumber: 575,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                    lineNumber: 573,
+                                                    columnNumber: 17
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "form-group",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                            children: "Financial County"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                            lineNumber: 584,
+                                                            columnNumber: 19
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                            type: "text",
+                                                            value: case_?.county || '',
+                                                            placeholder: "Will be pre-filled from Magic Button",
+                                                            disabled: true
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                            lineNumber: 585,
+                                                            columnNumber: 19
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                    lineNumber: 583,
+                                                    columnNumber: 17
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                            lineNumber: 561,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                    lineNumber: 415,
+                                    columnNumber: 13
+                                }, this),
+                                currentStep === 2 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "setup-step",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                            children: "Step 2: Verify Case Membership"
+                                        }, void 0, false, {
+                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                            lineNumber: 599,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            children: "Review the people involved in this case and add any missing individuals before assignment."
+                                        }, void 0, false, {
+                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                            lineNumber: 600,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -592,7 +1135,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 410,
+                                                                    lineNumber: 606,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -600,7 +1143,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                     children: person.role
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 411,
+                                                                    lineNumber: 607,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 person.date_of_birth && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -611,13 +1154,13 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 413,
+                                                                    lineNumber: 609,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 409,
+                                                            lineNumber: 605,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -629,25 +1172,25 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                     children: "remove"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 422,
+                                                                    lineNumber: 618,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 "Remove"
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 418,
+                                                            lineNumber: 614,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, person.person_id, true, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 408,
+                                                    lineNumber: 604,
                                                     columnNumber: 19
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 406,
+                                            lineNumber: 602,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -660,7 +1203,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                             children: "Search for a person or add new"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 431,
+                                                            lineNumber: 627,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -670,13 +1213,13 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                             placeholder: "Start typing a person's name..."
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 432,
+                                                            lineNumber: 628,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 430,
+                                                    lineNumber: 626,
                                                     columnNumber: 17
                                                 }, this),
                                                 searchLoading && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -687,14 +1230,14 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                             children: "hourglass_empty"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 442,
+                                                            lineNumber: 638,
                                                             columnNumber: 21
                                                         }, this),
                                                         "Searching..."
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 441,
+                                                    lineNumber: 637,
                                                     columnNumber: 19
                                                 }, this),
                                                 searchResults.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -708,7 +1251,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 449,
+                                                            lineNumber: 645,
                                                             columnNumber: 21
                                                         }, this),
                                                         searchResults.map((person)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -725,7 +1268,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                                lineNumber: 453,
+                                                                                lineNumber: 649,
                                                                                 columnNumber: 27
                                                                             }, this),
                                                                             person.date_of_birth && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -736,7 +1279,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                                lineNumber: 455,
+                                                                                lineNumber: 651,
                                                                                 columnNumber: 29
                                                                             }, this),
                                                                             person.contact_info?.address && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -744,13 +1287,13 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                                 children: person.contact_info.address
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                                lineNumber: 460,
+                                                                                lineNumber: 656,
                                                                                 columnNumber: 29
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                        lineNumber: 452,
+                                                                        lineNumber: 648,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -767,19 +1310,19 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                         children: casePersons.some((p)=>p.person_id === person.person_id) ? 'Already Added' : 'Select'
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                        lineNumber: 463,
+                                                                        lineNumber: 659,
                                                                         columnNumber: 25
                                                                     }, this)
                                                                 ]
                                                             }, person.person_id, true, {
                                                                 fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                lineNumber: 451,
+                                                                lineNumber: 647,
                                                                 columnNumber: 23
                                                             }, this))
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 448,
+                                                    lineNumber: 644,
                                                     columnNumber: 19
                                                 }, this),
                                                 searchQuery.length >= 2 && !searchLoading && searchResults.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -792,7 +1335,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                 children: "search_off"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                lineNumber: 485,
+                                                                lineNumber: 681,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -803,7 +1346,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                lineNumber: 486,
+                                                                lineNumber: 682,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -815,7 +1358,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                         children: "person_add"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                        lineNumber: 491,
+                                                                        lineNumber: 687,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     'Add "',
@@ -824,18 +1367,18 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                lineNumber: 487,
+                                                                lineNumber: 683,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                        lineNumber: 484,
+                                                        lineNumber: 680,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 483,
+                                                    lineNumber: 679,
                                                     columnNumber: 19
                                                 }, this),
                                                 searchQuery.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -845,7 +1388,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                             children: "Start typing to search for existing people, or"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 500,
+                                                            lineNumber: 696,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -857,26 +1400,26 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                     children: "person_add"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 505,
+                                                                    lineNumber: 701,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 "Add New Person"
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 501,
+                                                            lineNumber: 697,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 499,
+                                                    lineNumber: 695,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 429,
+                                            lineNumber: 625,
                                             columnNumber: 15
                                         }, this),
                                         showPersonSearch && selectedPerson && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -891,7 +1434,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 514,
+                                                    lineNumber: 710,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -901,7 +1444,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                             children: "Role in Case"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 516,
+                                                            lineNumber: 712,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -913,7 +1456,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                     children: "Parent"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 521,
+                                                                    lineNumber: 717,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -921,7 +1464,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                     children: "Non-Resident Parent"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 522,
+                                                                    lineNumber: 718,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -929,7 +1472,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                     children: "Client"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 523,
+                                                                    lineNumber: 719,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -937,7 +1480,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                     children: "Guardian"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 524,
+                                                                    lineNumber: 720,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -945,7 +1488,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                     children: "Relative"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 525,
+                                                                    lineNumber: 721,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -953,19 +1496,19 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                     children: "Family Support"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 526,
+                                                                    lineNumber: 722,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 517,
+                                                            lineNumber: 713,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 515,
+                                                    lineNumber: 711,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -984,14 +1527,14 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                     children: "add"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 538,
+                                                                    lineNumber: 734,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 "Add to Case"
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 530,
+                                                            lineNumber: 726,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1003,19 +1546,19 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                             children: "Cancel"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 541,
+                                                            lineNumber: 737,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 529,
+                                                    lineNumber: 725,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 513,
+                                            lineNumber: 709,
                                             columnNumber: 17
                                         }, this),
                                         showAddPersonForm && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1025,7 +1568,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                     children: "Add New Person"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 556,
+                                                    lineNumber: 752,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1038,7 +1581,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                     children: "First Name *"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 559,
+                                                                    lineNumber: 755,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1051,13 +1594,13 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                     placeholder: "Enter first name"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 560,
+                                                                    lineNumber: 756,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 558,
+                                                            lineNumber: 754,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1067,7 +1610,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                     children: "Last Name *"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 568,
+                                                                    lineNumber: 764,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1080,13 +1623,13 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                     placeholder: "Enter last name"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 569,
+                                                                    lineNumber: 765,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 567,
+                                                            lineNumber: 763,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1096,7 +1639,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                     children: "Date of Birth"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 577,
+                                                                    lineNumber: 773,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1108,13 +1651,13 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                         })
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 578,
+                                                                    lineNumber: 774,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 576,
+                                                            lineNumber: 772,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1124,7 +1667,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                     children: "Relationship to Case *"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 585,
+                                                                    lineNumber: 781,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -1139,7 +1682,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                             children: "Parent"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                            lineNumber: 590,
+                                                                            lineNumber: 786,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -1147,7 +1690,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                             children: "Non-Resident Parent"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                            lineNumber: 591,
+                                                                            lineNumber: 787,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -1155,7 +1698,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                             children: "Client"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                            lineNumber: 592,
+                                                                            lineNumber: 788,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -1163,7 +1706,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                             children: "Guardian"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                            lineNumber: 593,
+                                                                            lineNumber: 789,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -1171,7 +1714,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                             children: "Relative"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                            lineNumber: 594,
+                                                                            lineNumber: 790,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -1179,25 +1722,25 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                             children: "Family Support"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                            lineNumber: 595,
+                                                                            lineNumber: 791,
                                                                             columnNumber: 25
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 586,
+                                                                    lineNumber: 782,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 584,
+                                                            lineNumber: 780,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 557,
+                                                    lineNumber: 753,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1212,14 +1755,14 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                                     children: "add"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 601,
+                                                                    lineNumber: 797,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 "Add Person"
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 600,
+                                                            lineNumber: 796,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1228,588 +1771,310 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                             children: "Cancel"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 604,
+                                                            lineNumber: 800,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 599,
+                                                    lineNumber: 795,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 555,
+                                            lineNumber: 751,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                    lineNumber: 402,
-                                    columnNumber: 13
-                                }, this),
-                                currentStep === 2 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "setup-step",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                            children: "Step 2: Confirm and Detail Allegations"
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 619,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            children: "Review and update the allegations for this case."
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 620,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "form-group",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                    children: "Allegation Type *"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 623,
-                                                    columnNumber: 17
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
-                                                    value: allegations.type,
-                                                    onChange: (e)=>setAllegations({
-                                                            ...allegations,
-                                                            type: e.target.value
-                                                        }),
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                            value: "",
-                                                            children: "Select allegation type"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 628,
-                                                            columnNumber: 19
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                            value: "Physical Abuse",
-                                                            children: "Physical Abuse"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 629,
-                                                            columnNumber: 19
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                            value: "Sexual Abuse",
-                                                            children: "Sexual Abuse"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 630,
-                                                            columnNumber: 19
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                            value: "Emotional Abuse",
-                                                            children: "Emotional Abuse"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 631,
-                                                            columnNumber: 19
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                            value: "Neglect",
-                                                            children: "Neglect"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 632,
-                                                            columnNumber: 19
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                            value: "Medical Neglect",
-                                                            children: "Medical Neglect"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 633,
-                                                            columnNumber: 19
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                            value: "Educational Neglect",
-                                                            children: "Educational Neglect"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 634,
-                                                            columnNumber: 19
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                            value: "Abandonment",
-                                                            children: "Abandonment"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 635,
-                                                            columnNumber: 19
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                            value: "Substance Abuse",
-                                                            children: "Substance Abuse"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 636,
-                                                            columnNumber: 19
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                            value: "Domestic Violence",
-                                                            children: "Domestic Violence"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 637,
-                                                            columnNumber: 19
-                                                        }, this)
-                                                    ]
-                                                }, void 0, true, {
-                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 624,
-                                                    columnNumber: 17
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 622,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "form-group",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                    children: "Allegation Description *"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 642,
-                                                    columnNumber: 17
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
-                                                    value: allegations.description,
-                                                    onChange: (e)=>setAllegations({
-                                                            ...allegations,
-                                                            description: e.target.value
-                                                        }),
-                                                    placeholder: "Provide detailed description of the allegations...",
-                                                    rows: 4
-                                                }, void 0, false, {
-                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 643,
-                                                    columnNumber: 17
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 641,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                    lineNumber: 618,
+                                    lineNumber: 598,
                                     columnNumber: 13
                                 }, this),
                                 currentStep === 3 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "setup-step",
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                            children: "Step 3: Confirm Risk and Safety Assessments"
+                                            children: "Step 3: Update Living Arrangements"
                                         }, void 0, false, {
                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 656,
+                                            lineNumber: 815,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            children: "Review the risk and safety assessments for this case."
+                                            children: "Set living arrangements for all children/clients before requesting SWCM assignment."
                                         }, void 0, false, {
                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 657,
+                                            lineNumber: 816,
                                             columnNumber: 15
                                         }, this),
-                                        case_?.safety_assessment_due && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "assessment-due-notice",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "icon",
-                                                    children: "schedule"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 662,
-                                                    columnNumber: 19
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                    children: "Safety Assessment Due: "
-                                                }, void 0, false, {
-                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 663,
-                                                    columnNumber: 19
-                                                }, this),
-                                                new Date(case_.safety_assessment_due).toLocaleDateString(),
-                                                " at ",
-                                                new Date(case_.safety_assessment_due).toLocaleTimeString()
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 661,
-                                            columnNumber: 17
-                                        }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "assessment-section",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
-                                                    children: "Risk Assessment"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 669,
-                                                    columnNumber: 17
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "form-group",
+                                            className: "living-arrangements-section",
+                                            children: casePersons.filter((person)=>person.role.toLowerCase() === 'client' || person.role.toLowerCase() === 'child').length > 0 ? casePersons.filter((person)=>person.role.toLowerCase() === 'client' || person.role.toLowerCase() === 'child').map((child)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "child-living-arrangement",
                                                     children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                            children: "Risk Level"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 671,
-                                                            columnNumber: 19
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
-                                                            value: assessments.risk_level,
-                                                            onChange: (e)=>setAssessments({
-                                                                    ...assessments,
-                                                                    risk_level: e.target.value
-                                                                }),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
                                                             children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                                    value: "Low",
-                                                                    children: "Low Risk"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 676,
-                                                                    columnNumber: 21
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                                    value: "Medium",
-                                                                    children: "Medium Risk"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 677,
-                                                                    columnNumber: 21
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                                    value: "High",
-                                                                    children: "High Risk"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 678,
-                                                                    columnNumber: 21
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                                    value: "Very High",
-                                                                    children: "Very High Risk"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 679,
-                                                                    columnNumber: 21
-                                                                }, this)
+                                                                child.first_name,
+                                                                " ",
+                                                                child.last_name
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 672,
-                                                            columnNumber: 19
-                                                        }, this)
-                                                    ]
-                                                }, void 0, true, {
-                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 670,
-                                                    columnNumber: 17
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "form-group",
-                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                                type: "checkbox",
-                                                                checked: assessments.risk_confirmed,
-                                                                onChange: (e)=>setAssessments({
-                                                                        ...assessments,
-                                                                        risk_confirmed: e.target.checked
-                                                                    })
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                lineNumber: 684,
-                                                                columnNumber: 21
-                                                            }, this),
-                                                            "I confirm the risk assessment is accurate and complete"
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                        lineNumber: 683,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                }, void 0, false, {
-                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 682,
-                                                    columnNumber: 17
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 668,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "assessment-section",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
-                                                    children: "Safety Assessment"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 695,
-                                                    columnNumber: 17
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "form-group",
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                            children: "Safety Factors"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 698,
-                                                            columnNumber: 19
+                                                            lineNumber: 824,
+                                                            columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "safety-factors-list",
-                                                            children: assessments.safety_factors.map((factor, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                    className: "safety-factor-item",
-                                                                    children: [
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                            children: factor
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                            lineNumber: 702,
-                                                                            columnNumber: 25
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                                            type: "button",
-                                                                            onClick: ()=>{
-                                                                                const newFactors = assessments.safety_factors.filter((_, i)=>i !== index);
-                                                                                setAssessments({
-                                                                                    ...assessments,
-                                                                                    safety_factors: newFactors
-                                                                                });
-                                                                            },
-                                                                            className: "remove-factor-btn",
-                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                className: "icon",
-                                                                                children: "close"
-                                                                            }, void 0, false, {
-                                                                                fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                                lineNumber: 711,
-                                                                                columnNumber: 27
-                                                                            }, this)
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                            lineNumber: 703,
-                                                                            columnNumber: 25
-                                                                        }, this)
-                                                                    ]
-                                                                }, index, true, {
-                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 701,
-                                                                    columnNumber: 23
-                                                                }, this))
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 699,
-                                                            columnNumber: 19
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "add-safety-factor",
+                                                            className: "form-grid",
                                                             children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
-                                                                    value: "",
-                                                                    onChange: (e)=>{
-                                                                        if (e.target.value && !assessments.safety_factors.includes(e.target.value)) {
-                                                                            setAssessments({
-                                                                                ...assessments,
-                                                                                safety_factors: [
-                                                                                    ...assessments.safety_factors,
-                                                                                    e.target.value
-                                                                                ]
-                                                                            });
-                                                                        }
-                                                                    },
-                                                                    children: [
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                                            value: "",
-                                                                            children: "Select a common safety factor..."
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                            lineNumber: 729,
-                                                                            columnNumber: 23
-                                                                        }, this),
-                                                                        commonSafetyFactors.filter((factor)=>!assessments.safety_factors.includes(factor)).map((factor)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                                                value: factor,
-                                                                                children: factor
-                                                                            }, factor, false, {
-                                                                                fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                                lineNumber: 733,
-                                                                                columnNumber: 27
-                                                                            }, this))
-                                                                    ]
-                                                                }, void 0, true, {
-                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 718,
-                                                                    columnNumber: 21
-                                                                }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                    className: "custom-factor-input",
+                                                                    className: "form-group",
                                                                     children: [
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                                            type: "text",
-                                                                            value: newSafetyFactor,
-                                                                            onChange: (e)=>setNewSafetyFactor(e.target.value),
-                                                                            placeholder: "Or add a custom safety factor..."
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                            children: "Living Arrangement Type *"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                            lineNumber: 739,
-                                                                            columnNumber: 23
+                                                                            lineNumber: 827,
+                                                                            columnNumber: 29
                                                                         }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                                            type: "button",
-                                                                            onClick: ()=>{
-                                                                                if (newSafetyFactor.trim() && !assessments.safety_factors.includes(newSafetyFactor.trim())) {
-                                                                                    setAssessments({
-                                                                                        ...assessments,
-                                                                                        safety_factors: [
-                                                                                            ...assessments.safety_factors,
-                                                                                            newSafetyFactor.trim()
-                                                                                        ]
-                                                                                    });
-                                                                                    setNewSafetyFactor('');
-                                                                                }
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                                                            value: "",
+                                                                            onChange: (e)=>{
+                                                                                // TODO: Store living arrangement data
+                                                                                console.log(`Living arrangement for ${child.first_name}: ${e.target.value}`);
                                                                             },
-                                                                            className: "action-btn small primary",
-                                                                            disabled: !newSafetyFactor.trim(),
                                                                             children: [
-                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                    className: "icon",
-                                                                                    children: "add"
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                    value: "",
+                                                                                    children: "Select arrangement type"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                                    lineNumber: 759,
-                                                                                    columnNumber: 25
+                                                                                    lineNumber: 835,
+                                                                                    columnNumber: 31
                                                                                 }, this),
-                                                                                "Add"
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                    value: "With Parent/Guardian",
+                                                                                    children: "With Parent/Guardian"
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                                    lineNumber: 836,
+                                                                                    columnNumber: 31
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                    value: "Foster Care",
+                                                                                    children: "Foster Care"
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                                    lineNumber: 837,
+                                                                                    columnNumber: 31
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                    value: "Kinship Care",
+                                                                                    children: "Kinship Care"
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                                    lineNumber: 838,
+                                                                                    columnNumber: 31
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                    value: "Group Home",
+                                                                                    children: "Group Home"
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                                    lineNumber: 839,
+                                                                                    columnNumber: 31
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                    value: "Residential Treatment",
+                                                                                    children: "Residential Treatment"
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                                    lineNumber: 840,
+                                                                                    columnNumber: 31
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                    value: "Independent Living",
+                                                                                    children: "Independent Living"
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                                    lineNumber: 841,
+                                                                                    columnNumber: 31
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                    value: "Other",
+                                                                                    children: "Other"
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                                    lineNumber: 842,
+                                                                                    columnNumber: 31
+                                                                                }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                            lineNumber: 745,
-                                                                            columnNumber: 23
+                                                                            lineNumber: 828,
+                                                                            columnNumber: 29
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                    lineNumber: 738,
-                                                                    columnNumber: 21
+                                                                    lineNumber: 826,
+                                                                    columnNumber: 27
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "form-group",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                            children: "Name and Location *"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                            lineNumber: 847,
+                                                                            columnNumber: 29
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                            type: "text",
+                                                                            placeholder: "Enter caregiver name and location",
+                                                                            onChange: (e)=>{
+                                                                                // TODO: Store location data
+                                                                                console.log(`Location for ${child.first_name}: ${e.target.value}`);
+                                                                            }
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                            lineNumber: 848,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                    lineNumber: 846,
+                                                                    columnNumber: 27
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "form-group",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                            children: "Start Date *"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                            lineNumber: 859,
+                                                                            columnNumber: 29
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                            type: "date",
+                                                                            onChange: (e)=>{
+                                                                                // TODO: Store start date
+                                                                                console.log(`Start date for ${child.first_name}: ${e.target.value}`);
+                                                                            }
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                            lineNumber: 860,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                    lineNumber: 858,
+                                                                    columnNumber: 27
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "form-group",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                            children: "End Date"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                            lineNumber: 870,
+                                                                            columnNumber: 29
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                            type: "date",
+                                                                            onChange: (e)=>{
+                                                                                // TODO: Store end date
+                                                                                console.log(`End date for ${child.first_name}: ${e.target.value}`);
+                                                                            }
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                            lineNumber: 871,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                                    lineNumber: 869,
+                                                                    columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 717,
-                                                            columnNumber: 19
+                                                            lineNumber: 825,
+                                                            columnNumber: 25
                                                         }, this)
                                                     ]
-                                                }, void 0, true, {
+                                                }, child.person_id, true, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 697,
-                                                    columnNumber: 17
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "form-group",
-                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                                type: "checkbox",
-                                                                checked: assessments.safety_confirmed,
-                                                                onChange: (e)=>setAssessments({
-                                                                        ...assessments,
-                                                                        safety_confirmed: e.target.checked
-                                                                    })
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                                lineNumber: 768,
-                                                                columnNumber: 21
-                                                            }, this),
-                                                            "I confirm the safety assessment is accurate and complete"
-                                                        ]
-                                                    }, void 0, true, {
+                                                    lineNumber: 823,
+                                                    columnNumber: 23
+                                                }, this)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "no-children-notice",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: "icon",
+                                                        children: "info"
+                                                    }, void 0, false, {
                                                         fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                        lineNumber: 767,
-                                                        columnNumber: 19
+                                                        lineNumber: 884,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        children: "No children/clients found in this case. Please add children in Step 2 before requesting assignment."
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                        lineNumber: 885,
+                                                        columnNumber: 21
                                                     }, this)
-                                                }, void 0, false, {
-                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 766,
-                                                    columnNumber: 17
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                lineNumber: 883,
+                                                columnNumber: 19
+                                            }, this)
+                                        }, void 0, false, {
                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 694,
+                                            lineNumber: 818,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "assessment-section",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
-                                                    children: "Assessment Notes"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 779,
-                                                    columnNumber: 17
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "form-group",
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                            children: "Additional Assessment Notes (Optional)"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 781,
-                                                            columnNumber: 19
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
-                                                            value: assessments.assessment_notes,
-                                                            onChange: (e)=>setAssessments({
-                                                                    ...assessments,
-                                                                    assessment_notes: e.target.value
-                                                                }),
-                                                            placeholder: "Provide any additional notes about the risk and safety assessment...",
-                                                            rows: 3
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 782,
-                                                            columnNumber: 19
-                                                        }, this)
-                                                    ]
-                                                }, void 0, true, {
-                                                    fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 780,
-                                                    columnNumber: 17
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
+                                            className: "form-group",
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                        type: "checkbox",
+                                                        checked: assessments.risk_confirmed,
+                                                        onChange: (e)=>setAssessments({
+                                                                ...assessments,
+                                                                risk_confirmed: e.target.checked
+                                                            })
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                        lineNumber: 892,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    "I confirm all living arrangements have been reviewed and updated"
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/components/CPWCaseSetupModal.tsx",
+                                                lineNumber: 891,
+                                                columnNumber: 17
+                                            }, this)
+                                        }, void 0, false, {
                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 778,
+                                            lineNumber: 890,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                    lineNumber: 655,
+                                    lineNumber: 814,
                                     columnNumber: 13
                                 }, this),
                                 currentStep === 4 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1819,24 +2084,24 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                             children: "Step 4: Request SWCM Assignment"
                                         }, void 0, false, {
                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 796,
+                                            lineNumber: 907,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                             children: "Review all information and request assignment to a Social Work Case Manager."
                                         }, void 0, false, {
                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 797,
+                                            lineNumber: 908,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "setup-summary",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
-                                                    children: "Case Setup Summary"
+                                                    children: "Assignment Request Summary"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 800,
+                                                    lineNumber: 911,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1846,7 +2111,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                             children: "People Involved:"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 802,
+                                                            lineNumber: 913,
                                                             columnNumber: 19
                                                         }, this),
                                                         " ",
@@ -1855,7 +2120,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 801,
+                                                    lineNumber: 912,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1865,7 +2130,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                             children: "Allegation:"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 805,
+                                                            lineNumber: 916,
                                                             columnNumber: 19
                                                         }, this),
                                                         " ",
@@ -1873,7 +2138,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 804,
+                                                    lineNumber: 915,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1883,7 +2148,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                             children: "Risk Level:"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 808,
+                                                            lineNumber: 919,
                                                             columnNumber: 19
                                                         }, this),
                                                         " ",
@@ -1891,31 +2156,31 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 807,
+                                                    lineNumber: 918,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                     className: "summary-item",
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                            children: "Assessments Confirmed:"
+                                                            children: "Ready for Assignment:"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                            lineNumber: 811,
+                                                            lineNumber: 922,
                                                             columnNumber: 19
                                                         }, this),
                                                         " ",
-                                                        assessments.risk_confirmed && assessments.safety_confirmed ? 'Yes' : 'No'
+                                                        assessments.risk_confirmed ? 'Yes' : 'No'
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 810,
+                                                    lineNumber: 921,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 799,
+                                            lineNumber: 910,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1925,7 +2190,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                     children: "CPW Notes (Optional)"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 816,
+                                                    lineNumber: 927,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
@@ -1938,13 +2203,13 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                     rows: 3
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                    lineNumber: 817,
+                                                    lineNumber: 928,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 815,
+                                            lineNumber: 926,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1960,31 +2225,31 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                                             })
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                        lineNumber: 827,
+                                                        lineNumber: 938,
                                                         columnNumber: 19
                                                     }, this),
-                                                    "I confirm this case is ready for SWCM assignment"
+                                                    "I confirm this case is ready for SWCM assignment and all required information has been reviewed"
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                                lineNumber: 826,
+                                                lineNumber: 937,
                                                 columnNumber: 17
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                            lineNumber: 825,
+                                            lineNumber: 936,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                    lineNumber: 795,
+                                    lineNumber: 906,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                            lineNumber: 392,
+                            lineNumber: 405,
                             columnNumber: 11
                         }, this)
                     ]
@@ -2004,7 +2269,7 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                 children: "Cancel"
                             }, void 0, false, {
                                 fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                lineNumber: 842,
+                                lineNumber: 953,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2016,14 +2281,14 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                         children: "save"
                                     }, void 0, false, {
                                         fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                        lineNumber: 847,
+                                        lineNumber: 958,
                                         columnNumber: 15
                                     }, this),
                                     "Save & Exit"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                lineNumber: 846,
+                                lineNumber: 957,
                                 columnNumber: 13
                             }, this),
                             currentStep > 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2035,14 +2300,14 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                         children: "arrow_back"
                                     }, void 0, false, {
                                         fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                        lineNumber: 853,
+                                        lineNumber: 964,
                                         columnNumber: 17
                                     }, this),
                                     "Previous"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                lineNumber: 852,
+                                lineNumber: 963,
                                 columnNumber: 15
                             }, this),
                             currentStep < 4 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2055,43 +2320,43 @@ function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }) {
                                         children: "arrow_forward"
                                     }, void 0, false, {
                                         fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                        lineNumber: 864,
+                                        lineNumber: 975,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                lineNumber: 859,
+                                lineNumber: 970,
                                 columnNumber: 15
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                 onClick: handleFinishSetup,
                                 className: "action-btn primary",
                                 disabled: !finalConfirmation.ready_for_assignment || loading,
                                 children: [
-                                    loading ? 'Processing...' : 'Complete Setup',
+                                    loading ? 'Requesting Assignment...' : 'Request SWCM Assignment',
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         className: "icon",
-                                        children: "check"
+                                        children: "assignment_ind"
                                     }, void 0, false, {
                                         fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                        lineNumber: 873,
+                                        lineNumber: 984,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                                lineNumber: 867,
+                                lineNumber: 978,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                        lineNumber: 841,
+                        lineNumber: 952,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/CPWCaseSetupModal.tsx",
-                    lineNumber: 840,
+                    lineNumber: 951,
                     columnNumber: 9
                 }, this)
             ]
@@ -2123,6 +2388,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/link.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/lib/api.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$CPWCaseSetupModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/components/CPWCaseSetupModal.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$TaskTable$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/components/TaskTable.tsx [app-client] (ecmascript)");
 "__TURBOPACK__ecmascript__hoisting__location__";
 ;
 var _s = __turbopack_refresh__.signature();
@@ -2131,14 +2397,18 @@ var _s = __turbopack_refresh__.signature();
 ;
 ;
 ;
+;
 function CPWPage() {
     _s();
-    const [activeTab, setActiveTab] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('cpw-queue');
+    const [activeFilters, setActiveFilters] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([
+        'Draft Cases'
+    ]);
     const [cases, setCases] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
     const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [isSetupModalOpen, setIsSetupModalOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [selectedCase, setSelectedCase] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [activeTask, setActiveTask] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         loadCases();
     }, []);
@@ -2210,14 +2480,14 @@ function CPWPage() {
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/cpw/page.tsx",
-                        lineNumber: 70,
+                        lineNumber: 72,
                         columnNumber: 9
                     }, this),
                     index < children.length - 1 && ', '
                 ]
             }, child.person_id, true, {
                 fileName: "[project]/app/cpw/page.tsx",
-                lineNumber: 69,
+                lineNumber: 71,
                 columnNumber: 7
             }, this));
     };
@@ -2236,12 +2506,42 @@ function CPWPage() {
         setSelectedCase(case_);
         setIsSetupModalOpen(true);
     };
+    const handleStartCaseSetup = (case_)=>{
+        // TODO: Open comprehensive case setup modal/component
+        // For now, navigate to case details page
+        window.location.href = `/cases/${case_.case_id}`;
+    };
     const hasSavedProgress = (caseId)=>{
         try {
             const saved = localStorage.getItem(`cpw_setup_${caseId}`);
             return saved !== null;
         } catch (error) {
             return false;
+        }
+    };
+    const getSetupProgress = (caseId)=>{
+        try {
+            const saved = localStorage.getItem(`cpw_setup_${caseId}`);
+            if (!saved) return {
+                step: 0,
+                total: 4,
+                percentage: 0
+            };
+            const data = JSON.parse(saved);
+            const currentStep = data.currentStep || 1;
+            const total = 4;
+            const percentage = Math.round(currentStep / total * 100);
+            return {
+                step: currentStep,
+                total,
+                percentage
+            };
+        } catch (error) {
+            return {
+                step: 0,
+                total: 4,
+                percentage: 0
+            };
         }
     };
     const handleSetupSuccess = ()=>{
@@ -2254,14 +2554,226 @@ function CPWPage() {
         setIsSetupModalOpen(false);
         setSelectedCase(null);
     };
-    // Filter cases based on active tab
+    // Handle task card clicks - toggle between showing task view and default view
+    const handleTaskCardClick = (taskType)=>{
+        if (activeTask === taskType) {
+            // If clicking the same task, toggle it off
+            setActiveTask(null);
+        } else {
+            // Set the new active task
+            setActiveTask(taskType);
+        }
+    };
+    // Get cases for the active task
+    const getTaskCases = (taskType)=>{
+        switch(taskType){
+            case 'request-assignment':
+                return cases.filter((c)=>c.status === 'Draft');
+            case 'edits-required':
+                return cases.filter((c)=>c.status === 'Edits Required');
+            case 'case-setup':
+                return cases.filter((c)=>c.status === 'Case Setup');
+            default:
+                return [];
+        }
+    };
+    // Handle task table action clicks
+    const handleTaskAction = (case_)=>{
+        if (activeTask === 'request-assignment') {
+            handleSetupCase(case_);
+        } else if (activeTask === 'edits-required') {
+            // TODO: Handle edits required action
+            console.log('Handle edits required for case:', case_.case_id);
+        } else if (activeTask === 'case-setup') {
+            handleStartCaseSetup(case_);
+        }
+    };
+    // Define available filter tags
+    const filterTags = [
+        {
+            id: 'pending-assignment',
+            label: 'Pending Assignment',
+            status: [
+                'Pending Assignment'
+            ],
+            count: cases.filter((c)=>c.status === 'Pending Assignment').length
+        },
+        {
+            id: 'pending-approval',
+            label: 'Pending Approval',
+            status: [
+                'Pending Approval'
+            ],
+            count: cases.filter((c)=>c.status === 'Pending Approval').length
+        },
+        {
+            id: 'ready-swcm-assignment',
+            label: 'Ready for SWCM Assignment',
+            status: [
+                'Draft'
+            ],
+            count: cases.filter((c)=>c.status === 'Draft').length
+        },
+        {
+            id: 'active',
+            label: 'Active',
+            status: [
+                'Active'
+            ],
+            count: cases.filter((c)=>c.status === 'Active').length
+        }
+    ];
+    // Toggle filter tag
+    const toggleFilter = (tagId)=>{
+        const tag = filterTags.find((t)=>t.id === tagId);
+        if (!tag) return;
+        setActiveFilters((prev)=>{
+            const isActive = prev.includes(tag.label);
+            if (isActive) {
+                return prev.filter((f)=>f !== tag.label);
+            } else {
+                return [
+                    ...prev,
+                    tag.label
+                ];
+            }
+        });
+    };
+    // Filter cases based on active filters
     const filteredCases = cases.filter((case_)=>{
-        if (activeTab === 'cpw-queue') return case_.status === 'Case Setup';
-        if (activeTab === 'completed') return case_.status === 'Active' || case_.status === 'Closed';
-        if (activeTab === 'overdue') return false // TODO: Implement overdue logic
-        ;
-        return true;
+        if (activeFilters.length === 0) return true;
+        return filterTags.some((tag)=>activeFilters.includes(tag.label) && tag.status.includes(case_.status));
     });
+    // Get action button for case based on status
+    const getCaseActionButton = (case_)=>{
+        switch(case_.status){
+            case 'Draft':
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                    onClick: ()=>handleSetupCase(case_),
+                    className: "action-btn small primary",
+                    title: "Request SWCM Assignment",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                            className: "icon",
+                            children: "assignment_ind"
+                        }, void 0, false, {
+                            fileName: "[project]/app/cpw/page.tsx",
+                            lineNumber: 219,
+                            columnNumber: 13
+                        }, this),
+                        "Request Assignment"
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/cpw/page.tsx",
+                    lineNumber: 214,
+                    columnNumber: 11
+                }, this);
+            case 'Pending Assignment':
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                    className: "action-btn small secondary",
+                    disabled: true,
+                    title: "Waiting for SWCM assignment",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                            className: "icon",
+                            children: "hourglass_empty"
+                        }, void 0, false, {
+                            fileName: "[project]/app/cpw/page.tsx",
+                            lineNumber: 230,
+                            columnNumber: 13
+                        }, this),
+                        "Pending"
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/cpw/page.tsx",
+                    lineNumber: 225,
+                    columnNumber: 11
+                }, this);
+            case 'Case Setup':
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                    onClick: ()=>handleStartCaseSetup(case_),
+                    className: "action-btn small primary",
+                    title: hasSavedProgress(case_.case_id) ? 'Resume case setup progress' : 'Start comprehensive case setup',
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                            className: "icon",
+                            children: hasSavedProgress(case_.case_id) ? 'play_arrow' : 'settings'
+                        }, void 0, false, {
+                            fileName: "[project]/app/cpw/page.tsx",
+                            lineNumber: 241,
+                            columnNumber: 13
+                        }, this),
+                        hasSavedProgress(case_.case_id) ? 'Resume Setup' : 'Start Setup'
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/cpw/page.tsx",
+                    lineNumber: 236,
+                    columnNumber: 11
+                }, this);
+            case 'Pending Approval':
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                    className: "action-btn small secondary",
+                    disabled: true,
+                    title: "Case setup complete, awaiting supervisor approval",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                            className: "icon",
+                            children: "pending"
+                        }, void 0, false, {
+                            fileName: "[project]/app/cpw/page.tsx",
+                            lineNumber: 252,
+                            columnNumber: 13
+                        }, this),
+                        "Awaiting Approval"
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/cpw/page.tsx",
+                    lineNumber: 247,
+                    columnNumber: 11
+                }, this);
+            case 'Active':
+            case 'Closed':
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                    href: `/cases/${case_.case_id}`,
+                    className: "action-btn small primary",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                            className: "icon",
+                            children: "visibility"
+                        }, void 0, false, {
+                            fileName: "[project]/app/cpw/page.tsx",
+                            lineNumber: 260,
+                            columnNumber: 13
+                        }, this),
+                        "View"
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/cpw/page.tsx",
+                    lineNumber: 259,
+                    columnNumber: 11
+                }, this);
+            default:
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                    className: "action-btn small secondary",
+                    disabled: true,
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                            className: "icon",
+                            children: "help"
+                        }, void 0, false, {
+                            fileName: "[project]/app/cpw/page.tsx",
+                            lineNumber: 267,
+                            columnNumber: 13
+                        }, this),
+                        "Unknown Status"
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/cpw/page.tsx",
+                    lineNumber: 266,
+                    columnNumber: 11
+                }, this);
+        }
+    };
     if (loading) {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "page-container",
@@ -2273,7 +2785,7 @@ function CPWPage() {
                         children: "CPW Dashboard"
                     }, void 0, false, {
                         fileName: "[project]/app/cpw/page.tsx",
-                        lineNumber: 127,
+                        lineNumber: 278,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2281,18 +2793,18 @@ function CPWPage() {
                         children: "Loading cases..."
                     }, void 0, false, {
                         fileName: "[project]/app/cpw/page.tsx",
-                        lineNumber: 128,
+                        lineNumber: 279,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/cpw/page.tsx",
-                lineNumber: 126,
+                lineNumber: 277,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/app/cpw/page.tsx",
-            lineNumber: 125,
+            lineNumber: 276,
             columnNumber: 7
         }, this);
     }
@@ -2307,7 +2819,7 @@ function CPWPage() {
                         children: "Hi Dana! What can I help you with today?"
                     }, void 0, false, {
                         fileName: "[project]/app/cpw/page.tsx",
-                        lineNumber: 137,
+                        lineNumber: 288,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2320,7 +2832,7 @@ function CPWPage() {
                                     children: "search"
                                 }, void 0, false, {
                                     fileName: "[project]/app/cpw/page.tsx",
-                                    lineNumber: 140,
+                                    lineNumber: 291,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2329,7 +2841,7 @@ function CPWPage() {
                                     placeholder: "Ask me anything about your cases, or search for specific information..."
                                 }, void 0, false, {
                                     fileName: "[project]/app/cpw/page.tsx",
-                                    lineNumber: 141,
+                                    lineNumber: 292,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2339,1086 +2851,931 @@ function CPWPage() {
                                         children: "send"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cpw/page.tsx",
-                                        lineNumber: 147,
+                                        lineNumber: 298,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/cpw/page.tsx",
-                                    lineNumber: 146,
+                                    lineNumber: 297,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/cpw/page.tsx",
-                            lineNumber: 139,
+                            lineNumber: 290,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/cpw/page.tsx",
-                        lineNumber: 138,
+                        lineNumber: 289,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/cpw/page.tsx",
-                lineNumber: 136,
+                lineNumber: 287,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "content-wrapper",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "tabs-container",
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "tabs",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                    className: `tab ${activeTab === 'cpw-queue' ? 'active' : ''}`,
-                                    onClick: ()=>setActiveTab('cpw-queue'),
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "icon",
-                                            children: "queue"
-                                        }, void 0, false, {
-                                            fileName: "[project]/app/cpw/page.tsx",
-                                            lineNumber: 160,
-                                            columnNumber: 15
-                                        }, this),
-                                        "CPW Queue (",
-                                        cases.filter((c)=>c.status === 'Case Setup').length,
-                                        ")"
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/app/cpw/page.tsx",
-                                    lineNumber: 156,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                    className: `tab ${activeTab === 'completed' ? 'active' : ''}`,
-                                    onClick: ()=>setActiveTab('completed'),
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "icon",
-                                            children: "check_circle"
-                                        }, void 0, false, {
-                                            fileName: "[project]/app/cpw/page.tsx",
-                                            lineNumber: 167,
-                                            columnNumber: 15
-                                        }, this),
-                                        "Completed (",
-                                        cases.filter((c)=>c.status === 'Active' || c.status === 'Closed').length,
-                                        ")"
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/app/cpw/page.tsx",
-                                    lineNumber: 163,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                    className: `tab ${activeTab === 'overdue' ? 'active' : ''}`,
-                                    onClick: ()=>setActiveTab('overdue'),
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "icon",
-                                            children: "warning"
-                                        }, void 0, false, {
-                                            fileName: "[project]/app/cpw/page.tsx",
-                                            lineNumber: 174,
-                                            columnNumber: 15
-                                        }, this),
-                                        "Overdue"
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/app/cpw/page.tsx",
-                                    lineNumber: 170,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/app/cpw/page.tsx",
-                            lineNumber: 155,
-                            columnNumber: 11
-                        }, this)
-                    }, void 0, false, {
-                        fileName: "[project]/app/cpw/page.tsx",
-                        lineNumber: 154,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "tab-content",
+                        className: "my-tasks-section",
                         children: [
-                            activeTab === 'cpw-queue' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "card",
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                className: "section-title",
+                                children: "My Tasks"
+                            }, void 0, false, {
+                                fileName: "[project]/app/cpw/page.tsx",
+                                lineNumber: 307,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "task-cards-grid",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "card-header",
+                                        className: `task-card primary ${activeTask === 'request-assignment' ? 'active' : ''}`,
+                                        onClick: ()=>handleTaskCardClick('request-assignment'),
                                         children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                                children: "CPW Queue - Cases Requiring Setup"
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/cpw/page.tsx",
-                                                lineNumber: 184,
-                                                columnNumber: 17
-                                            }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "card-actions",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                        className: "action-btn secondary",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "icon",
-                                                                children: "filter_list"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                lineNumber: 187,
-                                                                columnNumber: 21
-                                                            }, this),
-                                                            "Filter"
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                        lineNumber: 186,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                        className: "action-btn primary",
-                                                        onClick: loadCases,
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "icon",
-                                                                children: "refresh"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                lineNumber: 191,
-                                                                columnNumber: 21
-                                                            }, this),
-                                                            "Refresh"
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                        lineNumber: 190,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/app/cpw/page.tsx",
-                                                lineNumber: 185,
-                                                columnNumber: 17
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/app/cpw/page.tsx",
-                                        lineNumber: 183,
-                                        columnNumber: 15
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "card-content",
-                                        children: [
-                                            error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "error-message",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "icon",
-                                                        children: "error"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                        lineNumber: 199,
-                                                        columnNumber: 21
-                                                    }, this),
-                                                    error
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/app/cpw/page.tsx",
-                                                lineNumber: 198,
-                                                columnNumber: 19
-                                            }, this),
-                                            filteredCases.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "table-container",
-                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
-                                                    className: "data-table",
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("thead", {
-                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
-                                                                children: [
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                                        children: "Case Name"
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                        lineNumber: 208,
-                                                                        columnNumber: 27
-                                                                    }, this),
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                                        children: "Intake Date"
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                        lineNumber: 209,
-                                                                        columnNumber: 27
-                                                                    }, this),
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                                        children: "Key Allegations"
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                        lineNumber: 210,
-                                                                        columnNumber: 27
-                                                                    }, this),
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                                        children: "Children Involved"
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                        lineNumber: 211,
-                                                                        columnNumber: 27
-                                                                    }, this),
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                                        children: "Indicators"
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                        lineNumber: 212,
-                                                                        columnNumber: 27
-                                                                    }, this),
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                                        children: "Assigned Workers"
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                        lineNumber: 213,
-                                                                        columnNumber: 27
-                                                                    }, this),
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                                        children: "Actions"
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                        lineNumber: 214,
-                                                                        columnNumber: 27
-                                                                    }, this)
-                                                                ]
-                                                            }, void 0, true, {
-                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                lineNumber: 207,
-                                                                columnNumber: 25
-                                                            }, this)
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                            lineNumber: 206,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
-                                                            children: filteredCases.map((case_)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
-                                                                    children: [
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                className: "case-name-cell",
-                                                                                children: [
-                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                                                                        href: `/cases/${case_.case_id}`,
-                                                                                        className: "case-link",
-                                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                                                            children: case_.case_display_name || case_.family_name
-                                                                                        }, void 0, false, {
-                                                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                                                            lineNumber: 223,
-                                                                                            columnNumber: 35
-                                                                                        }, this)
-                                                                                    }, void 0, false, {
-                                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                                        lineNumber: 222,
-                                                                                        columnNumber: 33
-                                                                                    }, this),
-                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                        className: "case-number",
-                                                                                        children: case_.case_number
-                                                                                    }, void 0, false, {
-                                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                                        lineNumber: 225,
-                                                                                        columnNumber: 33
-                                                                                    }, this)
-                                                                                ]
-                                                                            }, void 0, true, {
-                                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                                lineNumber: 221,
-                                                                                columnNumber: 31
-                                                                            }, this)
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                                            lineNumber: 220,
-                                                                            columnNumber: 29
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                                            children: new Date(case_.created_date).toLocaleDateString()
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                                            lineNumber: 228,
-                                                                            columnNumber: 29
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                className: "allegation-cell",
-                                                                                children: [
-                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                        className: "allegation-type",
-                                                                                        children: case_.allegation_type
-                                                                                    }, void 0, false, {
-                                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                                        lineNumber: 231,
-                                                                                        columnNumber: 33
-                                                                                    }, this),
-                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                        className: "allegation-desc",
-                                                                                        children: case_.allegation_description
-                                                                                    }, void 0, false, {
-                                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                                        lineNumber: 232,
-                                                                                        columnNumber: 33
-                                                                                    }, this)
-                                                                                ]
-                                                                            }, void 0, true, {
-                                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                                lineNumber: 230,
-                                                                                columnNumber: 31
-                                                                            }, this)
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                                            lineNumber: 229,
-                                                                            columnNumber: 29
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                className: "children-list",
-                                                                                children: getChildrenNames(case_) || 'No children listed'
-                                                                            }, void 0, false, {
-                                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                                lineNumber: 236,
-                                                                                columnNumber: 31
-                                                                            }, this)
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                                            lineNumber: 235,
-                                                                            columnNumber: 29
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                className: "indicators-cell",
-                                                                                children: [
-                                                                                    getAllIndicators(case_).slice(0, 3).map((indicator, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                            className: `indicator-badge ${getIndicatorColor(indicator)}`,
-                                                                                            title: indicator,
-                                                                                            children: [
-                                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                                    className: "icon",
-                                                                                                    children: getIndicatorIcon(indicator)
-                                                                                                }, void 0, false, {
-                                                                                                    fileName: "[project]/app/cpw/page.tsx",
-                                                                                                    lineNumber: 248,
-                                                                                                    columnNumber: 37
-                                                                                                }, this),
-                                                                                                indicator
-                                                                                            ]
-                                                                                        }, index, true, {
-                                                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                                                            lineNumber: 243,
-                                                                                            columnNumber: 35
-                                                                                        }, this)),
-                                                                                    getAllIndicators(case_).length > 3 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                        className: "indicator-more",
-                                                                                        children: [
-                                                                                            "+",
-                                                                                            getAllIndicators(case_).length - 3,
-                                                                                            " more"
-                                                                                        ]
-                                                                                    }, void 0, true, {
-                                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                                        lineNumber: 253,
-                                                                                        columnNumber: 35
-                                                                                    }, this)
-                                                                                ]
-                                                                            }, void 0, true, {
-                                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                                lineNumber: 241,
-                                                                                columnNumber: 31
-                                                                            }, this)
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                                            lineNumber: 240,
-                                                                            columnNumber: 29
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                className: "workers-cell",
-                                                                                children: [
-                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                        className: "primary-worker",
-                                                                                        children: [
-                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                                                                children: "Primary:"
-                                                                                            }, void 0, false, {
-                                                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                                                lineNumber: 262,
-                                                                                                columnNumber: 35
-                                                                                            }, this),
-                                                                                            " ",
-                                                                                            case_.assigned_worker || 'Unassigned'
-                                                                                        ]
-                                                                                    }, void 0, true, {
-                                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                                        lineNumber: 261,
-                                                                                        columnNumber: 33
-                                                                                    }, this),
-                                                                                    case_.assigned_supervisor && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                        className: "supervisor",
-                                                                                        children: [
-                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                                                                children: "Supervisor:"
-                                                                                            }, void 0, false, {
-                                                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                                                lineNumber: 266,
-                                                                                                columnNumber: 37
-                                                                                            }, this),
-                                                                                            " ",
-                                                                                            case_.assigned_supervisor
-                                                                                        ]
-                                                                                    }, void 0, true, {
-                                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                                        lineNumber: 265,
-                                                                                        columnNumber: 35
-                                                                                    }, this)
-                                                                                ]
-                                                                            }, void 0, true, {
-                                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                                lineNumber: 260,
-                                                                                columnNumber: 31
-                                                                            }, this)
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                                            lineNumber: 259,
-                                                                            columnNumber: 29
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                className: "action-buttons",
-                                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                                                    onClick: ()=>handleSetupCase(case_),
-                                                                                    className: "action-btn small primary",
-                                                                                    title: hasSavedProgress(case_.case_id) ? 'Resume saved progress' : 'Start case setup',
-                                                                                    children: [
-                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                            className: "icon",
-                                                                                            children: hasSavedProgress(case_.case_id) ? 'play_arrow' : 'settings'
-                                                                                        }, void 0, false, {
-                                                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                                                            lineNumber: 278,
-                                                                                            columnNumber: 35
-                                                                                        }, this),
-                                                                                        hasSavedProgress(case_.case_id) ? 'Resume' : 'Setup'
-                                                                                    ]
-                                                                                }, void 0, true, {
-                                                                                    fileName: "[project]/app/cpw/page.tsx",
-                                                                                    lineNumber: 273,
-                                                                                    columnNumber: 33
-                                                                                }, this)
-                                                                            }, void 0, false, {
-                                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                                lineNumber: 272,
-                                                                                columnNumber: 31
-                                                                            }, this)
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                                            lineNumber: 271,
-                                                                            columnNumber: 29
-                                                                        }, this)
-                                                                    ]
-                                                                }, case_.case_id, true, {
-                                                                    fileName: "[project]/app/cpw/page.tsx",
-                                                                    lineNumber: 219,
-                                                                    columnNumber: 27
-                                                                }, this))
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                            lineNumber: 217,
-                                                            columnNumber: 23
-                                                        }, this)
-                                                    ]
-                                                }, void 0, true, {
+                                                className: "task-card-icon",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "icon",
+                                                    children: "assignment_ind"
+                                                }, void 0, false, {
                                                     fileName: "[project]/app/cpw/page.tsx",
-                                                    lineNumber: 205,
-                                                    columnNumber: 21
+                                                    lineNumber: 314,
+                                                    columnNumber: 17
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/cpw/page.tsx",
-                                                lineNumber: 204,
-                                                columnNumber: 19
-                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "empty-state",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "icon large",
-                                                        children: "queue"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                        lineNumber: 290,
-                                                        columnNumber: 21
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                                        children: "No Cases in CPW Queue"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                        lineNumber: 291,
-                                                        columnNumber: 21
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                        children: "All cases requiring setup have been processed"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                        lineNumber: 292,
-                                                        columnNumber: 21
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/app/cpw/page.tsx",
-                                                lineNumber: 289,
-                                                columnNumber: 19
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/app/cpw/page.tsx",
-                                        lineNumber: 196,
-                                        columnNumber: 15
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/app/cpw/page.tsx",
-                                lineNumber: 182,
-                                columnNumber: 13
-                            }, this),
-                            activeTab === 'completed' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "card",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "card-header",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                                children: "Completed Cases"
-                                            }, void 0, false, {
-                                                fileName: "[project]/app/cpw/page.tsx",
-                                                lineNumber: 302,
-                                                columnNumber: 17
+                                                lineNumber: 313,
+                                                columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "card-actions",
+                                                className: "task-card-content",
                                                 children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                        className: "action-btn secondary",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "icon",
-                                                                children: "filter_list"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                lineNumber: 305,
-                                                                columnNumber: 21
-                                                            }, this),
-                                                            "Filter"
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                        lineNumber: 304,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                        className: "action-btn primary",
-                                                        onClick: loadCases,
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "icon",
-                                                                children: "refresh"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                lineNumber: 309,
-                                                                columnNumber: 21
-                                                            }, this),
-                                                            "Refresh"
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                        lineNumber: 308,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/app/cpw/page.tsx",
-                                                lineNumber: 303,
-                                                columnNumber: 17
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/app/cpw/page.tsx",
-                                        lineNumber: 301,
-                                        columnNumber: 15
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "card-content",
-                                        children: [
-                                            error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "error-message",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "icon",
-                                                        children: "error"
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                        children: "Ready to Request SWCM Assignment"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/cpw/page.tsx",
                                                         lineNumber: 317,
-                                                        columnNumber: 21
+                                                        columnNumber: 17
                                                     }, this),
-                                                    error
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        className: "task-count",
+                                                        children: [
+                                                            cases.filter((c)=>c.status === 'Draft').length,
+                                                            " cases"
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                        lineNumber: 318,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        className: "task-description",
+                                                        children: "New cases ready for assignment request"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                        lineNumber: 319,
+                                                        columnNumber: 17
+                                                    }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/cpw/page.tsx",
                                                 lineNumber: 316,
-                                                columnNumber: 19
+                                                columnNumber: 15
                                             }, this),
-                                            filteredCases.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "table-container",
-                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
-                                                    className: "data-table",
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("thead", {
-                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
-                                                                children: [
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                                        children: "Case Name"
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                        lineNumber: 326,
-                                                                        columnNumber: 27
-                                                                    }, this),
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                                        children: "Intake Date"
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                        lineNumber: 327,
-                                                                        columnNumber: 27
-                                                                    }, this),
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                                        children: "Key Allegations"
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                        lineNumber: 328,
-                                                                        columnNumber: 27
-                                                                    }, this),
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                                        children: "Children Involved"
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                        lineNumber: 329,
-                                                                        columnNumber: 27
-                                                                    }, this),
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                                        children: "Indicators"
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                        lineNumber: 330,
-                                                                        columnNumber: 27
-                                                                    }, this),
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                                        children: "Assigned Workers"
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                        lineNumber: 331,
-                                                                        columnNumber: 27
-                                                                    }, this),
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                                        children: "Actions"
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                        lineNumber: 332,
-                                                                        columnNumber: 27
-                                                                    }, this)
-                                                                ]
-                                                            }, void 0, true, {
-                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                lineNumber: 325,
-                                                                columnNumber: 25
-                                                            }, this)
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                            lineNumber: 324,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
-                                                            children: filteredCases.map((case_)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
-                                                                    children: [
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                className: "case-name-cell",
-                                                                                children: [
-                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                                                                        href: `/cases/${case_.case_id}`,
-                                                                                        className: "case-link",
-                                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                                                            children: case_.case_display_name || case_.family_name
-                                                                                        }, void 0, false, {
-                                                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                                                            lineNumber: 341,
-                                                                                            columnNumber: 35
-                                                                                        }, this)
-                                                                                    }, void 0, false, {
-                                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                                        lineNumber: 340,
-                                                                                        columnNumber: 33
-                                                                                    }, this),
-                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                        className: "case-number",
-                                                                                        children: case_.case_number
-                                                                                    }, void 0, false, {
-                                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                                        lineNumber: 343,
-                                                                                        columnNumber: 33
-                                                                                    }, this)
-                                                                                ]
-                                                                            }, void 0, true, {
-                                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                                lineNumber: 339,
-                                                                                columnNumber: 31
-                                                                            }, this)
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                                            lineNumber: 338,
-                                                                            columnNumber: 29
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                                            children: new Date(case_.created_date).toLocaleDateString()
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                                            lineNumber: 346,
-                                                                            columnNumber: 29
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                className: "allegation-cell",
-                                                                                children: [
-                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                        className: "allegation-type",
-                                                                                        children: case_.allegation_type
-                                                                                    }, void 0, false, {
-                                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                                        lineNumber: 349,
-                                                                                        columnNumber: 33
-                                                                                    }, this),
-                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                        className: "allegation-desc",
-                                                                                        children: case_.allegation_description
-                                                                                    }, void 0, false, {
-                                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                                        lineNumber: 350,
-                                                                                        columnNumber: 33
-                                                                                    }, this)
-                                                                                ]
-                                                                            }, void 0, true, {
-                                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                                lineNumber: 348,
-                                                                                columnNumber: 31
-                                                                            }, this)
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                                            lineNumber: 347,
-                                                                            columnNumber: 29
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                className: "children-list",
-                                                                                children: getChildrenNames(case_) || 'No children listed'
-                                                                            }, void 0, false, {
-                                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                                lineNumber: 354,
-                                                                                columnNumber: 31
-                                                                            }, this)
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                                            lineNumber: 353,
-                                                                            columnNumber: 29
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                className: "indicators-cell",
-                                                                                children: [
-                                                                                    getAllIndicators(case_).slice(0, 3).map((indicator, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                            className: `indicator-badge ${getIndicatorColor(indicator)}`,
-                                                                                            title: indicator,
-                                                                                            children: [
-                                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                                    className: "icon",
-                                                                                                    children: getIndicatorIcon(indicator)
-                                                                                                }, void 0, false, {
-                                                                                                    fileName: "[project]/app/cpw/page.tsx",
-                                                                                                    lineNumber: 366,
-                                                                                                    columnNumber: 37
-                                                                                                }, this),
-                                                                                                indicator
-                                                                                            ]
-                                                                                        }, index, true, {
-                                                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                                                            lineNumber: 361,
-                                                                                            columnNumber: 35
-                                                                                        }, this)),
-                                                                                    getAllIndicators(case_).length > 3 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                        className: "indicator-more",
-                                                                                        children: [
-                                                                                            "+",
-                                                                                            getAllIndicators(case_).length - 3,
-                                                                                            " more"
-                                                                                        ]
-                                                                                    }, void 0, true, {
-                                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                                        lineNumber: 371,
-                                                                                        columnNumber: 35
-                                                                                    }, this)
-                                                                                ]
-                                                                            }, void 0, true, {
-                                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                                lineNumber: 359,
-                                                                                columnNumber: 31
-                                                                            }, this)
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                                            lineNumber: 358,
-                                                                            columnNumber: 29
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                className: "workers-cell",
-                                                                                children: [
-                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                        className: "primary-worker",
-                                                                                        children: [
-                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                                                                children: "Primary:"
-                                                                                            }, void 0, false, {
-                                                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                                                lineNumber: 380,
-                                                                                                columnNumber: 35
-                                                                                            }, this),
-                                                                                            " ",
-                                                                                            case_.assigned_worker || 'Unassigned'
-                                                                                        ]
-                                                                                    }, void 0, true, {
-                                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                                        lineNumber: 379,
-                                                                                        columnNumber: 33
-                                                                                    }, this),
-                                                                                    case_.assigned_supervisor && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                        className: "supervisor",
-                                                                                        children: [
-                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                                                                children: "Supervisor:"
-                                                                                            }, void 0, false, {
-                                                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                                                lineNumber: 384,
-                                                                                                columnNumber: 37
-                                                                                            }, this),
-                                                                                            " ",
-                                                                                            case_.assigned_supervisor
-                                                                                        ]
-                                                                                    }, void 0, true, {
-                                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                                        lineNumber: 383,
-                                                                                        columnNumber: 35
-                                                                                    }, this)
-                                                                                ]
-                                                                            }, void 0, true, {
-                                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                                lineNumber: 378,
-                                                                                columnNumber: 31
-                                                                            }, this)
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                                            lineNumber: 377,
-                                                                            columnNumber: 29
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                className: "action-buttons",
-                                                                                children: [
-                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                                                                        href: `/cases/${case_.case_id}`,
-                                                                                        className: "action-btn small primary",
-                                                                                        children: [
-                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                                className: "icon",
-                                                                                                children: "visibility"
-                                                                                            }, void 0, false, {
-                                                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                                                lineNumber: 392,
-                                                                                                columnNumber: 35
-                                                                                            }, this),
-                                                                                            "View"
-                                                                                        ]
-                                                                                    }, void 0, true, {
-                                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                                        lineNumber: 391,
-                                                                                        columnNumber: 33
-                                                                                    }, this),
-                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                                                        className: "action-btn small secondary",
-                                                                                        children: [
-                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                                className: "icon",
-                                                                                                children: "note_add"
-                                                                                            }, void 0, false, {
-                                                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                                                lineNumber: 396,
-                                                                                                columnNumber: 35
-                                                                                            }, this),
-                                                                                            "Note"
-                                                                                        ]
-                                                                                    }, void 0, true, {
-                                                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                                                        lineNumber: 395,
-                                                                                        columnNumber: 33
-                                                                                    }, this)
-                                                                                ]
-                                                                            }, void 0, true, {
-                                                                                fileName: "[project]/app/cpw/page.tsx",
-                                                                                lineNumber: 390,
-                                                                                columnNumber: 31
-                                                                            }, this)
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                                            lineNumber: 389,
-                                                                            columnNumber: 29
-                                                                        }, this)
-                                                                    ]
-                                                                }, case_.case_id, true, {
-                                                                    fileName: "[project]/app/cpw/page.tsx",
-                                                                    lineNumber: 337,
-                                                                    columnNumber: 27
-                                                                }, this))
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/app/cpw/page.tsx",
-                                                            lineNumber: 335,
-                                                            columnNumber: 23
-                                                        }, this)
-                                                    ]
-                                                }, void 0, true, {
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "task-card-action",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "icon",
+                                                    children: "arrow_forward"
+                                                }, void 0, false, {
                                                     fileName: "[project]/app/cpw/page.tsx",
-                                                    lineNumber: 323,
-                                                    columnNumber: 21
+                                                    lineNumber: 322,
+                                                    columnNumber: 17
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/cpw/page.tsx",
-                                                lineNumber: 322,
-                                                columnNumber: 19
-                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "empty-state",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "icon large",
-                                                        children: "check_circle"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                        lineNumber: 408,
-                                                        columnNumber: 21
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                                        children: "No Completed Cases"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                        lineNumber: 409,
-                                                        columnNumber: 21
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                        children: "No cases have been sent for SWCM assignment yet"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/app/cpw/page.tsx",
-                                                        lineNumber: 410,
-                                                        columnNumber: 21
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/app/cpw/page.tsx",
-                                                lineNumber: 407,
-                                                columnNumber: 19
+                                                lineNumber: 321,
+                                                columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/cpw/page.tsx",
-                                        lineNumber: 314,
-                                        columnNumber: 15
+                                        lineNumber: 309,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: `task-card error ${activeTask === 'edits-required' ? 'active' : ''}`,
+                                        onClick: ()=>handleTaskCardClick('edits-required'),
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "task-card-icon",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "icon",
+                                                    children: "edit"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                    lineNumber: 331,
+                                                    columnNumber: 17
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/cpw/page.tsx",
+                                                lineNumber: 330,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "task-card-content",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                        children: "Edits Required"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                        lineNumber: 334,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        className: "task-count",
+                                                        children: [
+                                                            cases.filter((c)=>c.status === 'Edits Required').length,
+                                                            " cases"
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                        lineNumber: 335,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        className: "task-description",
+                                                        children: "Cases returned by supervisor for changes"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                        lineNumber: 336,
+                                                        columnNumber: 17
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/cpw/page.tsx",
+                                                lineNumber: 333,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "task-card-action",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "icon",
+                                                    children: "arrow_forward"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                    lineNumber: 339,
+                                                    columnNumber: 17
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/cpw/page.tsx",
+                                                lineNumber: 338,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/cpw/page.tsx",
+                                        lineNumber: 326,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: `task-card secondary ${activeTask === 'case-setup' ? 'active' : ''}`,
+                                        onClick: ()=>handleTaskCardClick('case-setup'),
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "task-card-icon",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "icon",
+                                                    children: "settings"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                    lineNumber: 348,
+                                                    columnNumber: 17
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/cpw/page.tsx",
+                                                lineNumber: 347,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "task-card-content",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                        children: "Ready for Setup"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                        lineNumber: 351,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        className: "task-count",
+                                                        children: [
+                                                            cases.filter((c)=>c.status === 'Case Setup').length,
+                                                            " cases"
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                        lineNumber: 352,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        className: "task-description",
+                                                        children: "Cases assigned and ready for setup"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                        lineNumber: 353,
+                                                        columnNumber: 17
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/cpw/page.tsx",
+                                                lineNumber: 350,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "task-card-action",
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "icon",
+                                                    children: "arrow_forward"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                    lineNumber: 356,
+                                                    columnNumber: 17
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/cpw/page.tsx",
+                                                lineNumber: 355,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/app/cpw/page.tsx",
+                                        lineNumber: 343,
+                                        columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/cpw/page.tsx",
-                                lineNumber: 300,
-                                columnNumber: 13
-                            }, this),
-                            activeTab === 'overdue' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "card",
+                                lineNumber: 308,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/app/cpw/page.tsx",
+                        lineNumber: 306,
+                        columnNumber: 9
+                    }, this),
+                    activeTask ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$TaskTable$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                        taskType: activeTask,
+                        cases: getTaskCases(activeTask),
+                        onActionClick: handleTaskAction
+                    }, void 0, false, {
+                        fileName: "[project]/app/cpw/page.tsx",
+                        lineNumber: 364,
+                        columnNumber: 11
+                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "filter-container",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "filter-header",
                                 children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "card-header",
-                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                            children: "Overdue Cases"
-                                        }, void 0, false, {
-                                            fileName: "[project]/app/cpw/page.tsx",
-                                            lineNumber: 420,
-                                            columnNumber: 17
-                                        }, this)
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                        className: "section-subtitle",
+                                        children: "My Cases"
                                     }, void 0, false, {
                                         fileName: "[project]/app/cpw/page.tsx",
-                                        lineNumber: 419,
+                                        lineNumber: 372,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "card-content",
-                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "empty-state",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "icon large",
-                                                    children: "warning"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/app/cpw/page.tsx",
-                                                    lineNumber: 424,
-                                                    columnNumber: 19
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                                    children: "No Overdue Cases"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/app/cpw/page.tsx",
-                                                    lineNumber: 425,
-                                                    columnNumber: 19
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                    children: "All cases are within required timeframes"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/app/cpw/page.tsx",
-                                                    lineNumber: 426,
-                                                    columnNumber: 19
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/app/cpw/page.tsx",
-                                            lineNumber: 423,
-                                            columnNumber: 17
-                                        }, this)
-                                    }, void 0, false, {
+                                        className: "filter-actions",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                className: "action-btn secondary",
+                                                onClick: ()=>setActiveFilters([]),
+                                                disabled: activeFilters.length === 0,
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: "icon",
+                                                        children: "clear_all"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                        lineNumber: 379,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    "Clear Filters"
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/cpw/page.tsx",
+                                                lineNumber: 374,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                className: "action-btn primary",
+                                                onClick: loadCases,
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: "icon",
+                                                        children: "refresh"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                        lineNumber: 383,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    "Refresh"
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/cpw/page.tsx",
+                                                lineNumber: 382,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
                                         fileName: "[project]/app/cpw/page.tsx",
-                                        lineNumber: 422,
+                                        lineNumber: 373,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/cpw/page.tsx",
-                                lineNumber: 418,
+                                lineNumber: 371,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "filter-tags",
+                                children: filterTags.map((tag)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        onClick: ()=>toggleFilter(tag.id),
+                                        className: `filter-tag ${activeFilters.includes(tag.label) ? 'active' : ''}`,
+                                        disabled: tag.count === 0,
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "tag-label",
+                                                children: tag.label
+                                            }, void 0, false, {
+                                                fileName: "[project]/app/cpw/page.tsx",
+                                                lineNumber: 396,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "tag-count",
+                                                children: [
+                                                    "(",
+                                                    tag.count,
+                                                    ")"
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/cpw/page.tsx",
+                                                lineNumber: 397,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, tag.id, true, {
+                                        fileName: "[project]/app/cpw/page.tsx",
+                                        lineNumber: 390,
+                                        columnNumber: 17
+                                    }, this))
+                            }, void 0, false, {
+                                fileName: "[project]/app/cpw/page.tsx",
+                                lineNumber: 388,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/cpw/page.tsx",
-                        lineNumber: 180,
+                        lineNumber: 370,
+                        columnNumber: 11
+                    }, this),
+                    !activeTask && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "content-area",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "card",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "card-header",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                            children: [
+                                                activeFilters.length === 0 ? 'My Cases' : activeFilters.length === 1 ? activeFilters[0] : `${activeFilters.length} Filters Active`,
+                                                activeFilters.length > 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "filter-summary",
+                                                    children: [
+                                                        " (",
+                                                        activeFilters.join(', '),
+                                                        ")"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                    lineNumber: 417,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/cpw/page.tsx",
+                                            lineNumber: 409,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "card-actions",
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "case-count",
+                                                children: [
+                                                    filteredCases.length,
+                                                    " cases"
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/cpw/page.tsx",
+                                                lineNumber: 421,
+                                                columnNumber: 17
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/cpw/page.tsx",
+                                            lineNumber: 420,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/cpw/page.tsx",
+                                    lineNumber: 408,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "card-content",
+                                    children: [
+                                        error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "error-message",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "icon",
+                                                    children: "error"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                    lineNumber: 427,
+                                                    columnNumber: 19
+                                                }, this),
+                                                error
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/cpw/page.tsx",
+                                            lineNumber: 426,
+                                            columnNumber: 17
+                                        }, this),
+                                        filteredCases.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "table-container",
+                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
+                                                className: "data-table",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("thead", {
+                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                    children: "Case Name"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                                    lineNumber: 436,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                    children: "Status"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                                    lineNumber: 437,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                    children: "Intake Date"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                                    lineNumber: 438,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                    children: "Key Allegations"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                                    lineNumber: 439,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                    children: "Children Involved"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                                    lineNumber: 440,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                    children: "Indicators"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                                    lineNumber: 441,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                    children: "Progress"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                                    lineNumber: 442,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                    children: "Assigned Workers"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                                    lineNumber: 443,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                    children: "Actions"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                                    lineNumber: 444,
+                                                                    columnNumber: 25
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/app/cpw/page.tsx",
+                                                            lineNumber: 435,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                        lineNumber: 434,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
+                                                        children: filteredCases.map((case_)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                            className: "case-name-cell",
+                                                                            children: [
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                                                    href: `/cases/${case_.case_id}`,
+                                                                                    className: "case-link",
+                                                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                                                        children: case_.case_display_name || case_.family_name
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                                                        lineNumber: 453,
+                                                                                        columnNumber: 33
+                                                                                    }, this)
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                                                    lineNumber: 452,
+                                                                                    columnNumber: 31
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "case-number",
+                                                                                    children: case_.case_number
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                                                    lineNumber: 455,
+                                                                                    columnNumber: 31
+                                                                                }, this)
+                                                                            ]
+                                                                        }, void 0, true, {
+                                                                            fileName: "[project]/app/cpw/page.tsx",
+                                                                            lineNumber: 451,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                                        lineNumber: 450,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: `status-badge ${case_.status.toLowerCase().replace(/\s+/g, '-')}`,
+                                                                            children: case_.status
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/cpw/page.tsx",
+                                                                            lineNumber: 459,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                                        lineNumber: 458,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                        children: new Date(case_.created_date).toLocaleDateString()
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                                        lineNumber: 463,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                            className: "allegation-cell",
+                                                                            children: [
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                    className: "allegation-type",
+                                                                                    children: case_.allegation_type
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                                                    lineNumber: 466,
+                                                                                    columnNumber: 31
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "allegation-desc",
+                                                                                    children: case_.allegation_description
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                                                    lineNumber: 467,
+                                                                                    columnNumber: 31
+                                                                                }, this)
+                                                                            ]
+                                                                        }, void 0, true, {
+                                                                            fileName: "[project]/app/cpw/page.tsx",
+                                                                            lineNumber: 465,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                                        lineNumber: 464,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                            className: "children-list",
+                                                                            children: getChildrenNames(case_) || 'No children listed'
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/cpw/page.tsx",
+                                                                            lineNumber: 471,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                                        lineNumber: 470,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                            className: "indicators-cell",
+                                                                            children: [
+                                                                                getAllIndicators(case_).slice(0, 3).map((indicator, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                        className: `indicator-badge ${getIndicatorColor(indicator)}`,
+                                                                                        title: indicator,
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                className: "icon",
+                                                                                                children: getIndicatorIcon(indicator)
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/app/cpw/page.tsx",
+                                                                                                lineNumber: 483,
+                                                                                                columnNumber: 35
+                                                                                            }, this),
+                                                                                            indicator
+                                                                                        ]
+                                                                                    }, index, true, {
+                                                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                                                        lineNumber: 478,
+                                                                                        columnNumber: 33
+                                                                                    }, this)),
+                                                                                getAllIndicators(case_).length > 3 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                    className: "indicator-more",
+                                                                                    children: [
+                                                                                        "+",
+                                                                                        getAllIndicators(case_).length - 3,
+                                                                                        " more"
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                                                    lineNumber: 488,
+                                                                                    columnNumber: 33
+                                                                                }, this)
+                                                                            ]
+                                                                        }, void 0, true, {
+                                                                            fileName: "[project]/app/cpw/page.tsx",
+                                                                            lineNumber: 476,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                                        lineNumber: 475,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                            className: "progress-cell",
+                                                                            children: [
+                                                                                case_.status === 'Case Setup' && (()=>{
+                                                                                    const progress = getSetupProgress(case_.case_id);
+                                                                                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "setup-progress-indicator",
+                                                                                        children: [
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                className: "progress-bar-small",
+                                                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                    className: "progress-fill-small",
+                                                                                                    style: {
+                                                                                                        width: `${progress.percentage}%`
+                                                                                                    }
+                                                                                                }, void 0, false, {
+                                                                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                                                                    lineNumber: 501,
+                                                                                                    columnNumber: 39
+                                                                                                }, this)
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/app/cpw/page.tsx",
+                                                                                                lineNumber: 500,
+                                                                                                columnNumber: 37
+                                                                                            }, this),
+                                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                className: "progress-text-small",
+                                                                                                children: progress.step > 0 ? `Step ${progress.step}/${progress.total}` : 'Not Started'
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/app/cpw/page.tsx",
+                                                                                                lineNumber: 506,
+                                                                                                columnNumber: 37
+                                                                                            }, this)
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                                                        lineNumber: 499,
+                                                                                        columnNumber: 35
+                                                                                    }, this);
+                                                                                })(),
+                                                                                case_.status !== 'Case Setup' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                    className: "progress-na",
+                                                                                    children: "—"
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                                                    lineNumber: 513,
+                                                                                    columnNumber: 33
+                                                                                }, this)
+                                                                            ]
+                                                                        }, void 0, true, {
+                                                                            fileName: "[project]/app/cpw/page.tsx",
+                                                                            lineNumber: 495,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                                        lineNumber: 494,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                            className: "workers-cell",
+                                                                            children: [
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "primary-worker",
+                                                                                    children: [
+                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                                                            children: "Primary:"
+                                                                                        }, void 0, false, {
+                                                                                            fileName: "[project]/app/cpw/page.tsx",
+                                                                                            lineNumber: 520,
+                                                                                            columnNumber: 33
+                                                                                        }, this),
+                                                                                        " ",
+                                                                                        case_.assigned_worker || 'Unassigned'
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                                                    lineNumber: 519,
+                                                                                    columnNumber: 31
+                                                                                }, this),
+                                                                                case_.assigned_supervisor && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                    className: "supervisor",
+                                                                                    children: [
+                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                                                            children: "Supervisor:"
+                                                                                        }, void 0, false, {
+                                                                                            fileName: "[project]/app/cpw/page.tsx",
+                                                                                            lineNumber: 524,
+                                                                                            columnNumber: 35
+                                                                                        }, this),
+                                                                                        " ",
+                                                                                        case_.assigned_supervisor
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                                                    lineNumber: 523,
+                                                                                    columnNumber: 33
+                                                                                }, this)
+                                                                            ]
+                                                                        }, void 0, true, {
+                                                                            fileName: "[project]/app/cpw/page.tsx",
+                                                                            lineNumber: 518,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                                        lineNumber: 517,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                            className: "action-buttons",
+                                                                            children: getCaseActionButton(case_)
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/app/cpw/page.tsx",
+                                                                            lineNumber: 530,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                                        lineNumber: 529,
+                                                                        columnNumber: 27
+                                                                    }, this)
+                                                                ]
+                                                            }, case_.case_id, true, {
+                                                                fileName: "[project]/app/cpw/page.tsx",
+                                                                lineNumber: 449,
+                                                                columnNumber: 25
+                                                            }, this))
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/cpw/page.tsx",
+                                                        lineNumber: 447,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/app/cpw/page.tsx",
+                                                lineNumber: 433,
+                                                columnNumber: 19
+                                            }, this)
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/cpw/page.tsx",
+                                            lineNumber: 432,
+                                            columnNumber: 17
+                                        }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "empty-state",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "icon large",
+                                                    children: "filter_list"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                    lineNumber: 541,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                    children: "No Cases Match Current Filters"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                    lineNumber: 542,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                    children: activeFilters.length === 0 ? 'No cases found in the system' : `Try adjusting your filters or clearing them to see more cases`
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                    lineNumber: 543,
+                                                    columnNumber: 19
+                                                }, this),
+                                                activeFilters.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                    className: "action-btn primary",
+                                                    onClick: ()=>setActiveFilters([]),
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "icon",
+                                                            children: "clear_all"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/cpw/page.tsx",
+                                                            lineNumber: 554,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        "Clear All Filters"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/app/cpw/page.tsx",
+                                                    lineNumber: 550,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/cpw/page.tsx",
+                                            lineNumber: 540,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/cpw/page.tsx",
+                                    lineNumber: 424,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/app/cpw/page.tsx",
+                            lineNumber: 407,
+                            columnNumber: 11
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "[project]/app/cpw/page.tsx",
+                        lineNumber: 406,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/cpw/page.tsx",
-                lineNumber: 153,
+                lineNumber: 304,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$CPWCaseSetupModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -3428,17 +3785,17 @@ function CPWPage() {
                 onSuccess: handleSetupSuccess
             }, void 0, false, {
                 fileName: "[project]/app/cpw/page.tsx",
-                lineNumber: 435,
+                lineNumber: 567,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/cpw/page.tsx",
-        lineNumber: 135,
+        lineNumber: 286,
         columnNumber: 5
     }, this);
 }
-_s(CPWPage, "XMjAYWDmI9jU0So2iOwdN6YfyG4=");
+_s(CPWPage, "UzH2tDa0hyPNmemo2ds/8Ul+2IM=");
 _c = CPWPage;
 var _c;
 __turbopack_refresh__.register(_c, "CPWPage");

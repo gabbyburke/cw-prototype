@@ -223,3 +223,132 @@ export const updateCase = (caseId: string, updates: Partial<Case>) =>
 export const searchPersons = (query: string) => apiClient.searchPersons(query)
 export const getPersonById = (personId: string) => apiClient.getPersonById(personId)
 export const healthCheck = () => apiClient.healthCheck()
+
+// Magic Button data interface based on BigQuery schema
+export interface MagicButtonData {
+  incident_number: string
+  child_first_names: string
+  child_last_names: string
+  parent_first_names: string
+  parent_last_names: string
+  cps_worker: string
+  due_date: string
+  county_of_assessment: string
+  intake_date: string
+  reported_native_american_heritage: string
+  perpetrators: string
+  perpetrator_first_name: string
+  perpetrator_last_name: string
+  findings: string
+  allegations: string
+  victims: string
+  victim_first_name: string
+  victim_last_name: string
+  person_id: string
+  role: string
+  gender: string
+  age_calculated: number
+  prior_workers: string
+  current_address: string
+  address_type: string
+  residence_county: string
+  date_of_birth: string
+  phone_number: string
+  phone_type: string
+  address: string
+  city: string
+  state: string
+  zip_code: number
+  non_custodial_parent: boolean
+  non_custodial_parent_person_id: string
+  non_custodial_parent_first_name: string
+  non_custodial_parent_last_name: string
+  non_custodial_parent_middle_name: string
+  non_custodial_parent_dob: string
+  non_custodial_parent_ssn: string
+  non_custodial_parent_suffix: string
+  non_custodial_parent_sex: string
+  non_custodial_parent_race: string
+  non_custodial_parent_ethnicity: string
+  legal_custodian: string
+  guardian: string
+  prior_assessment: string
+  type_of_appointment: string
+  clinic_name: string
+  appointment_date: string
+}
+
+// Search Magic Button data by incident number (mock implementation for now)
+export const searchMagicButtonData = async (query: string): Promise<ApiResponse<{ incidents: MagicButtonData[] }>> => {
+  // Mock implementation - replace with real API call when backend is ready
+  await new Promise(resolve => setTimeout(resolve, 400))
+  
+  // Mock data for development
+  const mockIncidents: MagicButtonData[] = [
+    {
+      incident_number: "INC-2024-001234",
+      child_first_names: "Emma",
+      child_last_names: "Johnson", 
+      parent_first_names: "Michael, Sarah",
+      parent_last_names: "Johnson, Johnson",
+      cps_worker: "Dana Wilson",
+      due_date: "2024-09-15",
+      county_of_assessment: "King County",
+      intake_date: "2024-08-15",
+      reported_native_american_heritage: "No",
+      perpetrators: "Michael Johnson",
+      perpetrator_first_name: "Michael",
+      perpetrator_last_name: "Johnson",
+      findings: "Substantiated",
+      allegations: "Physical abuse",
+      victims: "Emma Johnson",
+      victim_first_name: "Emma", 
+      victim_last_name: "Johnson",
+      person_id: "12345",
+      role: "Client",
+      gender: "Female",
+      age_calculated: 8,
+      prior_workers: "None",
+      current_address: "123 Main St",
+      address_type: "Residential",
+      residence_county: "King County",
+      date_of_birth: "2016-03-12",
+      phone_number: "206-555-0123",
+      phone_type: "Home",
+      address: "123 Main St",
+      city: "Seattle",
+      state: "WA",
+      zip_code: 98101,
+      non_custodial_parent: false,
+      non_custodial_parent_person_id: "",
+      non_custodial_parent_first_name: "",
+      non_custodial_parent_last_name: "",
+      non_custodial_parent_middle_name: "",
+      non_custodial_parent_dob: "",
+      non_custodial_parent_ssn: "",
+      non_custodial_parent_suffix: "",
+      non_custodial_parent_sex: "",
+      non_custodial_parent_race: "",
+      non_custodial_parent_ethnicity: "",
+      legal_custodian: "Sarah Johnson",
+      guardian: "",
+      prior_assessment: "None",
+      type_of_appointment: "",
+      clinic_name: "",
+      appointment_date: ""
+    }
+  ]
+  
+  if (!query || query.length < 2) {
+    return { data: { incidents: [] }, error: undefined }
+  }
+  
+  const filteredIncidents = mockIncidents.filter(incident => 
+    incident.incident_number.toLowerCase().includes(query.toLowerCase()) ||
+    incident.child_first_names.toLowerCase().includes(query.toLowerCase()) ||
+    incident.child_last_names.toLowerCase().includes(query.toLowerCase()) ||
+    incident.allegations.toLowerCase().includes(query.toLowerCase())
+  )
+  
+  return { data: { incidents: filteredIncidents }, error: undefined }
+}

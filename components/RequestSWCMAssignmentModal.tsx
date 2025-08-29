@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Case, Person, updateCase, searchPersons } from '../lib/api'
 
-interface CPWCaseSetupModalProps {
+interface RequestSWCMAssignmentModalProps {
   isOpen: boolean
   onClose: () => void
   case_: Case | null
@@ -39,7 +39,7 @@ interface SavedSetupData {
   lastSaved: string
 }
 
-export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }: CPWCaseSetupModalProps) {
+export default function RequestSWCMAssignmentModal({ isOpen, onClose, case_, onSuccess }: RequestSWCMAssignmentModalProps) {
   const [currentStep, setCurrentStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -103,20 +103,20 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
   const steps: SetupStep[] = [
     {
       id: 1,
+      title: 'Review Case Details',
+      description: 'Name case, add safety concerns, and review case information',
+      completed: allegations.type !== '' && allegations.description !== ''
+    },
+    {
+      id: 2,
       title: 'Verify Case Membership',
       description: 'Review and add people involved in the case',
       completed: casePersons.length > 0
     },
     {
-      id: 2,
-      title: 'Confirm Allegations',
-      description: 'Review and update case allegations',
-      completed: allegations.type !== '' && allegations.description !== ''
-    },
-    {
       id: 3,
-      title: 'Confirm Assessments',
-      description: 'Review risk and safety assessments',
+      title: 'Update Living Arrangements',
+      description: 'Set living arrangements for all children/clients',
       completed: assessments.risk_confirmed && assessments.safety_confirmed
     },
     {
@@ -128,7 +128,7 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
   ]
 
   // Save/Resume functionality
-  const getStorageKey = (caseId: string) => `cpw_setup_${caseId}`
+  const getStorageKey = (caseId: string) => `cpw_assignment_${caseId}`
 
   const saveProgress = () => {
     if (!case_) return
@@ -158,11 +158,6 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
 
   const clearSavedProgress = (caseId: string) => {
     localStorage.removeItem(getStorageKey(caseId))
-  }
-
-  const handleSaveAndExit = () => {
-    saveProgress()
-    onClose()
   }
 
   useEffect(() => {
@@ -345,7 +340,7 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
         onClose()
       }
     } catch (err) {
-      setError('Failed to complete case setup')
+      setError('Failed to request SWCM assignment')
     } finally {
       setLoading(false)
     }
@@ -363,13 +358,26 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
     <div className="modal-overlay" onClick={handleOverlayClick}>
       <div className="modal-container large scrollable">
         <div className="modal-header">
-          <h2>CPW Case Setup - {case_.case_display_name || `Case ${case_.case_id}`}</h2>
+          <h2>Request SWCM Assignment - {case_.case_display_name || `Case ${case_.case_id}`}</h2>
           <button onClick={onClose} className="modal-close">
             <span className="icon">close</span>
           </button>
         </div>
 
         <div className="modal-body">
+          {/* Progress Bar */}
+          <div className="progress-bar-container">
+            <div className="progress-bar">
+              <div 
+                className="progress-fill" 
+                style={{ width: `${(currentStep / steps.length) * 100}%` }}
+              ></div>
+            </div>
+            <div className="progress-text">
+              Step {currentStep} of {steps.length}: {steps[currentStep - 1]?.title}
+            </div>
+          </div>
+
           {/* Progress Steps */}
           <div className="setup-progress">
             {steps.map((step) => (
@@ -397,11 +405,194 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
             </div>
           )}
 
-          {/* Step 1: Case Membership */}
+          {/* Step 1: Review Case Details */}
           {currentStep === 1 && (
             <div className="setup-step">
-              <h3>Step 1: Verify Case Membership</h3>
-              <p>Review the people involved in this case and add any missing individuals.</p>
+              <h3>Step 1: Review Case Details</h3>
+              <p>Name this case, add family safety concerns, and review case information before requesting SWCM assignment.</p>
+              
+              <div className="form-group">
+                <label>Name this case *</label>
+                <input
+                  type="text"
+                  value={allegations.description}
+                  onChange={(e) => setAllegations({...allegations, description: e.target.value})}
+                  placeholder="Enter a descriptive name for this case..."
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Add family safety concerns</label>
+                <textarea
+                  value={assessments.assessment_notes}
+                  onChange={(e) => setAssessments({...assessments, assessment_notes: e.target.value})}
+                  placeholder="Describe any family safety concerns..."
+                  rows={3}
+                />
+              </div>
+              
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Safety Plan</label>
+                  <div className="radio-group">
+                    <label>
+                      <input
+                        type="radio"
+                        name="safety_plan"
+                        value="yes"
+                        checked={assessments.safety_factors.includes('Safety Plan Required')}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setAssessments({
+                              ...assessments,
+                              safety_factors: [...assessments.safety_factors.filter(f => !f.includes('Safety Plan')), 'Safety Plan Required']
+                            })
+                          }
+                        }}
+                      />
+                      Yes
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="safety_plan"
+                        value="no"
+                        checked={!assessments.safety_factors.includes('Safety Plan Required')}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setAssessments({
+                              ...assessments,
+                              safety_factors: assessments.safety_factors.filter(f => !f.includes('Safety Plan'))
+                            })
+                          }
+                        }}
+                      />
+                      No
+                    </label>
+                  </div>
+                </div>
+                
+                <div className="form-group">
+                  <label>Family Preservation</label>
+                  <div className="radio-group">
+                    <label>
+                      <input
+                        type="radio"
+                        name="family_preservation"
+                        value="yes"
+                        checked={assessments.safety_factors.includes('Family Preservation Services')}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setAssessments({
+                              ...assessments,
+                              safety_factors: [...assessments.safety_factors.filter(f => !f.includes('Family Preservation')), 'Family Preservation Services']
+                            })
+                          }
+                        }}
+                      />
+                      Yes
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="family_preservation"
+                        value="no"
+                        checked={!assessments.safety_factors.includes('Family Preservation Services')}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setAssessments({
+                              ...assessments,
+                              safety_factors: assessments.safety_factors.filter(f => !f.includes('Family Preservation'))
+                            })
+                          }
+                        }}
+                      />
+                      No
+                    </label>
+                  </div>
+                </div>
+                
+                <div className="form-group">
+                  <label>Prior Service Case</label>
+                  <div className="radio-group">
+                    <label>
+                      <input
+                        type="radio"
+                        name="prior_service"
+                        value="yes"
+                        checked={assessments.safety_factors.includes('Prior Service Case')}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setAssessments({
+                              ...assessments,
+                              safety_factors: [...assessments.safety_factors.filter(f => !f.includes('Prior Service')), 'Prior Service Case']
+                            })
+                          }
+                        }}
+                      />
+                      Yes
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="prior_service"
+                        value="no"
+                        checked={!assessments.safety_factors.includes('Prior Service Case')}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setAssessments({
+                              ...assessments,
+                              safety_factors: assessments.safety_factors.filter(f => !f.includes('Prior Service'))
+                            })
+                          }
+                        }}
+                      />
+                      No
+                    </label>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Service Area Assigned</label>
+                  <input
+                    type="text"
+                    value={allegations.type}
+                    onChange={(e) => setAllegations({...allegations, type: e.target.value})}
+                    placeholder="Will be pre-filled from Magic Button"
+                    disabled
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Residence County</label>
+                  <input
+                    type="text"
+                    value={case_?.county || ''}
+                    placeholder="Will be pre-filled from Magic Button"
+                    disabled
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Financial County</label>
+                  <input
+                    type="text"
+                    value={case_?.county || ''}
+                    placeholder="Will be pre-filled from Magic Button"
+                    disabled
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Case Membership */}
+          {currentStep === 2 && (
+            <div className="setup-step">
+              <h3>Step 2: Verify Case Membership</h3>
+              <p>Review the people involved in this case and add any missing individuals before assignment.</p>
               
               <div className="persons-list">
                 {casePersons.map((person) => (
@@ -613,182 +804,97 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
             </div>
           )}
 
-          {/* Step 2: Allegations */}
-          {currentStep === 2 && (
-            <div className="setup-step">
-              <h3>Step 2: Confirm and Detail Allegations</h3>
-              <p>Review and update the allegations for this case.</p>
-              
-              <div className="form-group">
-                <label>Allegation Type *</label>
-                <select
-                  value={allegations.type}
-                  onChange={(e) => setAllegations({...allegations, type: e.target.value})}
-                >
-                  <option value="">Select allegation type</option>
-                  <option value="Physical Abuse">Physical Abuse</option>
-                  <option value="Sexual Abuse">Sexual Abuse</option>
-                  <option value="Emotional Abuse">Emotional Abuse</option>
-                  <option value="Neglect">Neglect</option>
-                  <option value="Medical Neglect">Medical Neglect</option>
-                  <option value="Educational Neglect">Educational Neglect</option>
-                  <option value="Abandonment">Abandonment</option>
-                  <option value="Substance Abuse">Substance Abuse</option>
-                  <option value="Domestic Violence">Domestic Violence</option>
-                </select>
-              </div>
-              
-              <div className="form-group">
-                <label>Allegation Description *</label>
-                <textarea
-                  value={allegations.description}
-                  onChange={(e) => setAllegations({...allegations, description: e.target.value})}
-                  placeholder="Provide detailed description of the allegations..."
-                  rows={4}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Step 3: Assessments */}
+          {/* Step 3: Update Living Arrangements */}
           {currentStep === 3 && (
             <div className="setup-step">
-              <h3>Step 3: Confirm Risk and Safety Assessments</h3>
-              <p>Review the risk and safety assessments for this case.</p>
+              <h3>Step 3: Update Living Arrangements</h3>
+              <p>Set living arrangements for all children/clients before requesting SWCM assignment.</p>
               
-              {/* Safety Assessment Due Date */}
-              {case_?.safety_assessment_due && (
-                <div className="assessment-due-notice">
-                  <span className="icon">schedule</span>
-                  <strong>Safety Assessment Due: </strong>
-                  {new Date(case_.safety_assessment_due).toLocaleDateString()} at {new Date(case_.safety_assessment_due).toLocaleTimeString()}
-                </div>
-              )}
-              
-              <div className="assessment-section">
-                <h4>Risk Assessment</h4>
-                <div className="form-group">
-                  <label>Risk Level</label>
-                  <select
-                    value={assessments.risk_level}
-                    onChange={(e) => setAssessments({...assessments, risk_level: e.target.value as any})}
-                  >
-                    <option value="Low">Low Risk</option>
-                    <option value="Medium">Medium Risk</option>
-                    <option value="High">High Risk</option>
-                    <option value="Very High">Very High Risk</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={assessments.risk_confirmed}
-                      onChange={(e) => setAssessments({...assessments, risk_confirmed: e.target.checked})}
-                    />
-                    I confirm the risk assessment is accurate and complete
-                  </label>
-                </div>
-              </div>
-
-              <div className="assessment-section">
-                <h4>Safety Assessment</h4>
-                
-                <div className="form-group">
-                  <label>Safety Factors</label>
-                  <div className="safety-factors-list">
-                    {assessments.safety_factors.map((factor, index) => (
-                      <div key={index} className="safety-factor-item">
-                        <span>{factor}</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newFactors = assessments.safety_factors.filter((_, i) => i !== index)
-                            setAssessments({...assessments, safety_factors: newFactors})
-                          }}
-                          className="remove-factor-btn"
-                        >
-                          <span className="icon">close</span>
-                        </button>
+              <div className="living-arrangements-section">
+                {casePersons.filter(person => person.role.toLowerCase() === 'client' || person.role.toLowerCase() === 'child').length > 0 ? (
+                  casePersons
+                    .filter(person => person.role.toLowerCase() === 'client' || person.role.toLowerCase() === 'child')
+                    .map((child) => (
+                      <div key={child.person_id} className="child-living-arrangement">
+                        <h4>{child.first_name} {child.last_name}</h4>
+                        <div className="form-grid">
+                          <div className="form-group">
+                            <label>Living Arrangement Type *</label>
+                            <select
+                              value=""
+                              onChange={(e) => {
+                                // TODO: Store living arrangement data
+                                console.log(`Living arrangement for ${child.first_name}: ${e.target.value}`)
+                              }}
+                            >
+                              <option value="">Select arrangement type</option>
+                              <option value="With Parent/Guardian">With Parent/Guardian</option>
+                              <option value="Foster Care">Foster Care</option>
+                              <option value="Kinship Care">Kinship Care</option>
+                              <option value="Group Home">Group Home</option>
+                              <option value="Residential Treatment">Residential Treatment</option>
+                              <option value="Independent Living">Independent Living</option>
+                              <option value="Other">Other</option>
+                            </select>
+                          </div>
+                          
+                          <div className="form-group">
+                            <label>Name and Location *</label>
+                            <input
+                              type="text"
+                              placeholder="Enter caregiver name and location"
+                              onChange={(e) => {
+                                // TODO: Store location data
+                                console.log(`Location for ${child.first_name}: ${e.target.value}`)
+                              }}
+                            />
+                          </div>
+                          
+                          <div className="form-group">
+                            <label>Start Date *</label>
+                            <input
+                              type="date"
+                              onChange={(e) => {
+                                // TODO: Store start date
+                                console.log(`Start date for ${child.first_name}: ${e.target.value}`)
+                              }}
+                            />
+                          </div>
+                          
+                          <div className="form-group">
+                            <label>End Date</label>
+                            <input
+                              type="date"
+                              onChange={(e) => {
+                                // TODO: Store end date
+                                console.log(`End date for ${child.first_name}: ${e.target.value}`)
+                              }}
+                            />
+                          </div>
+                        </div>
                       </div>
-                    ))}
+                    ))
+                ) : (
+                  <div className="no-children-notice">
+                    <span className="icon">info</span>
+                    <p>No children/clients found in this case. Please add children in Step 2 before requesting assignment.</p>
                   </div>
-                  
-                  <div className="add-safety-factor">
-                    <select
-                      value=""
-                      onChange={(e) => {
-                        if (e.target.value && !assessments.safety_factors.includes(e.target.value)) {
-                          setAssessments({
-                            ...assessments, 
-                            safety_factors: [...assessments.safety_factors, e.target.value]
-                          })
-                        }
-                      }}
-                    >
-                      <option value="">Select a common safety factor...</option>
-                      {commonSafetyFactors
-                        .filter(factor => !assessments.safety_factors.includes(factor))
-                        .map(factor => (
-                          <option key={factor} value={factor}>{factor}</option>
-                        ))
-                      }
-                    </select>
-                    
-                    <div className="custom-factor-input">
-                      <input
-                        type="text"
-                        value={newSafetyFactor}
-                        onChange={(e) => setNewSafetyFactor(e.target.value)}
-                        placeholder="Or add a custom safety factor..."
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (newSafetyFactor.trim() && !assessments.safety_factors.includes(newSafetyFactor.trim())) {
-                            setAssessments({
-                              ...assessments, 
-                              safety_factors: [...assessments.safety_factors, newSafetyFactor.trim()]
-                            })
-                            setNewSafetyFactor('')
-                          }
-                        }}
-                        className="action-btn small primary"
-                        disabled={!newSafetyFactor.trim()}
-                      >
-                        <span className="icon">add</span>
-                        Add
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="form-group">
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={assessments.safety_confirmed}
-                      onChange={(e) => setAssessments({...assessments, safety_confirmed: e.target.checked})}
-                    />
-                    I confirm the safety assessment is accurate and complete
-                  </label>
-                </div>
+                )}
               </div>
-
-              <div className="assessment-section">
-                <h4>Assessment Notes</h4>
-                <div className="form-group">
-                  <label>Additional Assessment Notes (Optional)</label>
-                  <textarea
-                    value={assessments.assessment_notes}
-                    onChange={(e) => setAssessments({...assessments, assessment_notes: e.target.value})}
-                    placeholder="Provide any additional notes about the risk and safety assessment..."
-                    rows={3}
+              
+              <div className="form-group">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={assessments.risk_confirmed}
+                    onChange={(e) => setAssessments({...assessments, risk_confirmed: e.target.checked})}
                   />
-                </div>
+                  I confirm all living arrangements have been reviewed and updated
+                </label>
               </div>
             </div>
           )}
+
 
           {/* Step 4: Final Confirmation */}
           {currentStep === 4 && (
@@ -797,7 +903,7 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
               <p>Review all information and request assignment to a Social Work Case Manager.</p>
               
               <div className="setup-summary">
-                <h4>Case Setup Summary</h4>
+                <h4>Assignment Request Summary</h4>
                 <div className="summary-item">
                   <strong>People Involved:</strong> {casePersons.length} person(s)
                 </div>
@@ -808,7 +914,7 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
                   <strong>Risk Level:</strong> {assessments.risk_level}
                 </div>
                 <div className="summary-item">
-                  <strong>Assessments Confirmed:</strong> {assessments.risk_confirmed && assessments.safety_confirmed ? 'Yes' : 'No'}
+                  <strong>Ready for Assignment:</strong> {assessments.risk_confirmed ? 'Yes' : 'No'}
                 </div>
               </div>
 
@@ -829,7 +935,7 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
                     checked={finalConfirmation.ready_for_assignment}
                     onChange={(e) => setFinalConfirmation({...finalConfirmation, ready_for_assignment: e.target.checked})}
                   />
-                  I confirm this case is ready for SWCM assignment
+                  I confirm this case is ready for SWCM assignment and all required information has been reviewed
                 </label>
               </div>
             </div>
@@ -841,11 +947,6 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
           <div className="modal-actions">
             <button onClick={onClose} className="action-btn secondary">
               Cancel
-            </button>
-            
-            <button onClick={handleSaveAndExit} className="action-btn tertiary">
-              <span className="icon">save</span>
-              Save & Exit
             </button>
             
             {currentStep > 1 && (
@@ -869,8 +970,8 @@ export default function CPWCaseSetupModal({ isOpen, onClose, case_, onSuccess }:
                 className="action-btn primary"
                 disabled={!finalConfirmation.ready_for_assignment || loading}
               >
-                {loading ? 'Processing...' : 'Complete Setup'}
-                <span className="icon">check</span>
+                {loading ? 'Requesting Assignment...' : 'Request SWCM Assignment'}
+                <span className="icon">assignment_ind</span>
               </button>
             )}
           </div>
