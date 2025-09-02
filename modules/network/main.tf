@@ -116,8 +116,7 @@ module "default_firewall" {
   source  = "terraform-google-modules/gcloud/google"
   version = "~> 3.4"
 
-  skip_download = true
-  platform      = "linux"
+  platform = "linux"
 
   create_cmd_entrypoint  = "gcloud"
   create_cmd_body        = "compute firewall-rules update default-allow-${each.key} --enable-logging --disabled --quiet || true"
