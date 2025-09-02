@@ -16,6 +16,7 @@
 ### Required APIs
 ##########################
 resource "google_project_service" "services" {
+  project = var.project_id
   for_each                   = toset(local.required_apis)
   service                    = each.key
   disable_dependent_services = true
