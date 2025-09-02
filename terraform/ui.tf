@@ -116,7 +116,8 @@ resource "google_cloudbuild_trigger" "ui" {
     google_storage_bucket_iam_member.cloud_build_deployer,
     google_project_iam_member.cloud_build_deployer,
     google_artifact_registry_repository_iam_member.cloud_build_deployer,
-    time_sleep.wait_for_iam_propagation
+    time_sleep.wait_for_iam_propagation,
+    google_storage_bucket_object.ui_tarball
   ]
 }
 
