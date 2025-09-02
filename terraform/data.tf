@@ -24,4 +24,6 @@ resource "google_project" "this" {
 }
 
 data "google_client_config" "current" {}
-data "google_compute_zones" "available" {}
+data "google_compute_zones" "available" {
+  project = var.project_id
+}
