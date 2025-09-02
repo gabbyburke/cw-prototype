@@ -37,10 +37,6 @@ resource "google_storage_bucket" "course_catalog" {
   autoclass {
     enabled = true
   }
-  logging {
-    log_bucket        = module.network.logs_bucket.name
-    log_object_prefix = "${local.prefix}course-catalog/"
-  }
 }
 
 resource "google_storage_bucket" "cloud_run_code" {
@@ -56,10 +52,6 @@ resource "google_storage_bucket" "cloud_run_code" {
   autoclass {
     enabled = true
   }
-  logging {
-    log_bucket        = module.network.logs_bucket.name
-    log_object_prefix = "${local.prefix}ccwis-case-management-cr-code/"
-  }
 }
 
 resource "google_storage_bucket" "firebase_storage" {
@@ -74,9 +66,5 @@ resource "google_storage_bucket" "firebase_storage" {
   }
   autoclass {
     enabled = true
-  }
-  logging {
-    log_bucket        = module.network.logs_bucket.name
-    log_object_prefix = "${local.prefix}firebase-storage/"
   }
 }

@@ -162,13 +162,6 @@ resource "google_storage_bucket" "logs" {
   uniform_bucket_level_access = true
 }
 
-# https://cloud.google.com/storage/docs/access-logs
-resource "google_storage_bucket_iam_binding" "logs" {
-  bucket  = google_storage_bucket.logs.name
-  role    = "roles/storage.objectCreator"
-  members = ["group:cloud-storage-analytics@google.com"]
-}
-
 resource "google_storage_bucket" "logs_archive" {
   name                        = "${local.prefix}logs-archive-${random_string.random.result}"
   location                    = "US"
