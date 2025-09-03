@@ -6,6 +6,12 @@ DEPLOYMENT_PROJECT_ID="${1:-terraform-dev-66677}"
 SERVICE_ACCOUNT_NAME="terraform-deployer"
 TARGET_PROJECT_ID="${2:-}"  # Optional: create new or use existing
 
+LOGGED_GOOGLE_IMPERSONATE_SERVICE_ACCOUNT=`gcloud config list --format='value(core.account)'`
+
+gcloud projects add-iam-policy-binding [PROJECT_ID] \
+    --member="user:${LOGGED_GOOGLE_IMPERSONATE_SERVICE_ACCOUNT}" \
+    --role="roles/iam.serviceAccountAdmin"
+
 # Enable APIs in deployment project
 gcloud services enable \
     compute.googleapis.com \
@@ -17,7 +23,7 @@ gcloud services enable \
     --project=${DEPLOYMENT_PROJECT_ID}
 
 # Create/configure service account
-SERVICE_ACCOUNT_EMAIL="${SERVICE_ACCOUNT_NAME}@${DEPLOYMENT_PROJECT_ID}.iam.gserviceaccount.com"
+#SERVICE_ACCOUNT_EMAIL="${SERVICE_ACCOUNT_NAME}@${DEPLOYMENT_PROJECT_ID}.iam.gserviceaccount.com"
 
 # If creating new projects, grant org-level permissions
 if [ -n "${ORG_ID:-}" ]; then

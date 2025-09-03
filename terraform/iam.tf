@@ -38,7 +38,7 @@ resource "google_artifact_registry_repository_iam_member" "cloud_build_deployer"
   project    = google_project.this.project_id
   location   = google_artifact_registry_repository.docker.location
   repository = google_artifact_registry_repository.docker.name
-  role       = "roles/artifactregistry.repositoryAdmin"
+  role       = "roles/artifactregistry.writer"
   member     = google_service_account.cloud_build_deployer.member
 }
 
