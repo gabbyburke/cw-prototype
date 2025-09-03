@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Configuration
-DEPLOYMENT_PROJECT_ID="${1:-terraform-dev-66677}"
-SERVICE_ACCOUNT_NAME="terraform-deployer"
-TARGET_PROJECT_ID="${2:-}"  # Optional: create new or use existing
+if [ -z "${GOOGLE_CLOUD_PROJECT}" ]; then
+    echo "ERROR: The GOOGLE_CLOUD_PROJECT environment variable is not set."
+    echo "Please set it to your Google Cloud project ID and re-run this script."
+    exit 1
+fi
 
-LOGGED_GOOGLE_IMPERSONATE_SERVICE_ACCOUNT=`gcloud config list --format='value(core.account)'`
-
-#gcloud projects add-iam-policy-binding ${DEPLOYMENT_PROJECT_ID} \
+#gcloud projects add-iam-policy-binding ${GOOGLE_CLOUD_PROJECT} \
 #    --member="user:${LOGGED_GOOGLE_IMPERSONATE_SERVICE_ACCOUNT}" \
 #    --role="roles/iam.serviceAccountAdmin"
 
@@ -20,17 +19,7 @@ gcloud services enable \
     serviceusage.googleapis.com \
     iam.googleapis.com \
     storage.googleapis.com \
-    --project=${DEPLOYMENT_PROJECT_ID}
-
-# Create/configure service account
-#SERVICE_ACCOUNT_EMAIL="${SERVICE_ACCOUNT_NAME}@${DEPLOYMENT_PROJECT_ID}.iam.gserviceaccount.com"
-
-# If creating new projects, grant org-level permissions
-if [ -n "${ORG_ID:-}" ]; then
-    gcloud organizations add-iam-policy-binding ${ORG_ID} \
-        --member="serviceAccount:${SERVICE_ACCOUNT_EMAIL}" \
-        --role="roles/resourcemanager.projectCreator"
-fi
+    --project=${GOOGLE_CLOUD_PROJECT}
 
 gcs_bucket="tf-state-${GOOGLE_CLOUD_PROJECT}"
 if gcloud storage buckets list | grep -q "gs://${gcs_bucket}/"; then
@@ -47,9 +36,7 @@ EOF
 cat > ./config/dev.tfvars <<EOF
 # Development environment variables
 
-deployment_project_id = "${DEPLOYMENT_PROJECT_ID}"
-project_id = "${TARGET_PROJECT_ID}"
-service_account_name="${SERVICE_ACCOUNT_NAME}"
+project_id = "${GOOGLE_CLOUD_PROJECT}"
 environment = "dev"
 
 # Optional variables
