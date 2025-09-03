@@ -24,9 +24,9 @@ if ! gcloud iam service-accounts describe "$SERVICE_ACCOUNT_EMAIL" --project="$D
   # create the service account
   gcloud iam service-accounts create "$SERVICE_ACCOUNT_NAME" \
     --display-name="Used for Terraform deployment" \
-    --project="$PROJECT_ID"
+    --project="${DEPLOYMENT_PROJECT_ID}"
 else
-  echo "Service account $SERVICE_ACCOUNT_EMAIL already exists. Skipping creation."
+  echo "Service account ${SERVICE_ACCOUNT_EMAIL} already exists. Skipping creation."
 fi
 
 
