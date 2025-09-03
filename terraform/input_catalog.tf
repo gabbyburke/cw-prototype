@@ -48,14 +48,11 @@ data "google_storage_project_service_account" "gcs_service_account" {}
 
 resource "google_pubsub_topic_iam_member" "gcs_pubsub_publisher" {
   for_each = {
-    "new-source" = google_pubsub_topic.new_source.name
+    "new-source" = google_pubsub_topic.new_source.id
   }
   topic  = each.value
   role   = "roles/pubsub.publisher"
   member = data.google_storage_project_service_account.gcs_service_account.member
-  depends_on = [
-    google_pubsub_topic.new_source
-  ]
 }
 
 # To use GCS CloudEvent triggers, the GCS service account requires the Pub/Sub Publisher (roles/pubsub.publisher) IAM role

@@ -95,12 +95,9 @@ resource "google_pubsub_topic" "input_catalog_dispatcher_source_upload" {
 }
 
 resource "google_pubsub_topic_iam_member" "input_catalog_dispatcher_gcs_pubsub_publisher" {
-  topic  = google_pubsub_topic.input_catalog_dispatcher_source_upload.name
+  topic  = google_pubsub_topic.input_catalog_dispatcher_source_upload.id
   role   = "roles/pubsub.publisher"
   member = data.google_storage_project_service_account.gcs_service_account.member
-  depends_on = [
-    google_pubsub_topic.input_catalog_dispatcher_source_upload
-  ]
 }
 
 locals {
