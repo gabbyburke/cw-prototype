@@ -18,6 +18,17 @@ gcloud services enable \
 
 # Create/configure service account
 SERVICE_ACCOUNT_EMAIL="${SERVICE_ACCOUNT_NAME}@${DEPLOYMENT_PROJECT_ID}.iam.gserviceaccount.com"
+# Check if the service account exists
+if ! gcloud iam service-accounts describe "$SERVICE_ACCOUNT_EMAIL" --project="$DEPLOYMENT_PROJECT_ID" > /dev/null 2>&1; then
+  echo "Service account $SERVICE_ACCOUNT_EMAIL does not exist. Creating..."
+  # create the service account
+  gcloud iam service-accounts create "$SERVICE_ACCOUNT_NAME" \
+    --display-name="Used for Terraform deployment" \
+    --project="$PROJECT_ID"
+else
+  echo "Service account $SERVICE_ACCOUNT_EMAIL already exists. Skipping creation."
+fi
+
 
 # If creating new projects, grant org-level permissions
 if [ -n "${ORG_ID:-}" ]; then
