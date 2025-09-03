@@ -5,6 +5,7 @@ set -euo pipefail
 DEPLOYMENT_PROJECT_ID="${1:-terraform-dev-66677}"
 SERVICE_ACCOUNT_NAME="terraform-deployer"
 TARGET_PROJECT_ID="${2:-}"  # Optional: create new or use existing
+BILLING_ACCOUNT_ID="${3:-}" # Optional: required for new project creation
 
 # Enable APIs in deployment project
 gcloud services enable \
@@ -29,12 +30,39 @@ else
   echo "Service account ${SERVICE_ACCOUNT_EMAIL} already exists. Skipping creation."
 fi
 
+echo "Granting necessary IAM roles to service account..."
+gcloud projects add-iam-policy-binding "${DEPLOYMENT_PROJECT_ID}" \
+    --member="serviceAccount:${SERVICE_ACCOUNT_EMAIL}" \
+    --role="roles/storage.admin" --condition=None > /dev/null
+
+gcloud projects add-iam-policy-binding "${DEPLOYMENT_PROJECT_ID}" \
+    --member="serviceAccount:${SERVICE_ACCOUNT_EMAIL}" \
+    --role="roles/serviceusage.serviceUsageAdmin" --condition=None > /dev/null
+
+gcloud projects add-iam-policy-binding "${DEPLOYMENT_PROJECT_ID}" \
+    --member="serviceAccount:${SERVICE_ACCOUNT_EMAIL}" \
+    --role="roles/iam.serviceAccountAdmin" --condition=None > /dev/null
+
+gcloud projects add-iam-policy-binding "${DEPLOYMENT_PROJECT_ID}" \
+    --member="serviceAccount:${SERVICE_ACCOUNT_EMAIL}" \
+    --role="roles/resourcemanager.projectIamAdmin" --condition=None > /dev/null
+
 
 # If creating new projects, grant org-level permissions
 if [ -n "${ORG_ID:-}" ]; then
-    gcloud organizations add-iam-policy-binding ${ORG_ID} \
+    echo "Granting Organization-level permissions to create projects..."
+    gcloud organizations add-iam-policy-binding "${ORG_ID}" \
         --member="serviceAccount:${SERVICE_ACCOUNT_EMAIL}" \
-        --role="roles/resourcemanager.projectCreator"
+        --role="roles/resourcemanager.projectCreator" --condition=None > /dev/null
+
+    if [ -n "${BILLING_ACCOUNT_ID:-}" ]; then
+        echo "Granting Billing Account User role..."
+        gcloud billing accounts add-iam-policy-binding "${BILLING_ACCOUNT_ID}" \
+            --member="serviceAccount:${SERVICE_ACCOUNT_EMAIL}" \
+            --role="roles/billing.user" --condition=None > /dev/null
+    else
+        echo "Warning: BILLING_ACCOUNT_ID is not set. Project creation may fail if a billing account is required."
+    fi
 fi
 
 gcs_bucket="tf-state-${GOOGLE_CLOUD_PROJECT}"
