@@ -142,7 +142,7 @@ resource "google_cloud_run_v2_service" "referral_intake" {
   name                = "${var.environment}-${local.vertex_ai_model_region}-referral-intake${local.random_suffix}"
   location            = local.vertex_ai_model_region
   deletion_protection = var.cloud_run_service_deletion_protection
-  ingress             = "INGRESS_TRAFFIC_INTERNAL_ONLY"
+  ingress             = "INGRESS_TRAFFIC_ALL"
 
   traffic {
     type    = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
