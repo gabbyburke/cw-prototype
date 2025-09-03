@@ -34,7 +34,6 @@ else
 fi
 
 cat > ./config/backend.hcl <<EOF
-deployment_project_id = "${DEPLOYMENT_PROJECT_ID}"
 bucket = "${gcs_bucket}"
 prefix = "terraform/state"
 EOF
