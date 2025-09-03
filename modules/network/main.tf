@@ -78,6 +78,7 @@ resource "google_dns_policy" "this" {
 }
 
 resource "google_compute_router" "router" {
+  project = var.project_id
   count   = var.enable_cloud_nat ? 1 : 0
   name    = "${local.prefix}router${local.suffix}"
   region  = data.google_client_config.current.region
