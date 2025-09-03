@@ -35,7 +35,7 @@ data "google_client_config" "current" {}
 resource "google_compute_network" "this" {
   name                            = var.network_name == null ? "${local.prefix}main${local.suffix}" : var.network_name
   auto_create_subnetworks         = false
-  delete_default_routes_on_create = false
+  delete_default_routes_on_create = true
 }
 
 resource "google_compute_subnetwork" "subnets" {
@@ -106,23 +106,6 @@ resource "google_compute_router_nat" "nat" {
   }
 }
 
-module "default_firewall" {
-  for_each = var.disable_default_firewall_rules ? toset([
-    "rdp",
-    "ssh",
-    "icmp",
-    "internal",
-  ]) : toset([])
-  source  = "terraform-google-modules/gcloud/google"
-  version = "~> 3.4"
-
-  platform = "linux"
-
-  create_cmd_entrypoint  = "gcloud"
-  create_cmd_body        = "compute firewall-rules update default-allow-${each.key} --enable-logging --disabled --quiet || true"
-  destroy_cmd_entrypoint = "gcloud"
-  destroy_cmd_body       = "compute firewall-rules update default-allow-${each.key} --enable-logging --no-disabled --quiet || true"
-}
 
 resource "google_project_iam_audit_config" "all_services" {
   count   = var.enable_all_services_audit_logs ? 1 : 0
