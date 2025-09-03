@@ -12,36 +12,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-data "archive_file" "input_catalog_dispatcher_tarball" {
+data "archive_file" "input_data_dispatcher_tarball" {
   type        = "tar.gz"
-  output_path = "${path.module}/input_catalog_dispatcher.tar.gz"
+  output_path = "${path.module}/input_data_dispatcher.tar.gz"
   source_dir  = "../src/dispatcher"
 }
 
 locals {
-  input_catalog_dispatcher_tarball_name = "cloud-run/input-catalog-dispatcher.tar.gz"
+  input_data_dispatcher_tarball_name = "cloud-run/input-catalog-dispatcher.tar.gz"
 }
 
-resource "google_storage_bucket_object" "input_catalog_dispatcher_tarball" {
-  name   = local.input_catalog_dispatcher_tarball_name
+resource "google_storage_bucket_object" "input_data_dispatcher_tarball" {
+  name   = local.input_data_dispatcher_tarball_name
   bucket = google_storage_bucket.cloud_run_code.name
-  source = data.archive_file.input_catalog_dispatcher_tarball.output_path
+  source = data.archive_file.input_data_dispatcher_tarball.output_path
   depends_on = [
-    google_storage_notification.input_catalog_dispatcher_tarball,
-    google_cloudbuild_trigger.input_catalog_dispatcher_build_trigger
+    google_storage_notification.input_data_dispatcher_tarball,
+    google_cloudbuild_trigger.input_data_dispatcher_build_trigger
   ]
 }
 
-resource "google_storage_notification" "input_catalog_dispatcher_tarball" {
+resource "google_storage_notification" "input_data_dispatcher_tarball" {
   bucket             = google_storage_bucket.cloud_run_code.name
   payload_format     = "NONE"
-  topic              = google_pubsub_topic.input_catalog_dispatcher_source_upload.id
+  topic              = google_pubsub_topic.input_data_dispatcher_source_upload.id
   event_types        = ["OBJECT_FINALIZE"]
-  object_name_prefix = local.input_catalog_dispatcher_tarball_name
+  object_name_prefix = local.input_data_dispatcher_tarball_name
   depends_on         = [time_sleep.wait_for_iam_propagation]
 }
 
-resource "google_cloud_tasks_queue" "input_catalog_dispatcher" {
+resource "google_cloud_tasks_queue" "input_data_dispatcher" {
   depends_on = [
     google_project_service.services["cloudtasks.googleapis.com"]
   ]
@@ -61,81 +61,81 @@ resource "google_cloud_tasks_queue" "input_catalog_dispatcher" {
   }
 }
 
-resource "google_service_account" "input_catalog_dispatcher" {
+resource "google_service_account" "input_data_dispatcher" {
   account_id   = regex("^(.*?)(?:-)?$", substr("${local.prefix}dispatcher", 0, 30))[0]
   display_name = "Service Account for Input Catalog Dispatcher"
   description  = "Service account used by the input catalog dispatcher"
 }
 
-resource "google_cloud_tasks_queue_iam_member" "input_catalog_dispatcher" {
-  location = google_cloud_tasks_queue.input_catalog_dispatcher.location
-  name     = google_cloud_tasks_queue.input_catalog_dispatcher.name
+resource "google_cloud_tasks_queue_iam_member" "input_data_dispatcher" {
+  location = google_cloud_tasks_queue.input_data_dispatcher.location
+  name     = google_cloud_tasks_queue.input_data_dispatcher.name
   role     = "roles/cloudtasks.enqueuer"
-  member   = google_service_account.input_catalog_dispatcher.member
+  member   = google_service_account.input_data_dispatcher.member
 }
 
-resource "google_project_iam_member" "input_catalog_dispatcher" {
+resource "google_project_iam_member" "input_data_dispatcher" {
   for_each = toset([
     "roles/logging.logWriter",
     "roles/monitoring.metricWriter",
   ])
   project = var.project_id
   role    = each.value
-  member  = google_service_account.input_catalog_dispatcher.member
+  member  = google_service_account.input_data_dispatcher.member
 }
 
-resource "google_service_account_iam_member" "input_catalog_dispatcher" {
-  service_account_id = google_service_account.input_catalog_dispatcher.name
+resource "google_service_account_iam_member" "input_data_dispatcher" {
+  service_account_id = google_service_account.input_data_dispatcher.name
   role               = "roles/iam.serviceAccountUser"
   member             = google_service_account.cloud_build_deployer.member
 }
 
-resource "google_pubsub_topic" "input_catalog_dispatcher_source_upload" {
+resource "google_pubsub_topic" "input_data_dispatcher_source_upload" {
   name = "input-catalog-dispatcher-source-upload${local.random_suffix}"
 }
 
-resource "google_pubsub_topic_iam_member" "input_catalog_dispatcher_gcs_pubsub_publisher" {
-  topic  = google_pubsub_topic.input_catalog_dispatcher_source_upload.id
+resource "google_pubsub_topic_iam_member" "input_data_dispatcher_gcs_pubsub_publisher" {
+  topic  = google_pubsub_topic.input_data_dispatcher_source_upload.id
   role   = "roles/pubsub.publisher"
   member = data.google_storage_project_service_account.gcs_service_account.member
 }
 
 locals {
   # Use first 12 characters of source hash as tag - only changes when source changes
-  input_catalog_dispatcher_computed_image_tag = substr(data.archive_file.input_catalog_dispatcher_tarball.output_sha256, 0, 12)
+  input_data_dispatcher_computed_image_tag = substr(data.archive_file.input_data_dispatcher_tarball.output_sha256, 0, 12)
 
   # List of tags to apply to the image
-  input_catalog_dispatcher_image_tags = [
-    local.input_catalog_dispatcher_computed_image_tag,
+  input_data_dispatcher_image_tags = [
+    local.input_data_dispatcher_computed_image_tag,
     "latest"
   ]
   # Generate image URLs for all tags
-  input_catalog_dispatcher_image_urls = formatlist("%s:%s", "${local.image_base_url}/input-catalog-dispatcher", local.input_catalog_dispatcher_image_tags)
-  input_catalog_dispatcher_image_url  = local.input_catalog_dispatcher_image_urls[0]
+  input_data_dispatcher_image_urls = formatlist("%s:%s", "${local.image_base_url}/input-catalog-dispatcher", local.input_data_dispatcher_image_tags)
+  input_data_dispatcher_image_url  = local.input_data_dispatcher_image_urls[0]
 }
 
-resource "google_cloudbuild_trigger" "input_catalog_dispatcher_build_trigger" {
+resource "google_cloudbuild_trigger" "input_data_dispatcher_build_trigger" {
   name            = "${local.prefix}input-catalog-dispatcher-trigger"
   location        = data.google_compute_zones.available.region
   description     = "Triggers a build and deploy to Cloud Run when a new source .tar.gz is uploaded."
   service_account = google_service_account.cloud_build_deployer.id
 
   pubsub_config {
-    topic = google_pubsub_topic.input_catalog_dispatcher_source_upload.id
+    topic = google_pubsub_topic.input_data_dispatcher_source_upload.id
   }
 
   build {
     source {
       storage_source {
         bucket = google_storage_bucket.cloud_run_code.name
-        object = local.input_catalog_dispatcher_tarball_name
+        object = local.input_data_dispatcher_tarball_name
       }
     }
     step {
       name = "gcr.io/cloud-builders/docker"
-      args = flatten(["build", [for url in local.input_catalog_dispatcher_image_urls : ["-t", url]], ["-f", "Dockerfile", "."]])
+      args = flatten(["build", [for url in local.input_data_dispatcher_image_urls : ["-t", url]], ["-f", "Dockerfile", "."]])
     }
-    images      = local.input_catalog_dispatcher_image_urls
+    images      = local.input_data_dispatcher_image_urls
     logs_bucket = "${google_storage_bucket.cloud_run_code.name}/build-logs/input-catalog-dispatcher"
     tags        = ["input-catalog-dispatcher", "terraform-managed"]
     options {
@@ -150,23 +150,23 @@ resource "google_cloudbuild_trigger" "input_catalog_dispatcher_build_trigger" {
   ]
 }
 
-module "wait_for_input_catalog_dispatcher_build" {
+module "wait_for_input_data_dispatcher_build" {
   source  = "terraform-google-modules/gcloud/google"
   version = "~> 3.0"
 
   platform              = "linux"
   create_cmd_entrypoint = "bash"
-  create_cmd_body       = "${path.module}/../files/wait_for_build.sh ${google_cloudbuild_trigger.input_catalog_dispatcher_build_trigger.location} input-catalog-dispatcher ${local.input_catalog_dispatcher_image_url} 5"
+  create_cmd_body       = "${path.module}/../files/wait_for_build.sh ${google_cloudbuild_trigger.input_data_dispatcher_build_trigger.location} input-catalog-dispatcher ${local.input_data_dispatcher_image_url} 5"
 
   destroy_cmd_entrypoint = "echo"
   destroy_cmd_body       = "Build wait completed"
 
   module_depends_on = [
-    google_cloudbuild_trigger.input_catalog_dispatcher_build_trigger
+    google_cloudbuild_trigger.input_data_dispatcher_build_trigger
   ]
 }
 
-resource "google_cloud_run_v2_service" "input_catalog_dispatcher" {
+resource "google_cloud_run_v2_service" "input_data_dispatcher" {
   name                = "${local.prefix}input-catalog-dispatcher${local.random_suffix}"
   location            = data.google_compute_zones.available.region
   deletion_protection = var.cloud_run_service_deletion_protection
@@ -178,9 +178,9 @@ resource "google_cloud_run_v2_service" "input_catalog_dispatcher" {
   }
 
   template {
-    service_account = google_service_account.input_catalog_dispatcher.email
+    service_account = google_service_account.input_data_dispatcher.email
     containers {
-      image = google_cloudbuild_trigger.input_catalog_dispatcher_build_trigger.build[0].images[0]
+      image = google_cloudbuild_trigger.input_data_dispatcher_build_trigger.build[0].images[0]
       resources {
         limits = {
           cpu    = "1000m"
@@ -191,9 +191,9 @@ resource "google_cloud_run_v2_service" "input_catalog_dispatcher" {
         for_each = {
           GCP_PROJECT         = var.project_id
           GCP_LOCATION        = data.google_compute_zones.available.region
-          TASK_QUEUE          = google_cloud_tasks_queue.input_catalog_dispatcher.name
-          WORKER_SERVICE_URL  = google_cloud_run_v2_service.input_catalog.uri
-          DISPATCHER_SA_EMAIL = google_service_account.input_catalog_dispatcher.email
+          TASK_QUEUE          = google_cloud_tasks_queue.input_data_dispatcher.name
+          WORKER_SERVICE_URL  = google_cloud_run_v2_service.input_data.uri
+          DISPATCHER_SA_EMAIL = google_service_account.input_data_dispatcher.email
         }
         content {
           name  = env.key
@@ -203,13 +203,13 @@ resource "google_cloud_run_v2_service" "input_catalog_dispatcher" {
     }
   }
   depends_on = [
-    module.wait_for_input_catalog_dispatcher_build.wait
+    module.wait_for_input_data_dispatcher_build.wait
   ]
 }
 
 resource "google_cloud_run_v2_service_iam_member" "eventarc_trigger" {
-  name     = google_cloud_run_v2_service.input_catalog_dispatcher.name
-  location = google_cloud_run_v2_service.input_catalog_dispatcher.location
+  name     = google_cloud_run_v2_service.input_data_dispatcher.name
+  location = google_cloud_run_v2_service.input_data_dispatcher.location
   role     = "roles/run.invoker"
   member   = google_service_account.eventarc_trigger.member
 }
@@ -230,16 +230,16 @@ resource "google_project_iam_member" "tasks_run_invoker" {
 
 # Allow the Cloud Tasks service agent to impersonate the dispatcher SA for authentication to Input Catalog
 resource "google_service_account_iam_member" "cloud_tasks_dispatcher_sa_user" {
-  service_account_id = google_service_account.input_catalog_dispatcher.name
+  service_account_id = google_service_account.input_data_dispatcher.name
   role               = "roles/iam.serviceAccountUser"
   member             = google_project_service_identity.cloudtasks.member
 }
 
 # yes it needs to impersonate itself
 resource "google_service_account_iam_member" "dispatcher_self_impersonation" {
-  service_account_id = google_service_account.input_catalog_dispatcher.name
+  service_account_id = google_service_account.input_data_dispatcher.name
   role               = "roles/iam.serviceAccountUser"
-  member             = google_service_account.input_catalog_dispatcher.member
+  member             = google_service_account.input_data_dispatcher.member
 }
 
 # Eventarc Resources
@@ -296,7 +296,7 @@ resource "google_service_account_iam_member" "pubsub_sa_user" {
   member             = google_project_service_identity.pubsub.member
 }
 
-resource "google_eventarc_trigger" "new_input_catalog_upload" {
+resource "google_eventarc_trigger" "new_input_data_upload" {
   name     = "${local.prefix}new-input-catalog-upload"
   location = lower(google_storage_bucket.course_catalog.location) # This API only takes lower case "us"
 
@@ -310,8 +310,8 @@ resource "google_eventarc_trigger" "new_input_catalog_upload" {
   }
   destination {
     cloud_run_service {
-      service = google_cloud_run_v2_service.input_catalog_dispatcher.name
-      region  = google_cloud_run_v2_service.input_catalog_dispatcher.location
+      service = google_cloud_run_v2_service.input_data_dispatcher.name
+      region  = google_cloud_run_v2_service.input_data_dispatcher.location
       path    = "/"
     }
   }

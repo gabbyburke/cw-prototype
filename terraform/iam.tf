@@ -80,10 +80,10 @@ resource "time_sleep" "wait_for_iam_propagation" {
   # This map triggers a re-sleep whenever any of these IAM resources change.
   triggers = {
     eventarc_receiver_id             = values(google_project_iam_member.eventarc_trigger)[0].id
-    runtime_sa_perms_id              = values(google_project_iam_member.input_catalog)[0].id
+     runtime_sa_perms_id              = values(google_project_iam_member.input_data)[0].id
     cloudbuild_service_agent_role_id = values(google_project_iam_member.cloudbuild_service_agent_role)[0].id
     vertex_ai_user_id                = values(google_project_iam_member.vertex_ai_user)[0].id
-    task_queue_id                    = google_cloud_tasks_queue_iam_member.input_catalog_dispatcher.id
-    dispatcher_sa_perm_id            = values(google_project_iam_member.input_catalog_dispatcher)[0].id
+    task_queue_id                    = google_cloud_tasks_queue_iam_member.input_data_dispatcher.id
+    dispatcher_sa_perm_id            = values(google_project_iam_member.input_data_dispatcher)[0].id
   }
 }

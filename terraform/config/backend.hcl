@@ -1,2 +1,2 @@
-bucket = tf-state-terraform-dev-66677
+bucket = "tf-state-rit-ccwis-smo-dev"
 prefix = "terraform/state"

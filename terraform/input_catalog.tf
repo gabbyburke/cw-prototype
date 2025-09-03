@@ -13,33 +13,33 @@
 # limitations under the License.
 
 # Input Catalog Source Code
-data "archive_file" "input_catalog_tarball" {
+data "archive_file" "input_data_tarball" {
   type        = "tar.gz"
-  output_path = "${path.module}/input_catalog.tar.gz"
+  output_path = "${path.module}/input_data.tar.gz"
   source_dir  = "../src/dispatcher"
 }
 
 locals {
-  input_catalog_tarball_name = "cloud-run/input-catalog.tar.gz"
+  input_data_tarball_name = "cloud-run/input-catalog.tar.gz"
 }
 
 # depends_on to allow notification to exist before the tarball is uploaded
-resource "google_storage_bucket_object" "input_catalog_tarball" {
-  name   = local.input_catalog_tarball_name
+resource "google_storage_bucket_object" "input_data_tarball" {
+  name   = local.input_data_tarball_name
   bucket = google_storage_bucket.cloud_run_code.name
-  source = data.archive_file.input_catalog_tarball.output_path
+  source = data.archive_file.input_data_tarball.output_path
   depends_on = [
-    google_storage_notification.input_catalog_tarball,
-    google_cloudbuild_trigger.input_catalog_build_trigger
+    google_storage_notification.input_data_tarball,
+    google_cloudbuild_trigger.input_data_build_trigger
   ]
 }
 
-resource "google_storage_notification" "input_catalog_tarball" {
+resource "google_storage_notification" "input_data_tarball" {
   bucket             = google_storage_bucket.cloud_run_code.name
   payload_format     = "NONE"
   topic              = google_pubsub_topic.new_source.id
   event_types        = ["OBJECT_FINALIZE"]
-  object_name_prefix = local.input_catalog_tarball_name
+  object_name_prefix = local.input_data_tarball_name
   depends_on         = [time_sleep.wait_for_iam_propagation]
 }
 
@@ -63,8 +63,8 @@ resource "google_project_iam_member" "gcs_service_account" {
 }
 
 # Grant the Cloud Build SA permission to act as the Cloud Run runtime SA.
-resource "google_service_account_iam_member" "input_catalog" {
-  service_account_id = google_service_account.input_catalog_runtime_sa.name
+resource "google_service_account_iam_member" "input_data" {
+  service_account_id = google_service_account.input_data_runtime_sa.name
   role               = "roles/iam.serviceAccountUser"
   member             = google_service_account.cloud_build_deployer.member
 }
@@ -75,19 +75,19 @@ resource "google_pubsub_topic" "new_source" {
 
 locals {
   # Use first 12 characters of source hash as tag - only changes when source changes
-  input_catalog_computed_image_tag = substr(data.archive_file.input_catalog_tarball.output_sha256, 0, 12)
+  input_data_computed_image_tag = substr(data.archive_file.input_data_tarball.output_sha256, 0, 12)
 
   # List of tags to apply to the image
-  input_catalog_image_tags = [
-    local.input_catalog_computed_image_tag,
+  input_data_image_tags = [
+    local.input_data_computed_image_tag,
     "latest"
   ]
   # Generate image URLs for all tags
-  input_catalog_image_urls = formatlist("%s:%s", "${local.image_base_url}/input-catalog", local.input_catalog_image_tags)
-  input_catalog_image_url  = local.input_catalog_image_urls[0]
+  input_data_image_urls = formatlist("%s:%s", "${local.image_base_url}/input-catalog", local.input_data_image_tags)
+  input_data_image_url  = local.input_data_image_urls[0]
 }
 
-resource "google_cloudbuild_trigger" "input_catalog_build_trigger" {
+resource "google_cloudbuild_trigger" "input_data_build_trigger" {
   name            = "${local.prefix}input-catalog-trigger"
   location        = data.google_compute_zones.available.region
   description     = "Triggers a build and deploy to Cloud Run when a new source .tar.gz is uploaded."
@@ -101,14 +101,14 @@ resource "google_cloudbuild_trigger" "input_catalog_build_trigger" {
     source {
       storage_source {
         bucket = google_storage_bucket.cloud_run_code.name
-        object = local.input_catalog_tarball_name
+        object = local.input_data_tarball_name
       }
     }
     step {
       name = "gcr.io/cloud-builders/docker"
-      args = flatten(["build", [for url in local.input_catalog_image_urls : ["-t", url]], ["-f", "input_catalog/Dockerfile", "."]])
+      args = flatten(["build", [for url in local.input_data_image_urls : ["-t", url]], ["-f", "input_data/Dockerfile", "."]])
     }
-    images      = local.input_catalog_image_urls
+    images      = local.input_data_image_urls
     logs_bucket = "${google_storage_bucket.cloud_run_code.name}/build-logs/input-catalog"
     tags        = ["input-catalog", "terraform-managed"]
     options {
@@ -123,14 +123,14 @@ resource "google_cloudbuild_trigger" "input_catalog_build_trigger" {
   ]
 }
 
-resource "google_service_account" "input_catalog_runtime_sa" {
+resource "google_service_account" "input_data_runtime_sa" {
   account_id   = regex("^(.*?)(?:-)?$", substr("${local.prefix}input-catalog-runtime", 0, 30))[0]
   display_name = "Input Catalog runtime"
   description  = "Service account used by Input Catalog's Cloud Run service"
 }
 
-resource "google_project_iam_member" "input_catalog" {
-  for_each = toset([ # Permissions from input_catalog README
+resource "google_project_iam_member" "input_data" {
+  for_each = toset([ # Permissions from input_data README
     "roles/aiplatform.user",
     "roles/bigquery.dataEditor",
     "roles/bigquery.jobUser",
@@ -140,27 +140,27 @@ resource "google_project_iam_member" "input_catalog" {
   ])
   project = var.project_id
   role    = each.value
-  member  = google_service_account.input_catalog_runtime_sa.member
+  member  = google_service_account.input_data_runtime_sa.member
 }
 
 # Wait for any running Cloud Builds to complete before updating Cloud Run service
-module "wait_for_input_catalog_build" {
+module "wait_for_input_data_build" {
   source  = "terraform-google-modules/gcloud/google"
   version = "~> 3.0"
 
   platform              = "linux"
   create_cmd_entrypoint = "bash"
-  create_cmd_body       = "${path.module}/../files/wait_for_build.sh ${google_cloudbuild_trigger.input_catalog_build_trigger.location} input-catalog ${local.input_catalog_image_url} 5"
+  create_cmd_body       = "${path.module}/../files/wait_for_build.sh ${google_cloudbuild_trigger.input_data_build_trigger.location} input-catalog ${local.input_data_image_url} 5"
 
   destroy_cmd_entrypoint = "echo"
   destroy_cmd_body       = "Build wait completed"
 
   module_depends_on = [
-    google_cloudbuild_trigger.input_catalog_build_trigger
+    google_cloudbuild_trigger.input_data_build_trigger
   ]
 }
 
-resource "google_cloud_run_v2_service" "input_catalog" {
+resource "google_cloud_run_v2_service" "input_data" {
   name                = "${var.environment}-${local.vertex_ai_model_region}-input-catalog-worker${local.random_suffix}"
   location            = local.vertex_ai_model_region
   deletion_protection = var.cloud_run_service_deletion_protection
@@ -172,10 +172,10 @@ resource "google_cloud_run_v2_service" "input_catalog" {
   }
 
   template {
-    service_account                  = google_service_account.input_catalog_runtime_sa.email
+    service_account                  = google_service_account.input_data_runtime_sa.email
     max_instance_request_concurrency = 1 # We want to process no more than one request at a time
     containers {
-      image = google_cloudbuild_trigger.input_catalog_build_trigger.build[0].images[0]
+      image = google_cloudbuild_trigger.input_data_build_trigger.build[0].images[0]
       ports {
         container_port = 8080
       }
@@ -200,13 +200,13 @@ resource "google_cloud_run_v2_service" "input_catalog" {
     timeout = "3600s"
   }
   depends_on = [
-    module.wait_for_input_catalog_build.wait
+    module.wait_for_input_data_build.wait
   ]
 }
 
-resource "google_cloud_run_v2_service_iam_member" "input_catalog_dispatcher" {
-  name     = google_cloud_run_v2_service.input_catalog.name
-  location = google_cloud_run_v2_service.input_catalog.location
+resource "google_cloud_run_v2_service_iam_member" "input_data_dispatcher" {
+  name     = google_cloud_run_v2_service.input_data.name
+  location = google_cloud_run_v2_service.input_data.location
   role     = "roles/run.invoker"
-  member   = google_service_account.input_catalog_dispatcher.member
+  member   = google_service_account.input_data_dispatcher.member
 }
