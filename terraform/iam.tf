@@ -30,7 +30,6 @@ resource "google_project_iam_member" "cloud_build_deployer" {
 }
 
 resource "google_storage_bucket_iam_member" "cloud_build_deployer" {
-  project = google_project.this.project_id
   bucket = google_storage_bucket.cloud_run_code.name
   role   = "roles/storage.objectAdmin"
   member = google_service_account.cloud_build_deployer.member
