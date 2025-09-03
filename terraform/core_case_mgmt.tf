@@ -50,6 +50,9 @@ resource "google_pubsub_topic_iam_member" "core_case_mgmt_gcs_pubsub_publisher" 
   topic  = google_pubsub_topic.core_case_mgmt_source_upload.name
   role   = "roles/pubsub.publisher"
   member = data.google_storage_project_service_account.gcs_service_account.member
+  depends_on = [
+    google_pubsub_topic.core_case_mgmt_source_upload
+  ]
 }
 
 resource "google_service_account_iam_member" "core_case_mgmt_sa_user" {
