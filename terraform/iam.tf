@@ -14,7 +14,7 @@
 
 # Cloud Build Builder
 resource "google_service_account" "cloud_build_deployer" {
-  account_id   = regex("^(.*?)(?:-)?$", substr("${local.prefix}cloud-build", 0, 30))[0]
+  account_id   = var.service_account_name
   display_name = "Cloud Build builder"
   description  = "Service account used by Cloud Build triggers to deploy Cloud Run services"
 }
@@ -34,13 +34,13 @@ resource "google_storage_bucket_iam_member" "cloud_build_deployer" {
   member = google_service_account.cloud_build_deployer.member
 }
 
-resource "google_artifact_registry_repository_iam_member" "cloud_build_deployer" {
-  project    = google_project.this.project_id
-  location   = google_artifact_registry_repository.docker.location
-  repository = google_artifact_registry_repository.docker.name
-  role       = "roles/artifactregistry.writer"
-  member     = google_service_account.cloud_build_deployer.member
-}
+# resource "google_artifact_registry_repository_iam_member" "cloud_build_deployer" {
+#   project    = google_project.this.project_id
+#   location   = google_artifact_registry_repository.docker.location
+#   repository = google_artifact_registry_repository.docker.name
+#   role       = "roles/artifactregistry.writer"
+#   member     = google_service_account.cloud_build_deployer.member
+# }
 
 # Remove default compute service account from editor role
 data "google_compute_default_service_account" "default" {}
