@@ -24,9 +24,6 @@ resource "google_project_service" "services" {
   provisioner "local-exec" {
     command = "sleep 60"
   }
-  depends_on = [
-    google_project.this
-  ]
 }
 
 locals {

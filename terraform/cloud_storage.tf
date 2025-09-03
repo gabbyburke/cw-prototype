@@ -13,7 +13,7 @@
 # limitations under the License.
 
 resource "google_storage_bucket" "tfstate" {
-  name                        = "${local.prefix}tfstate-${random_string.suffix.result}"
+  name                        = "${var.project_id}-tfstate"
   location                    = "US"
   storage_class               = "STANDARD"
   public_access_prevention    = "enforced"

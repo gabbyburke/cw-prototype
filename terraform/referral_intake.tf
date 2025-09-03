@@ -117,7 +117,7 @@ resource "google_project_iam_member" "referral_intake" {
     "roles/logging.logWriter",
     "roles/monitoring.metricWriter",
   ])
-  project = google_project.this.project_id
+  project = var.project_id
   role    = each.value
   member  = google_service_account.referral_intake_runtime_sa.member
 }
@@ -164,7 +164,7 @@ resource "google_cloud_run_v2_service" "referral_intake" {
       }
       dynamic "env" {
         for_each = {
-          PROJECT_ID             = google_project.this.project_id,
+          PROJECT_ID             = var.project_id,
           FIRESTORE_DATABASE     = google_firestore_database.this.name,
           CORE_CASE_MGMT_API_URL = google_cloud_run_v2_service.core_case_mgmt.uri
         }

@@ -12,15 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-data "google_project" "deployment" {
-  project_id = var.deployment_project_id
-}
-
-resource "google_project" "this" {
-  project_id      = var.project_id
-  name            = var.project_id
-  org_id          = data.google_project.deployment.org_id
-  billing_account = data.google_project.deployment.billing_account
+data "google_project" "this" {
+  project_id = var.project_id
 }
 
 data "google_client_config" "current" {}

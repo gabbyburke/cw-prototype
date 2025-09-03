@@ -45,7 +45,7 @@ resource "google_cloud_tasks_queue" "input_catalog_dispatcher" {
   depends_on = [
     google_project_service.services["cloudtasks.googleapis.com"]
   ]
-  project  = google_project.this.project_id
+  project  = var.project_id
   name     = "input-catalog-dispatch"
   location = data.google_compute_zones.available.region
   rate_limits {
@@ -79,7 +79,7 @@ resource "google_project_iam_member" "input_catalog_dispatcher" {
     "roles/logging.logWriter",
     "roles/monitoring.metricWriter",
   ])
-  project = google_project.this.project_id
+  project = var.project_id
   role    = each.value
   member  = google_service_account.input_catalog_dispatcher.member
 }
@@ -189,7 +189,7 @@ resource "google_cloud_run_v2_service" "input_catalog_dispatcher" {
       }
       dynamic "env" {
         for_each = {
-          GCP_PROJECT         = google_project.this.project_id
+          GCP_PROJECT         = var.project_id
           GCP_LOCATION        = data.google_compute_zones.available.region
           TASK_QUEUE          = google_cloud_tasks_queue.input_catalog_dispatcher.name
           WORKER_SERVICE_URL  = google_cloud_run_v2_service.input_catalog.uri
@@ -223,7 +223,7 @@ resource "google_project_service_identity" "cloudtasks" {
 }
 
 resource "google_project_iam_member" "tasks_run_invoker" {
-  project = google_project.this.project_id
+  project = var.project_id
   role    = "roles/run.invoker"
   member  = google_project_service_identity.cloudtasks.member
 }
@@ -261,13 +261,13 @@ resource "google_project_iam_member" "eventarc_trigger" {
   for_each = toset([
     "roles/eventarc.eventReceiver",
   ])
-  project = google_project.this.project_id
+  project = var.project_id
   role    = each.value
   member  = google_service_account.eventarc_trigger.member
 }
 
 resource "google_project_iam_member" "eventarc_service_agent_role" {
-  project = google_project.this.project_id
+  project = var.project_id
   role    = "roles/eventarc.serviceAgent"
   member  = google_project_service_identity.eventarc.member
   provisioner "local-exec" {

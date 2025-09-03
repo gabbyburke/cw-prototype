@@ -1,5 +1,5 @@
 resource "google_monitoring_notification_channel" "emails" {
-  project      = google_project.this.project_id
+  project      = var.project_id
   for_each     = toset(var.alert_email_address_list)
   display_name = each.key
   type         = "email"

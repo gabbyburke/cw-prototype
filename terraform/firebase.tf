@@ -14,7 +14,7 @@
 
 resource "google_firebase_project" "this" {
   provider = google-beta
-  project  = google_project.this.project_id
+  project  = var.project_id
 }
 
 resource "google_firebase_web_app" "ccwis_case_management" {
@@ -22,7 +22,7 @@ resource "google_firebase_web_app" "ccwis_case_management" {
     google_firebase_project.this
   ]
   provider        = google-beta
-  project         = google_project.this.project_id
+  project         = var.project_id
   display_name    = var.add_random_suffix ? "CCWIS Case Management - ${random_string.suffix.result}" : "CCWIS Case Management"
   deletion_policy = "ABANDON"
 }
@@ -35,16 +35,16 @@ resource "google_firebase_storage_bucket" "ccwis_case_management" {
 # Data source to retrieve Firebase web app configuration
 data "google_firebase_web_app_config" "ccwis_case_management" {
   provider   = google-beta
-  project    = google_project.this.project_id
+  project    = var.project_id
   web_app_id = google_firebase_web_app.ccwis_case_management.app_id
 }
 
 resource "google_identity_platform_config" "this" {
-  project = google_project.this.project_id
+  project = var.project_id
   authorized_domains = concat([
     "localhost",
-    "${google_project.this.project_id}.firebaseapp.com",
-    "${google_project.this.project_id}.web.app",
+    "${var.project_id}.firebaseapp.com",
+    "${var.project_id}.web.app",
     ], [for url in google_cloud_run_v2_service.ui.urls : trimprefix(url, "https://")],
     var.custom_domain_list,
   )

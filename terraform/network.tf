@@ -17,7 +17,7 @@ module "network" {
     time_sleep.wait_for_iam_propagation
   ]
   source                         = "../modules/network"
-  project_id                     = google_project.this.project_id
+  project_id                     = var.project_id
   prefix                         = local.prefix
   enable_cloud_nat               = true
   disable_default_firewall_rules = true

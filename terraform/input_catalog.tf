@@ -57,7 +57,7 @@ resource "google_pubsub_topic_iam_member" "gcs_pubsub_publisher" {
 
 # To use GCS CloudEvent triggers, the GCS service account requires the Pub/Sub Publisher (roles/pubsub.publisher) IAM role
 resource "google_project_iam_member" "gcs_service_account" {
-  project = google_project.this.project_id
+  project = var.project_id
   role    = "roles/pubsub.publisher"
   member  = data.google_storage_project_service_account.gcs_service_account.member
 }
@@ -138,7 +138,7 @@ resource "google_project_iam_member" "input_catalog" {
     "roles/monitoring.metricWriter",
     "roles/storage.objectViewer",
   ])
-  project = google_project.this.project_id
+  project = var.project_id
   role    = each.value
   member  = google_service_account.input_catalog_runtime_sa.member
 }
@@ -188,7 +188,7 @@ resource "google_cloud_run_v2_service" "input_catalog" {
       dynamic "env" {
         for_each = {
           BIGQUERY_DATASET   = local.dataset_ids[0],
-          VERTEX_AI_PROJECT  = google_project.this.project_id,
+          VERTEX_AI_PROJECT  = var.project_id,
           VERTEX_AI_LOCATION = local.vertex_ai_model_region,
         }
         content {
