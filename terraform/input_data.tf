@@ -20,7 +20,7 @@ data "archive_file" "input_data_tarball" {
 }
 
 locals {
-  input_data_tarball_name = "cloud-run/input-catalog.tar.gz"
+  input_data_tarball_name = "cloud-run/input-data.tar.gz"
 }
 
 # depends_on to allow notification to exist before the tarball is uploaded
@@ -70,7 +70,7 @@ resource "google_service_account_iam_member" "input_data" {
 }
 
 resource "google_pubsub_topic" "new_source" {
-  name = "input-catalog-source-upload${local.random_suffix}"
+  name = "input-data-source-upload${local.random_suffix}"
 }
 
 locals {
@@ -83,12 +83,12 @@ locals {
     "latest"
   ]
   # Generate image URLs for all tags
-  input_data_image_urls = formatlist("%s:%s", "${local.image_base_url}/input-catalog", local.input_data_image_tags)
+  input_data_image_urls = formatlist("%s:%s", "${local.image_base_url}/input-data", local.input_data_image_tags)
   input_data_image_url  = local.input_data_image_urls[0]
 }
 
 resource "google_cloudbuild_trigger" "input_data_build_trigger" {
-  name            = "${local.prefix}input-catalog-trigger"
+  name            = "${local.prefix}input-data-trigger"
   location        = data.google_compute_zones.available.region
   description     = "Triggers a build and deploy to Cloud Run when a new source .tar.gz is uploaded."
   service_account = google_service_account.cloud_build_deployer.id
@@ -109,8 +109,8 @@ resource "google_cloudbuild_trigger" "input_data_build_trigger" {
       args = flatten(["build", [for url in local.input_data_image_urls : ["-t", url]], ["-f", "input_data/Dockerfile", "."]])
     }
     images      = local.input_data_image_urls
-    logs_bucket = "${google_storage_bucket.cloud_run_code.name}/build-logs/input-catalog"
-    tags        = ["input-catalog", "terraform-managed"]
+    logs_bucket = "${google_storage_bucket.cloud_run_code.name}/build-logs/input-data"
+    tags        = ["input-data", "terraform-managed"]
     options {
       log_streaming_option = "STREAM_ON"
     }
@@ -124,7 +124,7 @@ resource "google_cloudbuild_trigger" "input_data_build_trigger" {
 }
 
 resource "google_service_account" "input_data_runtime_sa" {
-  account_id   = regex("^(.*?)(?:-)?$", substr("${local.prefix}input-catalog-runtime", 0, 30))[0]
+  account_id   = regex("^(.*?)(?:-)?$", substr("${local.prefix}input-data-runtime", 0, 30))[0]
   display_name = "Input Catalog runtime"
   description  = "Service account used by Input Catalog's Cloud Run service"
 }
@@ -150,7 +150,7 @@ module "wait_for_input_data_build" {
 
   platform              = "linux"
   create_cmd_entrypoint = "bash"
-  create_cmd_body       = "${path.module}/../files/wait_for_build.sh ${google_cloudbuild_trigger.input_data_build_trigger.location} input-catalog ${local.input_data_image_url} 5"
+  create_cmd_body       = "${path.module}/../files/wait_for_build.sh ${google_cloudbuild_trigger.input_data_build_trigger.location} input-data ${local.input_data_image_url} 5"
 
   destroy_cmd_entrypoint = "echo"
   destroy_cmd_body       = "Build wait completed"
@@ -161,7 +161,7 @@ module "wait_for_input_data_build" {
 }
 
 resource "google_cloud_run_v2_service" "input_data" {
-  name                = "${var.environment}-${local.vertex_ai_model_region}-input-catalog-worker${local.random_suffix}"
+  name                = "${var.environment}-${local.vertex_ai_model_region}-input-data-worker${local.random_suffix}"
   location            = local.vertex_ai_model_region
   deletion_protection = var.cloud_run_service_deletion_protection
   ingress             = "INGRESS_TRAFFIC_INTERNAL_ONLY"

@@ -19,7 +19,7 @@ data "archive_file" "input_data_dispatcher_tarball" {
 }
 
 locals {
-  input_data_dispatcher_tarball_name = "cloud-run/input-catalog-dispatcher.tar.gz"
+  input_data_dispatcher_tarball_name = "cloud-run/input-data-dispatcher.tar.gz"
 }
 
 resource "google_storage_bucket_object" "input_data_dispatcher_tarball" {
@@ -46,7 +46,7 @@ resource "google_cloud_tasks_queue" "input_data_dispatcher" {
     google_project_service.services["cloudtasks.googleapis.com"]
   ]
   project  = var.project_id
-  name     = "input-catalog-dispatch"
+  name     = "input-data-dispatch"
   location = data.google_compute_zones.available.region
   rate_limits {
     max_concurrent_dispatches = 1
@@ -91,7 +91,7 @@ resource "google_service_account_iam_member" "input_data_dispatcher" {
 }
 
 resource "google_pubsub_topic" "input_data_dispatcher_source_upload" {
-  name = "input-catalog-dispatcher-source-upload${local.random_suffix}"
+  name = "input-data-dispatcher-source-upload${local.random_suffix}"
 }
 
 resource "google_pubsub_topic_iam_member" "input_data_dispatcher_gcs_pubsub_publisher" {
@@ -110,12 +110,12 @@ locals {
     "latest"
   ]
   # Generate image URLs for all tags
-  input_data_dispatcher_image_urls = formatlist("%s:%s", "${local.image_base_url}/input-catalog-dispatcher", local.input_data_dispatcher_image_tags)
+  input_data_dispatcher_image_urls = formatlist("%s:%s", "${local.image_base_url}/input-data-dispatcher", local.input_data_dispatcher_image_tags)
   input_data_dispatcher_image_url  = local.input_data_dispatcher_image_urls[0]
 }
 
 resource "google_cloudbuild_trigger" "input_data_dispatcher_build_trigger" {
-  name            = "${local.prefix}input-catalog-dispatcher-trigger"
+  name            = "${local.prefix}input-data-dispatcher-trigger"
   location        = data.google_compute_zones.available.region
   description     = "Triggers a build and deploy to Cloud Run when a new source .tar.gz is uploaded."
   service_account = google_service_account.cloud_build_deployer.id
@@ -136,8 +136,8 @@ resource "google_cloudbuild_trigger" "input_data_dispatcher_build_trigger" {
       args = flatten(["build", [for url in local.input_data_dispatcher_image_urls : ["-t", url]], ["-f", "Dockerfile", "."]])
     }
     images      = local.input_data_dispatcher_image_urls
-    logs_bucket = "${google_storage_bucket.cloud_run_code.name}/build-logs/input-catalog-dispatcher"
-    tags        = ["input-catalog-dispatcher", "terraform-managed"]
+    logs_bucket = "${google_storage_bucket.cloud_run_code.name}/build-logs/input-data-dispatcher"
+    tags        = ["input-data-dispatcher", "terraform-managed"]
     options {
       log_streaming_option = "STREAM_ON"
     }
@@ -156,7 +156,7 @@ module "wait_for_input_data_dispatcher_build" {
 
   platform              = "linux"
   create_cmd_entrypoint = "bash"
-  create_cmd_body       = "${path.module}/../files/wait_for_build.sh ${google_cloudbuild_trigger.input_data_dispatcher_build_trigger.location} input-catalog-dispatcher ${local.input_data_dispatcher_image_url} 5"
+  create_cmd_body       = "${path.module}/../files/wait_for_build.sh ${google_cloudbuild_trigger.input_data_dispatcher_build_trigger.location} input-data-dispatcher ${local.input_data_dispatcher_image_url} 5"
 
   destroy_cmd_entrypoint = "echo"
   destroy_cmd_body       = "Build wait completed"
@@ -167,7 +167,7 @@ module "wait_for_input_data_dispatcher_build" {
 }
 
 resource "google_cloud_run_v2_service" "input_data_dispatcher" {
-  name                = "${local.prefix}input-catalog-dispatcher${local.random_suffix}"
+  name                = "${local.prefix}input-data-dispatcher${local.random_suffix}"
   location            = data.google_compute_zones.available.region
   deletion_protection = var.cloud_run_service_deletion_protection
   ingress             = "INGRESS_TRAFFIC_INTERNAL_ONLY"
@@ -297,7 +297,7 @@ resource "google_service_account_iam_member" "pubsub_sa_user" {
 }
 
 resource "google_eventarc_trigger" "new_input_data_upload" {
-  name     = "${local.prefix}new-input-catalog-upload"
+  name     = "${local.prefix}new-input-data-upload"
   location = lower(google_storage_bucket.course_catalog.location) # This API only takes lower case "us"
 
   matching_criteria {
