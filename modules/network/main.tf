@@ -33,6 +33,7 @@ locals {
 data "google_client_config" "current" {}
 
 resource "google_compute_network" "this" {
+  project                         = var.project_id
   name                            = var.network_name == null ? "${local.prefix}main${local.suffix}" : var.network_name
   auto_create_subnetworks         = false
   delete_default_routes_on_create = true
