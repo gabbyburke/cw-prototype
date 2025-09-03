@@ -28,6 +28,11 @@ variable "deployment_project_id" {
   description = "Project where the terraform is being deployed from."
 }
 
+variable "service_account_name" {
+  type        = string
+  description = "Service Acccount name for the terraform deployer project that will execute the deployment."
+}
+
 variable "environment" {
   type        = string
   description = "Environment where resources will be created (e.g. dev/uat/prod). This is also used as a prefix for resource names."

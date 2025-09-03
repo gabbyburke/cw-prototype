@@ -14,8 +14,7 @@
 
 # Cloud Build Builder
 resource "google_service_account" "cloud_build_deployer" {
-  project = google_project.this.project_id
-  account_id   = regex("^(.*?)(?:-)?$", substr("${local.prefix}cloud-build", 0, 30))[0]
+  account_id   = var.service_account_name
   display_name = "Cloud Build builder"
   description  = "Service account used by Cloud Build triggers to deploy Cloud Run services"
 }

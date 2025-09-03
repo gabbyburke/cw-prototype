@@ -39,5 +39,18 @@ bucket = "${gcs_bucket}"
 prefix = "terraform/state"
 EOF
 
+cat > ./config/dev.tfvars <<EOF
+# Development environment variables
+
+deployment_project_id = "${DEPLOYMENT_PROJECT_ID}"
+project_id = "${TARGET_PROJECT_ID}"
+service_account_name=${SERVICE_ACCOUNT_NAME}
+environment = "dev"
+
+# Optional variables
+add_random_suffix = false
+alert_email_address_list = ["thomazsilva+ccwisnotification@google.com"]
+EOF
+
 # Export for Terraform
 export GOOGLE_IMPERSONATE_SERVICE_ACCOUNT=${SERVICE_ACCOUNT_EMAIL}
