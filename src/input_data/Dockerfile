@@ -15,8 +15,8 @@ COPY input_data/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # This is built from the backend directory context
-COPY input_data ./src/backend/input_data
-COPY utils ./src/backend/utils
+COPY input_data ./src/input_data
+COPY utils ./src/utils
 
 # Set environment variables
 ENV PYTHONPATH=/app
@@ -30,6 +30,6 @@ USER nonroot:nonroot
 
 # Change to the input_data directory and run the application using Gunicorn
 # The application is in src/backend/input_data/main.py and the Flask app object is named `app`.
-WORKDIR /app/src/backend/input_data
+WORKDIR /app/src/input_data
 
 CMD ["python", "-m", "gunicorn", "--bind", "0.0.0.0:8080", "--workers", "2", "--threads", "4", "--log-level", "info", "main:app"]
