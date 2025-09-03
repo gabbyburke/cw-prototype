@@ -14,6 +14,7 @@
 
 # Cloud Build Builder
 resource "google_service_account" "cloud_build_deployer" {
+  project = google_project.this.project_id
   account_id   = regex("^(.*?)(?:-)?$", substr("${local.prefix}cloud-build", 0, 30))[0]
   display_name = "Cloud Build builder"
   description  = "Service account used by Cloud Build triggers to deploy Cloud Run services"
@@ -29,12 +30,14 @@ resource "google_project_iam_member" "cloud_build_deployer" {
 }
 
 resource "google_storage_bucket_iam_member" "cloud_build_deployer" {
+  project = google_project.this.project_id
   bucket = google_storage_bucket.cloud_run_code.name
   role   = "roles/storage.objectAdmin"
   member = google_service_account.cloud_build_deployer.member
 }
 
 resource "google_artifact_registry_repository_iam_member" "cloud_build_deployer" {
+  project = google_project.this.project_id
   repository = google_artifact_registry_repository.docker.name
   role       = "roles/artifactregistry.writer"
   member     = google_service_account.cloud_build_deployer.member
@@ -50,6 +53,7 @@ resource "google_project_iam_member_remove" "default_compute_service_account" {
 }
 
 resource "google_project_service_identity" "cloudbuild" {
+  project = google_project.this.project_id
   provider = google-beta
   service  = "cloudbuild.googleapis.com"
   provisioner "local-exec" {
