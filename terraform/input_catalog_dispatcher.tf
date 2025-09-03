@@ -45,6 +45,7 @@ resource "google_cloud_tasks_queue" "input_catalog_dispatcher" {
   depends_on = [
     google_project_service.services["cloudtasks.googleapis.com"]
   ]
+  project  = google_project.this.project_id
   name     = "input-catalog-dispatch"
   location = data.google_compute_zones.available.region
   rate_limits {
