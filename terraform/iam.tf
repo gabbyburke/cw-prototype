@@ -22,6 +22,7 @@ resource "google_service_account" "cloud_build_deployer" {
 resource "google_project_iam_member" "cloud_build_deployer" {
   for_each = toset([
     "roles/cloudbuild.builds.builder",
+    "roles/artifactregistry.repositoryAdmin"
   ])
   project = google_project.this.project_id
   role    = each.value
