@@ -8,9 +8,9 @@ TARGET_PROJECT_ID="${2:-}"  # Optional: create new or use existing
 
 LOGGED_GOOGLE_IMPERSONATE_SERVICE_ACCOUNT=`gcloud config list --format='value(core.account)'`
 
-gcloud projects add-iam-policy-binding [PROJECT_ID] \
-    --member="user:${LOGGED_GOOGLE_IMPERSONATE_SERVICE_ACCOUNT}" \
-    --role="roles/iam.serviceAccountAdmin"
+#gcloud projects add-iam-policy-binding ${DEPLOYMENT_PROJECT_ID} \
+#    --member="user:${LOGGED_GOOGLE_IMPERSONATE_SERVICE_ACCOUNT}" \
+#    --role="roles/iam.serviceAccountAdmin"
 
 # Enable APIs in deployment project
 gcloud services enable \
@@ -59,4 +59,4 @@ alert_email_address_list = ["thomazsilva+ccwisnotification@google.com"]
 EOF
 
 # Export for Terraform
-export GOOGLE_IMPERSONATE_SERVICE_ACCOUNT=${SERVICE_ACCOUNT_EMAIL}
+#export GOOGLE_IMPERSONATE_SERVICE_ACCOUNT=${SERVICE_ACCOUNT_EMAIL}
