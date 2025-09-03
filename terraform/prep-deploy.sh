@@ -44,12 +44,13 @@ cat > ./config/dev.tfvars <<EOF
 
 deployment_project_id = "${DEPLOYMENT_PROJECT_ID}"
 project_id = "${TARGET_PROJECT_ID}"
-service_account_name=${SERVICE_ACCOUNT_NAME}
+service_account_name="${SERVICE_ACCOUNT_NAME}"
 environment = "dev"
 
 # Optional variables
 add_random_suffix = false
 alert_email_address_list = ["thomazsilva+ccwisnotification@google.com"]
+
 EOF
 
 # Export for Terraform
