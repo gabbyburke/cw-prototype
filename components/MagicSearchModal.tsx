@@ -1,27 +1,30 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { MagicButtonData, searchMagicButtonData } from '../lib/api'
+import { Person, searchPersons } from '../lib/api'
 
 interface MagicSearchModalProps {
   isOpen: boolean
   onClose: () => void
-  onSelectIncident: (incident: MagicButtonData) => void
+  onSelectPerson: (person: Person) => void
 }
 
-export default function MagicSearchModal({ isOpen, onClose, onSelectIncident }: MagicSearchModalProps) {
+export default function MagicSearchModal({ isOpen, onClose, onSelectPerson }: MagicSearchModalProps) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState<MagicButtonData[]>([])
+  const [searchResults, setSearchResults] = useState<Person[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [advancedFilters, setAdvancedFilters] = useState({
-    child_name: '',
-    parent_name: '',
-    county: '',
-    allegation_type: '',
-    date_from: '',
-    date_to: ''
+    first_name: '',
+    last_name: '',
+    date_of_birth: '',
+    state_id: '',
+    address: '',
+    city: '',
+    state: '',
+    zipcode: '',
+    phone_number: ''
   })
 
   // Debounced search
@@ -41,15 +44,15 @@ export default function MagicSearchModal({ isOpen, onClose, onSelectIncident }: 
     setError(null)
     
     try {
-      const response = await searchMagicButtonData(query)
+      const response = await searchPersons(query)
       if (response.error) {
         setError(response.error)
         setSearchResults([])
       } else if (response.data) {
-        setSearchResults(response.data.incidents)
+        setSearchResults(response.data.persons)
       }
     } catch (err) {
-      setError('Failed to search incidents')
+      setError('Failed to search people')
       setSearchResults([])
     } finally {
       setLoading(false)
@@ -57,9 +60,16 @@ export default function MagicSearchModal({ isOpen, onClose, onSelectIncident }: 
   }
 
   const handleAdvancedSearch = () => {
-    // For now, just use the child_name filter as a basic implementation
-    if (advancedFilters.child_name) {
-      handleSearch(advancedFilters.child_name)
+    // Combine all filled fields into a search query
+    const searchTerms = []
+    if (advancedFilters.first_name) searchTerms.push(advancedFilters.first_name)
+    if (advancedFilters.last_name) searchTerms.push(advancedFilters.last_name)
+    if (advancedFilters.state_id) searchTerms.push(advancedFilters.state_id)
+    if (advancedFilters.phone_number) searchTerms.push(advancedFilters.phone_number)
+    if (advancedFilters.city) searchTerms.push(advancedFilters.city)
+    
+    if (searchTerms.length > 0) {
+      handleSearch(searchTerms.join(' '))
     }
   }
 
@@ -68,9 +78,21 @@ export default function MagicSearchModal({ isOpen, onClose, onSelectIncident }: 
     return new Date(dateString).toLocaleDateString()
   }
 
-  const handleSelectIncident = (incident: MagicButtonData) => {
-    onSelectIncident(incident)
+  const handleSelectPerson = (person: Person) => {
+    onSelectPerson(person)
     onClose()
+  }
+
+  const calculateAge = (dateOfBirth: string) => {
+    if (!dateOfBirth) return 'N/A'
+    const today = new Date()
+    const birthDate = new Date(dateOfBirth)
+    let age = today.getFullYear() - birthDate.getFullYear()
+    const monthDiff = today.getMonth() - birthDate.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--
+    }
+    return age
   }
 
   const handleOverlayClick = (e: React.MouseEvent) => {
@@ -86,10 +108,10 @@ export default function MagicSearchModal({ isOpen, onClose, onSelectIncident }: 
       <div className="modal-container large scrollable">
         <div className="modal-header magic-modal-header">
           <div className="magic-header-content">
-            <div className="magic-header-icon">✨</div>
+            <div className="magic-header-icon">🔍</div>
             <div>
-              <h2>Magic Button</h2>
-              <p>Search JARVIS incidents to import case data</p>
+              <h2>Person Search</h2>
+              <p>Search for existing people to add to this case</p>
             </div>
           </div>
           <button onClick={onClose} className="modal-close">
@@ -105,7 +127,7 @@ export default function MagicSearchModal({ isOpen, onClose, onSelectIncident }: 
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Enter incident number (e.g., INC-2024-001234)..."
+                placeholder="Enter person details..."
                 className="magic-search-input"
                 autoFocus
               />
@@ -135,59 +157,88 @@ export default function MagicSearchModal({ isOpen, onClose, onSelectIncident }: 
                 <h4>Advanced Search Options</h4>
                 <div className="form-grid">
                   <div className="form-group">
-                    <label>Child Name</label>
+                    <label>First Name</label>
                     <input
                       type="text"
-                      value={advancedFilters.child_name}
-                      onChange={(e) => setAdvancedFilters({...advancedFilters, child_name: e.target.value})}
-                      placeholder="Enter child's name"
+                      value={advancedFilters.first_name}
+                      onChange={(e) => setAdvancedFilters({...advancedFilters, first_name: e.target.value})}
+                      placeholder="Enter first name"
                     />
                   </div>
                   <div className="form-group">
-                    <label>Parent Name</label>
+                    <label>Last Name</label>
                     <input
                       type="text"
-                      value={advancedFilters.parent_name}
-                      onChange={(e) => setAdvancedFilters({...advancedFilters, parent_name: e.target.value})}
-                      placeholder="Enter parent's name"
+                      value={advancedFilters.last_name}
+                      onChange={(e) => setAdvancedFilters({...advancedFilters, last_name: e.target.value})}
+                      placeholder="Enter last name"
                     />
                   </div>
                   <div className="form-group">
-                    <label>County</label>
+                    <label>Date of Birth</label>
                     <input
-                      type="text"
-                      value={advancedFilters.county}
-                      onChange={(e) => setAdvancedFilters({...advancedFilters, county: e.target.value})}
-                      placeholder="Enter county"
+                      type="date"
+                      value={advancedFilters.date_of_birth}
+                      onChange={(e) => setAdvancedFilters({...advancedFilters, date_of_birth: e.target.value})}
                     />
                   </div>
                   <div className="form-group">
-                    <label>Allegation Type</label>
+                    <label>State ID Number</label>
+                    <input
+                      type="text"
+                      value={advancedFilters.state_id}
+                      onChange={(e) => setAdvancedFilters({...advancedFilters, state_id: e.target.value})}
+                      placeholder="Enter state ID"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Address</label>
+                    <input
+                      type="text"
+                      value={advancedFilters.address}
+                      onChange={(e) => setAdvancedFilters({...advancedFilters, address: e.target.value})}
+                      placeholder="Enter address"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>City</label>
+                    <input
+                      type="text"
+                      value={advancedFilters.city}
+                      onChange={(e) => setAdvancedFilters({...advancedFilters, city: e.target.value})}
+                      placeholder="Enter city"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>State</label>
                     <select
-                      value={advancedFilters.allegation_type}
-                      onChange={(e) => setAdvancedFilters({...advancedFilters, allegation_type: e.target.value})}
+                      value={advancedFilters.state}
+                      onChange={(e) => setAdvancedFilters({...advancedFilters, state: e.target.value})}
                     >
-                      <option value="">All Types</option>
-                      <option value="Physical abuse">Physical Abuse</option>
-                      <option value="Sexual abuse">Sexual Abuse</option>
-                      <option value="Neglect">Neglect</option>
-                      <option value="Emotional abuse">Emotional Abuse</option>
+                      <option value="">Select State</option>
+                      <option value="IL">Illinois</option>
+                      <option value="IN">Indiana</option>
+                      <option value="WI">Wisconsin</option>
+                      <option value="MI">Michigan</option>
+                      <option value="IA">Iowa</option>
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Date From</label>
+                    <label>Zip Code</label>
                     <input
-                      type="date"
-                      value={advancedFilters.date_from}
-                      onChange={(e) => setAdvancedFilters({...advancedFilters, date_from: e.target.value})}
+                      type="text"
+                      value={advancedFilters.zipcode}
+                      onChange={(e) => setAdvancedFilters({...advancedFilters, zipcode: e.target.value})}
+                      placeholder="Enter zip code"
                     />
                   </div>
                   <div className="form-group">
-                    <label>Date To</label>
+                    <label>Phone Number</label>
                     <input
-                      type="date"
-                      value={advancedFilters.date_to}
-                      onChange={(e) => setAdvancedFilters({...advancedFilters, date_to: e.target.value})}
+                      type="tel"
+                      value={advancedFilters.phone_number}
+                      onChange={(e) => setAdvancedFilters({...advancedFilters, phone_number: e.target.value})}
+                      placeholder="Enter phone number"
                     />
                   </div>
                 </div>
@@ -198,8 +249,9 @@ export default function MagicSearchModal({ isOpen, onClose, onSelectIncident }: 
                   </button>
                   <button 
                     onClick={() => setAdvancedFilters({
-                      child_name: '', parent_name: '', county: '', 
-                      allegation_type: '', date_from: '', date_to: ''
+                      first_name: '', last_name: '', date_of_birth: '', 
+                      state_id: '', address: '', city: '', state: '', 
+                      zipcode: '', phone_number: ''
                     })}
                     className="action-btn secondary"
                   >
@@ -221,73 +273,81 @@ export default function MagicSearchModal({ isOpen, onClose, onSelectIncident }: 
             {loading && (
               <div className="loading-state">
                 <span className="icon">hourglass_empty</span>
-                Searching JARVIS incidents...
+                Searching people...
               </div>
             )}
 
             {searchQuery.length >= 2 && !loading && searchResults.length === 0 && !error && (
               <div className="no-results">
                 <span className="icon">search_off</span>
-                <h3>No incidents found</h3>
-                <p>No incidents match your search criteria. Try a different incident number or use advanced search.</p>
+                <h3>No people found</h3>
+                <p>No people match your search criteria. Try different search terms or use advanced search.</p>
               </div>
             )}
 
             {searchResults.length > 0 && (
               <div className="results-container">
-                <h4>Found {searchResults.length} incident(s)</h4>
-                <div className="incidents-list">
-                  {searchResults.map((incident) => (
-                    <div key={incident.incident_number} className="incident-card">
-                      <div className="incident-header">
-                        <div className="incident-number">
-                          <strong>{incident.incident_number}</strong>
+                <h4>Found {searchResults.length} person(s)</h4>
+                <div className="people-list">
+                  {searchResults.map((person) => (
+                    <div key={person.person_id} className="person-card">
+                      <div className="person-header">
+                        <div className="person-name">
+                          <strong>{person.first_name} {person.last_name}</strong>
                         </div>
-                        <div className="incident-date">
-                          Intake: {formatDate(incident.intake_date)}
+                        <div className="person-id">
+                          ID: {person.person_id}
                         </div>
                       </div>
                       
-                      <div className="incident-details">
+                      <div className="person-details">
                         <div className="detail-row">
-                          <span className="label">Child:</span>
-                          <span className="value">{incident.child_first_names} {incident.child_last_names}</span>
+                          <span className="label">Date of Birth:</span>
+                          <span className="value">{formatDate(person.date_of_birth)}</span>
                         </div>
                         <div className="detail-row">
                           <span className="label">Age:</span>
-                          <span className="value">{incident.age_calculated} years old</span>
+                          <span className="value">{calculateAge(person.date_of_birth)} years old</span>
                         </div>
-                        <div className="detail-row">
-                          <span className="label">Parents:</span>
-                          <span className="value">{incident.parent_first_names} {incident.parent_last_names}</span>
-                        </div>
-                        <div className="detail-row">
-                          <span className="label">Allegations:</span>
-                          <span className="value">{incident.allegations}</span>
-                        </div>
-                        <div className="detail-row">
-                          <span className="label">County:</span>
-                          <span className="value">{incident.residence_county}</span>
-                        </div>
-                        <div className="detail-row">
-                          <span className="label">CPS Worker:</span>
-                          <span className="value">{incident.cps_worker}</span>
-                        </div>
-                        {incident.perpetrators && (
+                        {person.role && (
                           <div className="detail-row">
-                            <span className="label">Perpetrator:</span>
-                            <span className="value perpetrator">{incident.perpetrators}</span>
+                            <span className="label">Current Role:</span>
+                            <span className="value">{person.role}</span>
+                          </div>
+                        )}
+                        {person.contact_info?.phone && (
+                          <div className="detail-row">
+                            <span className="label">Phone:</span>
+                            <span className="value">{person.contact_info.phone}</span>
+                          </div>
+                        )}
+                        {person.contact_info?.address && (
+                          <div className="detail-row">
+                            <span className="label">Address:</span>
+                            <span className="value">{person.contact_info.address}</span>
+                          </div>
+                        )}
+                        {person.contact_info?.email && (
+                          <div className="detail-row">
+                            <span className="label">Email:</span>
+                            <span className="value">{person.contact_info.email}</span>
+                          </div>
+                        )}
+                        {person.indicators && person.indicators.length > 0 && (
+                          <div className="detail-row">
+                            <span className="label">Indicators:</span>
+                            <span className="value">{person.indicators.join(', ')}</span>
                           </div>
                         )}
                       </div>
 
-                      <div className="incident-actions">
+                      <div className="person-actions">
                         <button 
-                          onClick={() => handleSelectIncident(incident)}
+                          onClick={() => handleSelectPerson(person)}
                           className="action-btn primary"
                         >
-                          <span className="icon">download</span>
-                          Import Case Data
+                          <span className="icon">person_add</span>
+                          Select Person
                         </button>
                       </div>
                     </div>
@@ -299,12 +359,12 @@ export default function MagicSearchModal({ isOpen, onClose, onSelectIncident }: 
             {searchQuery.length < 2 && (
               <div className="search-help">
                 <span className="icon">info</span>
-                <h3>Search JARVIS Incidents</h3>
-                <p>Enter an incident number to search for cases from the JARVIS intake system. The Magic Button will pull in all relevant case information to help with your case setup.</p>
+                <h3>Search for People Matches</h3>
+                <p>Enter details about a person to search for them across JARVIS and VISION.</p>
                 <ul>
-                  <li>Start typing an incident number (minimum 2 characters)</li>
+                  <li>Add a person's name and date of birth to begin identifying matches</li>
                   <li>Use advanced search for more specific criteria</li>
-                  <li>Select an incident to import all case data automatically</li>
+                  <li>Select a person to import their information into the case automatically</li>
                 </ul>
               </div>
             )}

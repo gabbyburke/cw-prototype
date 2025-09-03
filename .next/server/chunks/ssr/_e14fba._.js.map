@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 5, "column": 0}, "map": {"version":3,"sources":["/turbopack/[project]/components/FloatingActionButton.tsx"],"sourcesContent":["'use client'\n\nimport React from 'react'\n\ninterface FloatingActionButtonProps {\n  onClick: () => void;\n  icon?: string;\n  ariaLabel?: string;\n}\n\nconst FloatingActionButton: React.FC<FloatingActionButtonProps> = ({ \n  onClick, \n  icon = 'auto_awesome', \n  ariaLabel = 'Activate AI Assistant' \n}) => {\n  return (\n    <button className=\"fab\" onClick={onClick} aria-label={ariaLabel}>\n      <span className=\"icon\">{icon}</span>\n    </button>\n  );\n};\n\nexport default FloatingActionButton;\n"],"names":[],"mappings":";;;;;AAAA;;AAUA,MAAM,uBAA4D,CAAC,EACjE,OAAO,EACP,OAAO,cAAc,EACrB,YAAY,uBAAuB,EACpC;IACC,qBACE,wPAAC;QAAO,WAAU;QAAM,SAAS;QAAS,cAAY;kBACpD,cAAA,wPAAC;YAAK,WAAU;sBAAQ;;;;;;;;;;;AAG9B;uCAEe"}},
+    {"offset": {"line": 32, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}}]
+}

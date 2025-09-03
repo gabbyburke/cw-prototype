@@ -15,6 +15,7 @@ export default function CPWPage() {
   const [isSetupModalOpen, setIsSetupModalOpen] = useState(false)
   const [selectedCase, setSelectedCase] = useState<Case | null>(null)
   const [activeTask, setActiveTask] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     loadCases()
@@ -161,17 +162,6 @@ export default function CPWPage() {
     }
   }
 
-  // Handle task table action clicks
-  const handleTaskAction = (case_: Case) => {
-    if (activeTask === 'request-assignment') {
-      handleSetupCase(case_)
-    } else if (activeTask === 'edits-required') {
-      // TODO: Handle edits required action
-      console.log('Handle edits required for case:', case_.case_id)
-    } else if (activeTask === 'case-setup') {
-      handleStartCaseSetup(case_)
-    }
-  }
 
 
   // Define available filter tags
@@ -208,7 +198,48 @@ export default function CPWPage() {
   })
 
   // Get action button for case based on status
-  const getCaseActionButton = (case_: Case) => {
+  const getCaseActionButton = (case_: Case, taskType?: string) => {
+    // Handle task-specific actions first
+    if (taskType === 'request-assignment') {
+      return (
+        <button 
+          onClick={() => handleSetupCase(case_)}
+          className="action-btn small primary"
+          title="Request SWCM Assignment"
+        >
+          <span className="icon">assignment_ind</span>
+          Request Assignment
+        </button>
+      )
+    }
+
+    if (taskType === 'case-setup') {
+      return (
+        <button 
+          onClick={() => handleStartCaseSetup(case_)}
+          className="action-btn small primary"
+          title={hasSavedProgress(case_.case_id) ? 'Resume case setup progress' : 'Start comprehensive case setup'}
+        >
+          <span className="icon">{hasSavedProgress(case_.case_id) ? 'play_arrow' : 'settings'}</span>
+          {hasSavedProgress(case_.case_id) ? 'Resume Setup' : 'Start Setup'}
+        </button>
+      )
+    }
+
+    if (taskType === 'edits-required') {
+      return (
+        <button 
+          onClick={() => console.log('Handle edits required for case:', case_.case_id)}
+          className="action-btn small error"
+          title="Address required edits"
+        >
+          <span className="icon">edit</span>
+          Address Edits
+        </button>
+      )
+    }
+
+    // Fall back to status-based actions
     switch (case_.status) {
       case 'Draft':
         return (
@@ -283,284 +314,238 @@ export default function CPWPage() {
     )
   }
 
+  // Create unified task list sorted by due date
+  const createTaskList = () => {
+    const tasks: Array<{
+      id: string
+      type: 'request-assignment' | 'case-setup' | 'edits-required'
+      case: Case
+      dueDate: Date
+    }> = []
+
+    cases.forEach(case_ => {
+      let taskType: 'request-assignment' | 'case-setup' | 'edits-required'
+      let dueDate: Date
+
+      switch (case_.status.toLowerCase()) {
+        case 'draft':
+          taskType = 'request-assignment'
+          // Mock due date: 3 days from intake
+          dueDate = new Date(case_.created_date)
+          dueDate.setDate(dueDate.getDate() + 3)
+          break
+        case 'case setup':
+          taskType = 'case-setup'
+          // Mock due date: 7 days from status change
+          dueDate = new Date(case_.created_date)
+          dueDate.setDate(dueDate.getDate() + 10)
+          break
+        case 'edits required':
+          taskType = 'edits-required'
+          // Mock due date: 2 days from status change (urgent)
+          dueDate = new Date(case_.created_date)
+          dueDate.setDate(dueDate.getDate() + 12)
+          break
+        default:
+          return // Skip cases that don't need tasks
+      }
+
+      tasks.push({
+        id: `${case_.case_id}-${taskType}`,
+        type: taskType,
+        case: case_,
+        dueDate
+      })
+    })
+
+    // Sort by due date (earliest first)
+    return tasks.sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime())
+  }
+
+  const taskList = createTaskList()
+
+  // Filter task list based on search query
+  const filteredTaskList = taskList.filter(task => {
+    if (!searchQuery) return true
+    
+    const searchLower = searchQuery.toLowerCase()
+    const caseName = (task.case.case_display_name || task.case.family_name || '').toLowerCase()
+    const caseNumber = (task.case.case_number || '').toLowerCase()
+    const status = (task.case.status || '').toLowerCase()
+    
+    return caseName.includes(searchLower) || 
+           caseNumber.includes(searchLower) || 
+           status.includes(searchLower)
+  })
+
+  const getTaskName = (type: string) => {
+    switch (type) {
+      case 'request-assignment': return 'Request SWCM Assignment'
+      case 'case-setup': return 'Complete Case Setup'
+      case 'edits-required': return 'Address Required Edits'
+      default: return 'Unknown Task'
+    }
+  }
+
+  const getTaskIcon = (type: string) => {
+    switch (type) {
+      case 'request-assignment': return 'assignment_ind'
+      case 'case-setup': return 'settings'
+      case 'edits-required': return 'edit'
+      default: return 'task'
+    }
+  }
+
+  const handleTaskAction = (task: any) => {
+    switch (task.type) {
+      case 'request-assignment':
+        handleSetupCase(task.case)
+        break
+      case 'case-setup':
+        handleStartCaseSetup(task.case)
+        break
+      case 'edits-required':
+        console.log('Handle edits required for case:', task.case.case_id)
+        break
+    }
+  }
+
+  const isOverdue = (dueDate: Date) => {
+    return dueDate < new Date()
+  }
+
+  const formatDueDate = (dueDate: Date) => {
+    const today = new Date()
+    const daysDiff = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 3600 * 24))
+    
+    if (daysDiff < 0) return `${Math.abs(daysDiff)} days overdue`
+    if (daysDiff === 0) return 'Due today'
+    if (daysDiff === 1) return 'Due tomorrow'
+    return `Due in ${daysDiff} days`
+  }
+
   return (
     <div className="page-container">
-      <div className="page-header modern-header">
-        <h1 className="greeting-title">Hi Dana! What can I help you with today?</h1>
-        <div className="search-container">
-          <div className="search-bar">
-            <span className="search-icon icon">search</span>
-            <input 
-              type="text" 
-              className="search-input" 
-              placeholder="Ask me anything about your cases, or search for specific information..."
-            />
-            <button className="search-submit">
-              <span className="icon">send</span>
-            </button>
-          </div>
-        </div>
+      <div className="page-header">
+        <h1 className="page-title">My Tasks</h1>
+        <p className="page-description">Complete your assigned tasks in order of priority</p>
       </div>
 
       <div className="content-wrapper">
-        {/* My Tasks Section */}
-        <div className="my-tasks-section">
-          <h2 className="section-title">My Tasks</h2>
-          <div className="task-cards-grid">
-            <div 
-              className={`task-card primary ${activeTask === 'request-assignment' ? 'active' : ''}`} 
-              onClick={() => handleTaskCardClick('request-assignment')}
-            >
-              <div className="task-card-icon">
-                <span className="icon">assignment_ind</span>
-              </div>
-              <div className="task-card-content">
-                <h3>Ready to Request SWCM Assignment</h3>
-                <p className="task-count">{cases.filter(c => c.status.toLowerCase() === 'draft').length} cases</p>
-                <p className="task-description">New cases ready for assignment request</p>
-              </div>
-              <div className="task-card-action">
-                <span className="icon">arrow_forward</span>
-              </div>
-            </div>
-
-            <div 
-              className={`task-card secondary ${activeTask === 'case-setup' ? 'active' : ''}`} 
-              onClick={() => handleTaskCardClick('case-setup')}
-            >
-              <div className="task-card-icon">
-                <span className="icon">settings</span>
-              </div>
-              <div className="task-card-content">
-                <h3>Ready for Setup</h3>
-                <p className="task-count">{cases.filter(c => c.status.toLowerCase() === 'case setup').length} cases</p>
-                <p className="task-description">Cases assigned and ready for setup</p>
-              </div>
-              <div className="task-card-action">
-                <span className="icon">arrow_forward</span>
-              </div>
-            </div>
-
-            <div 
-              className={`task-card error ${activeTask === 'edits-required' ? 'active' : ''}`} 
-              onClick={() => handleTaskCardClick('edits-required')}
-            >
-              <div className="task-card-icon">
-                <span className="icon">edit</span>
-              </div>
-              <div className="task-card-content">
-                <h3>Edits Required</h3>
-                <p className="task-count">{cases.filter(c => c.status.toLowerCase() === 'edits required').length} cases</p>
-                <p className="task-description">Cases returned by supervisor for changes</p>
-              </div>
-              <div className="task-card-action">
-                <span className="icon">arrow_forward</span>
-              </div>
-            </div>
+        {error && (
+          <div className="error-message">
+            <span className="icon">error</span>
+            {error}
           </div>
-        </div>
+        )}
 
-        {/* Task Table or Filter Section */}
-        {activeTask ? (
-          <TaskTable
-            taskType={activeTask}
-            cases={getTaskCases(activeTask)}
-            onActionClick={handleTaskAction}
-          />
-        ) : (
-          <div className="filter-container">
-            <div className="filter-header">
-              <h3 className="section-subtitle">My Cases</h3>
-              <div className="filter-actions">
-                <button 
-                  className="action-btn secondary"
-                  onClick={() => setActiveFilters([])}
-                  disabled={activeFilters.length === 0}
-                >
-                  <span className="icon">clear_all</span>
-                  Clear Filters
-                </button>
-                <button className="action-btn primary" onClick={loadCases}>
+        {taskList.length > 0 ? (
+          <div className="task-table-container">
+            <div className="task-table-header">
+              <div className="search-bar">
+                <span className="search-icon icon">search</span>
+                <input
+                  type="text"
+                  className="search-input"
+                  placeholder="Search for a case or status"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                {searchQuery && (
+                  <button 
+                    className="clear-search-btn"
+                    onClick={() => setSearchQuery('')}
+                  >
+                    <span className="icon">close</span>
+                  </button>
+                )}
+              </div>
+              <div className="task-table-actions">
+                <span className="task-table-count">{filteredTaskList.length} of {taskList.length} tasks</span>
+                <button className="action-btn secondary" onClick={loadCases}>
                   <span className="icon">refresh</span>
                   Refresh
                 </button>
               </div>
             </div>
-            <div className="filter-tags">
-              {filterTags.map(tag => (
-                <button
-                  key={tag.id}
-                  onClick={() => toggleFilter(tag.id)}
-                  className={`filter-tag ${activeFilters.includes(tag.label) ? 'active' : ''}`}
-                  disabled={tag.count === 0}
-                >
-                  <span className="tag-label">{tag.label}</span>
-                  <span className="tag-count">({tag.count})</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Main Cases Table - only show when no task is active */}
-        {!activeTask && (
-        <div className="content-area">
-          <div className="card">
-            <div className="card-header">
-              <h2>
-                {activeFilters.length === 0 
-                  ? 'My Cases' 
-                  : activeFilters.length === 1 
-                    ? activeFilters[0] 
-                    : `${activeFilters.length} Filters Active`
-                }
-                {activeFilters.length > 1 && (
-                  <span className="filter-summary"> ({activeFilters.join(', ')})</span>
-                )}
-              </h2>
-              <div className="card-actions">
-                <span className="case-count">{filteredCases.length} cases</span>
-              </div>
-            </div>
-            <div className="card-content">
-              {error && (
-                <div className="error-message">
-                  <span className="icon">error</span>
-                  {error}
-                </div>
-              )}
-              {filteredCases.length > 0 ? (
-                <div className="table-container">
-                  <table className="data-table">
-                    <thead>
-                      <tr>
-                        <th>Case Name</th>
-                        <th>Status</th>
-                        <th>Intake Date</th>
-                        <th>Key Allegations</th>
-                        <th>Children Involved</th>
-                        <th>Indicators</th>
-                        <th>Progress</th>
-                        <th>Assigned Workers</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredCases.map((case_) => (
-                        <tr key={case_.case_id}>
-                          <td>
-                            <div className="case-name-cell">
-                              <Link href={`/cases/${case_.case_id}`} className="case-link">
-                                <strong>{case_.case_display_name || case_.family_name}</strong>
-                              </Link>
-                              <div className="case-number">{case_.case_number}</div>
-                            </div>
-                          </td>
-                          <td>
-                            <span className={`status-badge ${case_.status.toLowerCase().replace(/\s+/g, '-')}`}>
-                              {case_.status}
-                            </span>
-                          </td>
-                          <td>{new Date(case_.created_date).toLocaleDateString()}</td>
-                          <td>
-                            <div className="allegation-cell">
-                              <span className="allegation-type">{case_.allegation_type}</span>
-                              <div className="allegation-desc">{case_.allegation_description}</div>
-                            </div>
-                          </td>
-                          <td>
-                            <div className="children-list">
-                              {getChildrenNames(case_) || 'No children listed'}
-                            </div>
-                          </td>
-                          <td>
-                            <div className="indicators-cell">
-                              {getAllIndicators(case_).slice(0, 3).map((indicator, index) => (
-                                <span 
-                                  key={index}
-                                  className={`indicator-badge ${getIndicatorColor(indicator)}`}
-                                  title={indicator}
-                                >
-                                  <span className="icon">{getIndicatorIcon(indicator)}</span>
-                                  {indicator}
-                                </span>
-                              ))}
-                              {getAllIndicators(case_).length > 3 && (
-                                <span className="indicator-more">
-                                  +{getAllIndicators(case_).length - 3} more
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td>
-                            <div className="progress-cell">
-                              {case_.status === 'Case Setup' && (() => {
-                                const progress = getSetupProgress(case_.case_id)
-                                return (
-                                  <div className="setup-progress-indicator">
-                                    <div className="progress-bar-small">
-                                      <div 
-                                        className="progress-fill-small" 
-                                        style={{ width: `${progress.percentage}%` }}
-                                      ></div>
-                                    </div>
-                                    <div className="progress-text-small">
-                                      {progress.step > 0 ? `Step ${progress.step}/${progress.total}` : 'Not Started'}
-                                    </div>
-                                  </div>
-                                )
-                              })()}
-                              {case_.status !== 'Case Setup' && (
-                                <span className="progress-na">—</span>
-                              )}
-                            </div>
-                          </td>
-                          <td>
-                            <div className="workers-cell">
-                              <div className="primary-worker">
-                                <strong>Primary:</strong> {case_.assigned_worker || 'Unassigned'}
-                              </div>
-                              {case_.assigned_supervisor && (
-                                <div className="supervisor">
-                                  <strong>Supervisor:</strong> {case_.assigned_supervisor}
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                          <td>
-                            <div className="action-buttons">
-                              {getCaseActionButton(case_)}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <div className="empty-state">
-                  <span className="icon large">filter_list</span>
-                  <h3>No Cases Match Current Filters</h3>
-                  <p>
-                    {activeFilters.length === 0 
-                      ? 'No cases found in the system'
-                      : `Try adjusting your filters or clearing them to see more cases`
-                    }
-                  </p>
-                  {activeFilters.length > 0 && (
-                    <button 
-                      className="action-btn primary"
-                      onClick={() => setActiveFilters([])}
+            
+            <div className="table-container">
+              <table className="data-table task-table">
+                <thead>
+                  <tr>
+                    <th>Case Name</th>
+                    <th>Case ID</th>
+                    <th>Due Date</th>
+                    <th>Progress</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredTaskList.map((task) => (
+                    <tr 
+                      key={task.id} 
+                      className={isOverdue(task.dueDate) ? 'urgent' : ''}
                     >
-                      <span className="icon">clear_all</span>
-                      Clear All Filters
-                    </button>
-                  )}
-                </div>
-              )}
+                      <td>
+                        <div className="case-name-cell">
+                          <Link href={`/cases/${task.case.case_id}`} className="case-link">
+                            <strong>{task.case.case_display_name || task.case.family_name}</strong>
+                          </Link>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="case-number">{task.case.case_number}</div>
+                      </td>
+                      <td>
+                        <div className={`due-date-cell ${isOverdue(task.dueDate) ? 'overdue' : ''}`}>
+                          <div className="due-date">{task.dueDate.toLocaleDateString()}</div>
+                          <div className="due-status">{formatDueDate(task.dueDate)}</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="progress-cell">
+                          {task.type === 'case-setup' && (() => {
+                            const progress = getSetupProgress(task.case.case_id)
+                            return (
+                              <div className="setup-progress-indicator">
+                                <div className="progress-bar-small">
+                                  <div 
+                                    className="progress-fill-small" 
+                                    style={{ width: `${progress.percentage}%` }}
+                                  ></div>
+                                </div>
+                                <div className="progress-text-small">
+                                  {progress.step > 0 ? `Step ${progress.step}/${progress.total}` : 'Not Started'}
+                                </div>
+                              </div>
+                            )
+                          })()}
+                          {task.type !== 'case-setup' && (
+                            <span className="progress-na">—</span>
+                          )}
+                        </div>
+                      </td>
+                      <td>
+                        <div className="action-buttons">
+                          {getCaseActionButton(task.case, task.type)}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="empty-state">
+            <span className="icon large">check_circle</span>
+            <h3>All Tasks Complete!</h3>
+            <p>You have no pending tasks at this time.</p>
+            <button className="action-btn primary" onClick={loadCases}>
+              <span className="icon">refresh</span>
+              Check for New Tasks
+            </button>
+          </div>
         )}
       </div>
 

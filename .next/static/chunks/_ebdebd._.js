@@ -305,7 +305,7 @@ var _s = __turbopack_refresh__.signature();
 'use client';
 ;
 ;
-function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
+function MagicSearchModal({ isOpen, onClose, onSelectPerson }) {
     _s();
     const [searchQuery, setSearchQuery] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('');
     const [searchResults, setSearchResults] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
@@ -313,12 +313,15 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
     const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [showAdvancedSearch, setShowAdvancedSearch] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [advancedFilters, setAdvancedFilters] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
-        child_name: '',
-        parent_name: '',
-        county: '',
-        allegation_type: '',
-        date_from: '',
-        date_to: ''
+        first_name: '',
+        last_name: '',
+        date_of_birth: '',
+        state_id: '',
+        address: '',
+        city: '',
+        state: '',
+        zipcode: '',
+        phone_number: ''
     });
     // Debounced search
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
@@ -337,33 +340,50 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
         setLoading(true);
         setError(null);
         try {
-            const response = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["searchMagicButtonData"])(query);
+            const response = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["searchPersons"])(query);
             if (response.error) {
                 setError(response.error);
                 setSearchResults([]);
             } else if (response.data) {
-                setSearchResults(response.data.incidents);
+                setSearchResults(response.data.persons);
             }
         } catch (err) {
-            setError('Failed to search incidents');
+            setError('Failed to search people');
             setSearchResults([]);
         } finally{
             setLoading(false);
         }
     };
     const handleAdvancedSearch = ()=>{
-        // For now, just use the child_name filter as a basic implementation
-        if (advancedFilters.child_name) {
-            handleSearch(advancedFilters.child_name);
+        // Combine all filled fields into a search query
+        const searchTerms = [];
+        if (advancedFilters.first_name) searchTerms.push(advancedFilters.first_name);
+        if (advancedFilters.last_name) searchTerms.push(advancedFilters.last_name);
+        if (advancedFilters.state_id) searchTerms.push(advancedFilters.state_id);
+        if (advancedFilters.phone_number) searchTerms.push(advancedFilters.phone_number);
+        if (advancedFilters.city) searchTerms.push(advancedFilters.city);
+        if (searchTerms.length > 0) {
+            handleSearch(searchTerms.join(' '));
         }
     };
     const formatDate = (dateString)=>{
         if (!dateString) return 'N/A';
         return new Date(dateString).toLocaleDateString();
     };
-    const handleSelectIncident = (incident)=>{
-        onSelectIncident(incident);
+    const handleSelectPerson = (person)=>{
+        onSelectPerson(person);
         onClose();
+    };
+    const calculateAge = (dateOfBirth)=>{
+        if (!dateOfBirth) return 'N/A';
+        const today = new Date();
+        const birthDate = new Date(dateOfBirth);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || monthDiff === 0 && today.getDate() < birthDate.getDate()) {
+            age--;
+        }
+        return age;
     };
     const handleOverlayClick = (e)=>{
         if (e.target === e.currentTarget) {
@@ -385,38 +405,38 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "magic-header-icon",
-                                    children: "✨"
+                                    children: "🔍"
                                 }, void 0, false, {
                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                    lineNumber: 89,
+                                    lineNumber: 111,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                            children: "Magic Button"
+                                            children: "Person Search"
                                         }, void 0, false, {
                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                            lineNumber: 91,
+                                            lineNumber: 113,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            children: "Search JARVIS incidents to import case data"
+                                            children: "Search for existing people to add to this case"
                                         }, void 0, false, {
                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                            lineNumber: 92,
+                                            lineNumber: 114,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                    lineNumber: 90,
+                                    lineNumber: 112,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/MagicSearchModal.tsx",
-                            lineNumber: 88,
+                            lineNumber: 110,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -427,18 +447,18 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
                                 children: "close"
                             }, void 0, false, {
                                 fileName: "[project]/components/MagicSearchModal.tsx",
-                                lineNumber: 96,
+                                lineNumber: 118,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/MagicSearchModal.tsx",
-                            lineNumber: 95,
+                            lineNumber: 117,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/MagicSearchModal.tsx",
-                    lineNumber: 87,
+                    lineNumber: 109,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -455,19 +475,19 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
                                             children: "search"
                                         }, void 0, false, {
                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                            lineNumber: 103,
+                                            lineNumber: 125,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                             type: "text",
                                             value: searchQuery,
                                             onChange: (e)=>setSearchQuery(e.target.value),
-                                            placeholder: "Enter incident number (e.g., INC-2024-001234)...",
+                                            placeholder: "Enter person details...",
                                             className: "magic-search-input",
                                             autoFocus: true
                                         }, void 0, false, {
                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                            lineNumber: 104,
+                                            lineNumber: 126,
                                             columnNumber: 15
                                         }, this),
                                         searchQuery && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -478,18 +498,18 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
                                                 children: "close"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/MagicSearchModal.tsx",
-                                                lineNumber: 117,
+                                                lineNumber: 139,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                            lineNumber: 113,
+                                            lineNumber: 135,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                    lineNumber: 102,
+                                    lineNumber: 124,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -503,7 +523,7 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
                                                 children: "tune"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/MagicSearchModal.tsx",
-                                                lineNumber: 127,
+                                                lineNumber: 149,
                                                 columnNumber: 17
                                             }, this),
                                             "Advanced Search",
@@ -512,18 +532,18 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
                                                 children: showAdvancedSearch ? 'expand_less' : 'expand_more'
                                             }, void 0, false, {
                                                 fileName: "[project]/components/MagicSearchModal.tsx",
-                                                lineNumber: 129,
+                                                lineNumber: 151,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/MagicSearchModal.tsx",
-                                        lineNumber: 123,
+                                        lineNumber: 145,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                    lineNumber: 122,
+                                    lineNumber: 144,
                                     columnNumber: 13
                                 }, this),
                                 showAdvancedSearch && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -533,7 +553,7 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
                                             children: "Advanced Search Options"
                                         }, void 0, false, {
                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                            lineNumber: 135,
+                                            lineNumber: 157,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -543,163 +563,65 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
                                                     className: "form-group",
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                            children: "Child Name"
+                                                            children: "First Name"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                                            lineNumber: 138,
+                                                            lineNumber: 160,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                                             type: "text",
-                                                            value: advancedFilters.child_name,
+                                                            value: advancedFilters.first_name,
                                                             onChange: (e)=>setAdvancedFilters({
                                                                     ...advancedFilters,
-                                                                    child_name: e.target.value
+                                                                    first_name: e.target.value
                                                                 }),
-                                                            placeholder: "Enter child's name"
+                                                            placeholder: "Enter first name"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                                            lineNumber: 139,
+                                                            lineNumber: 161,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                                    lineNumber: 137,
+                                                    lineNumber: 159,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                     className: "form-group",
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                            children: "Parent Name"
+                                                            children: "Last Name"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                                            lineNumber: 147,
+                                                            lineNumber: 169,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                                             type: "text",
-                                                            value: advancedFilters.parent_name,
+                                                            value: advancedFilters.last_name,
                                                             onChange: (e)=>setAdvancedFilters({
                                                                     ...advancedFilters,
-                                                                    parent_name: e.target.value
+                                                                    last_name: e.target.value
                                                                 }),
-                                                            placeholder: "Enter parent's name"
+                                                            placeholder: "Enter last name"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                                            lineNumber: 148,
+                                                            lineNumber: 170,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                                    lineNumber: 146,
+                                                    lineNumber: 168,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                     className: "form-group",
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                            children: "County"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/MagicSearchModal.tsx",
-                                                            lineNumber: 156,
-                                                            columnNumber: 21
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                            type: "text",
-                                                            value: advancedFilters.county,
-                                                            onChange: (e)=>setAdvancedFilters({
-                                                                    ...advancedFilters,
-                                                                    county: e.target.value
-                                                                }),
-                                                            placeholder: "Enter county"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/MagicSearchModal.tsx",
-                                                            lineNumber: 157,
-                                                            columnNumber: 21
-                                                        }, this)
-                                                    ]
-                                                }, void 0, true, {
-                                                    fileName: "[project]/components/MagicSearchModal.tsx",
-                                                    lineNumber: 155,
-                                                    columnNumber: 19
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "form-group",
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                            children: "Allegation Type"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/MagicSearchModal.tsx",
-                                                            lineNumber: 165,
-                                                            columnNumber: 21
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
-                                                            value: advancedFilters.allegation_type,
-                                                            onChange: (e)=>setAdvancedFilters({
-                                                                    ...advancedFilters,
-                                                                    allegation_type: e.target.value
-                                                                }),
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                                    value: "",
-                                                                    children: "All Types"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                    lineNumber: 170,
-                                                                    columnNumber: 23
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                                    value: "Physical abuse",
-                                                                    children: "Physical Abuse"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                    lineNumber: 171,
-                                                                    columnNumber: 23
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                                    value: "Sexual abuse",
-                                                                    children: "Sexual Abuse"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                    lineNumber: 172,
-                                                                    columnNumber: 23
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                                    value: "Neglect",
-                                                                    children: "Neglect"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                    lineNumber: 173,
-                                                                    columnNumber: 23
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                                    value: "Emotional abuse",
-                                                                    children: "Emotional Abuse"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                    lineNumber: 174,
-                                                                    columnNumber: 23
-                                                                }, this)
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/components/MagicSearchModal.tsx",
-                                                            lineNumber: 166,
-                                                            columnNumber: 21
-                                                        }, this)
-                                                    ]
-                                                }, void 0, true, {
-                                                    fileName: "[project]/components/MagicSearchModal.tsx",
-                                                    lineNumber: 164,
-                                                    columnNumber: 19
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "form-group",
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                            children: "Date From"
+                                                            children: "Date of Birth"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/MagicSearchModal.tsx",
                                                             lineNumber: 178,
@@ -707,10 +629,10 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                                             type: "date",
-                                                            value: advancedFilters.date_from,
+                                                            value: advancedFilters.date_of_birth,
                                                             onChange: (e)=>setAdvancedFilters({
                                                                     ...advancedFilters,
-                                                                    date_from: e.target.value
+                                                                    date_of_birth: e.target.value
                                                                 })
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/MagicSearchModal.tsx",
@@ -727,19 +649,20 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
                                                     className: "form-group",
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                            children: "Date To"
+                                                            children: "State ID Number"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/MagicSearchModal.tsx",
                                                             lineNumber: 186,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                            type: "date",
-                                                            value: advancedFilters.date_to,
+                                                            type: "text",
+                                                            value: advancedFilters.state_id,
                                                             onChange: (e)=>setAdvancedFilters({
                                                                     ...advancedFilters,
-                                                                    date_to: e.target.value
-                                                                })
+                                                                    state_id: e.target.value
+                                                                }),
+                                                            placeholder: "Enter state ID"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/MagicSearchModal.tsx",
                                                             lineNumber: 187,
@@ -750,11 +673,204 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
                                                     fileName: "[project]/components/MagicSearchModal.tsx",
                                                     lineNumber: 185,
                                                     columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "form-group",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                            children: "Address"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/MagicSearchModal.tsx",
+                                                            lineNumber: 195,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                            type: "text",
+                                                            value: advancedFilters.address,
+                                                            onChange: (e)=>setAdvancedFilters({
+                                                                    ...advancedFilters,
+                                                                    address: e.target.value
+                                                                }),
+                                                            placeholder: "Enter address"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/MagicSearchModal.tsx",
+                                                            lineNumber: 196,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/MagicSearchModal.tsx",
+                                                    lineNumber: 194,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "form-group",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                            children: "City"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/MagicSearchModal.tsx",
+                                                            lineNumber: 204,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                            type: "text",
+                                                            value: advancedFilters.city,
+                                                            onChange: (e)=>setAdvancedFilters({
+                                                                    ...advancedFilters,
+                                                                    city: e.target.value
+                                                                }),
+                                                            placeholder: "Enter city"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/MagicSearchModal.tsx",
+                                                            lineNumber: 205,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/MagicSearchModal.tsx",
+                                                    lineNumber: 203,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "form-group",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                            children: "State"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/MagicSearchModal.tsx",
+                                                            lineNumber: 213,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                                            value: advancedFilters.state,
+                                                            onChange: (e)=>setAdvancedFilters({
+                                                                    ...advancedFilters,
+                                                                    state: e.target.value
+                                                                }),
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                    value: "",
+                                                                    children: "Select State"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/components/MagicSearchModal.tsx",
+                                                                    lineNumber: 218,
+                                                                    columnNumber: 23
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                    value: "IL",
+                                                                    children: "Illinois"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/components/MagicSearchModal.tsx",
+                                                                    lineNumber: 219,
+                                                                    columnNumber: 23
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                    value: "IN",
+                                                                    children: "Indiana"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/components/MagicSearchModal.tsx",
+                                                                    lineNumber: 220,
+                                                                    columnNumber: 23
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                    value: "WI",
+                                                                    children: "Wisconsin"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/components/MagicSearchModal.tsx",
+                                                                    lineNumber: 221,
+                                                                    columnNumber: 23
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                    value: "MI",
+                                                                    children: "Michigan"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/components/MagicSearchModal.tsx",
+                                                                    lineNumber: 222,
+                                                                    columnNumber: 23
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                    value: "IA",
+                                                                    children: "Iowa"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/components/MagicSearchModal.tsx",
+                                                                    lineNumber: 223,
+                                                                    columnNumber: 23
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/components/MagicSearchModal.tsx",
+                                                            lineNumber: 214,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/MagicSearchModal.tsx",
+                                                    lineNumber: 212,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "form-group",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                            children: "Zip Code"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/MagicSearchModal.tsx",
+                                                            lineNumber: 227,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                            type: "text",
+                                                            value: advancedFilters.zipcode,
+                                                            onChange: (e)=>setAdvancedFilters({
+                                                                    ...advancedFilters,
+                                                                    zipcode: e.target.value
+                                                                }),
+                                                            placeholder: "Enter zip code"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/MagicSearchModal.tsx",
+                                                            lineNumber: 228,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/MagicSearchModal.tsx",
+                                                    lineNumber: 226,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "form-group",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                            children: "Phone Number"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/MagicSearchModal.tsx",
+                                                            lineNumber: 236,
+                                                            columnNumber: 21
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                            type: "tel",
+                                                            value: advancedFilters.phone_number,
+                                                            onChange: (e)=>setAdvancedFilters({
+                                                                    ...advancedFilters,
+                                                                    phone_number: e.target.value
+                                                                }),
+                                                            placeholder: "Enter phone number"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/MagicSearchModal.tsx",
+                                                            lineNumber: 237,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/MagicSearchModal.tsx",
+                                                    lineNumber: 235,
+                                                    columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                            lineNumber: 136,
+                                            lineNumber: 158,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -769,48 +885,51 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
                                                             children: "search"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                                            lineNumber: 196,
+                                                            lineNumber: 247,
                                                             columnNumber: 21
                                                         }, this),
                                                         "Search"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                                    lineNumber: 195,
+                                                    lineNumber: 246,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                     onClick: ()=>setAdvancedFilters({
-                                                            child_name: '',
-                                                            parent_name: '',
-                                                            county: '',
-                                                            allegation_type: '',
-                                                            date_from: '',
-                                                            date_to: ''
+                                                            first_name: '',
+                                                            last_name: '',
+                                                            date_of_birth: '',
+                                                            state_id: '',
+                                                            address: '',
+                                                            city: '',
+                                                            state: '',
+                                                            zipcode: '',
+                                                            phone_number: ''
                                                         }),
                                                     className: "action-btn secondary",
                                                     children: "Clear Filters"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                                    lineNumber: 199,
+                                                    lineNumber: 250,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                            lineNumber: 194,
+                                            lineNumber: 245,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                    lineNumber: 134,
+                                    lineNumber: 156,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/MagicSearchModal.tsx",
-                            lineNumber: 101,
+                            lineNumber: 123,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -824,14 +943,14 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
                                             children: "error"
                                         }, void 0, false, {
                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                            lineNumber: 216,
+                                            lineNumber: 268,
                                             columnNumber: 17
                                         }, this),
                                         error
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                    lineNumber: 215,
+                                    lineNumber: 267,
                                     columnNumber: 15
                                 }, this),
                                 loading && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -842,14 +961,14 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
                                             children: "hourglass_empty"
                                         }, void 0, false, {
                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                            lineNumber: 223,
+                                            lineNumber: 275,
                                             columnNumber: 17
                                         }, this),
-                                        "Searching JARVIS incidents..."
+                                        "Searching people..."
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                    lineNumber: 222,
+                                    lineNumber: 274,
                                     columnNumber: 15
                                 }, this),
                                 searchQuery.length >= 2 && !loading && searchResults.length === 0 && !error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -860,27 +979,27 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
                                             children: "search_off"
                                         }, void 0, false, {
                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                            lineNumber: 230,
+                                            lineNumber: 282,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                            children: "No incidents found"
+                                            children: "No people found"
                                         }, void 0, false, {
                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                            lineNumber: 231,
+                                            lineNumber: 283,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            children: "No incidents match your search criteria. Try a different incident number or use advanced search."
+                                            children: "No people match your search criteria. Try different search terms or use advanced search."
                                         }, void 0, false, {
                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                            lineNumber: 232,
+                                            lineNumber: 284,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                    lineNumber: 229,
+                                    lineNumber: 281,
                                     columnNumber: 15
                                 }, this),
                                 searchResults.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -890,82 +1009,82 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
                                             children: [
                                                 "Found ",
                                                 searchResults.length,
-                                                " incident(s)"
+                                                " person(s)"
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                            lineNumber: 238,
+                                            lineNumber: 290,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "incidents-list",
-                                            children: searchResults.map((incident)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "incident-card",
+                                            className: "people-list",
+                                            children: searchResults.map((person)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "person-card",
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "incident-header",
+                                                            className: "person-header",
                                                             children: [
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                    className: "incident-number",
+                                                                    className: "person-name",
                                                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                                        children: incident.incident_number
-                                                                    }, void 0, false, {
+                                                                        children: [
+                                                                            person.first_name,
+                                                                            " ",
+                                                                            person.last_name
+                                                                        ]
+                                                                    }, void 0, true, {
                                                                         fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                        lineNumber: 244,
+                                                                        lineNumber: 296,
                                                                         columnNumber: 27
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                    lineNumber: 243,
+                                                                    lineNumber: 295,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                    className: "incident-date",
+                                                                    className: "person-id",
                                                                     children: [
-                                                                        "Intake: ",
-                                                                        formatDate(incident.intake_date)
+                                                                        "ID: ",
+                                                                        person.person_id
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                    lineNumber: 246,
+                                                                    lineNumber: 298,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                                            lineNumber: 242,
+                                                            lineNumber: 294,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "incident-details",
+                                                            className: "person-details",
                                                             children: [
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                     className: "detail-row",
                                                                     children: [
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                             className: "label",
-                                                                            children: "Child:"
+                                                                            children: "Date of Birth:"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                            lineNumber: 253,
+                                                                            lineNumber: 305,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                             className: "value",
-                                                                            children: [
-                                                                                incident.child_first_names,
-                                                                                " ",
-                                                                                incident.child_last_names
-                                                                            ]
-                                                                        }, void 0, true, {
+                                                                            children: formatDate(person.date_of_birth)
+                                                                        }, void 0, false, {
                                                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                            lineNumber: 254,
+                                                                            lineNumber: 306,
                                                                             columnNumber: 27
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                    lineNumber: 252,
+                                                                    lineNumber: 304,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -976,202 +1095,198 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
                                                                             children: "Age:"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                            lineNumber: 257,
+                                                                            lineNumber: 309,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                             className: "value",
                                                                             children: [
-                                                                                incident.age_calculated,
+                                                                                calculateAge(person.date_of_birth),
                                                                                 " years old"
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                            lineNumber: 258,
+                                                                            lineNumber: 310,
                                                                             columnNumber: 27
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                    lineNumber: 256,
+                                                                    lineNumber: 308,
                                                                     columnNumber: 25
                                                                 }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                person.role && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                     className: "detail-row",
                                                                     children: [
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                             className: "label",
-                                                                            children: "Parents:"
+                                                                            children: "Current Role:"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                            lineNumber: 261,
-                                                                            columnNumber: 27
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                            className: "value",
-                                                                            children: [
-                                                                                incident.parent_first_names,
-                                                                                " ",
-                                                                                incident.parent_last_names
-                                                                            ]
-                                                                        }, void 0, true, {
-                                                                            fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                            lineNumber: 262,
-                                                                            columnNumber: 27
-                                                                        }, this)
-                                                                    ]
-                                                                }, void 0, true, {
-                                                                    fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                    lineNumber: 260,
-                                                                    columnNumber: 25
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                    className: "detail-row",
-                                                                    children: [
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                            className: "label",
-                                                                            children: "Allegations:"
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                            lineNumber: 265,
-                                                                            columnNumber: 27
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                            className: "value",
-                                                                            children: incident.allegations
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                            lineNumber: 266,
-                                                                            columnNumber: 27
-                                                                        }, this)
-                                                                    ]
-                                                                }, void 0, true, {
-                                                                    fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                    lineNumber: 264,
-                                                                    columnNumber: 25
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                    className: "detail-row",
-                                                                    children: [
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                            className: "label",
-                                                                            children: "County:"
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                            lineNumber: 269,
-                                                                            columnNumber: 27
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                            className: "value",
-                                                                            children: incident.residence_county
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                            lineNumber: 270,
-                                                                            columnNumber: 27
-                                                                        }, this)
-                                                                    ]
-                                                                }, void 0, true, {
-                                                                    fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                    lineNumber: 268,
-                                                                    columnNumber: 25
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                    className: "detail-row",
-                                                                    children: [
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                            className: "label",
-                                                                            children: "CPS Worker:"
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                            lineNumber: 273,
-                                                                            columnNumber: 27
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                            className: "value",
-                                                                            children: incident.cps_worker
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                            lineNumber: 274,
-                                                                            columnNumber: 27
-                                                                        }, this)
-                                                                    ]
-                                                                }, void 0, true, {
-                                                                    fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                    lineNumber: 272,
-                                                                    columnNumber: 25
-                                                                }, this),
-                                                                incident.perpetrators && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                    className: "detail-row",
-                                                                    children: [
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                            className: "label",
-                                                                            children: "Perpetrator:"
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                            lineNumber: 278,
+                                                                            lineNumber: 314,
                                                                             columnNumber: 29
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                            className: "value perpetrator",
-                                                                            children: incident.perpetrators
+                                                                            className: "value",
+                                                                            children: person.role
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                            lineNumber: 279,
+                                                                            lineNumber: 315,
                                                                             columnNumber: 29
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                    lineNumber: 277,
+                                                                    lineNumber: 313,
+                                                                    columnNumber: 27
+                                                                }, this),
+                                                                person.contact_info?.phone && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "detail-row",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: "label",
+                                                                            children: "Phone:"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/MagicSearchModal.tsx",
+                                                                            lineNumber: 320,
+                                                                            columnNumber: 29
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: "value",
+                                                                            children: person.contact_info.phone
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/MagicSearchModal.tsx",
+                                                                            lineNumber: 321,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/components/MagicSearchModal.tsx",
+                                                                    lineNumber: 319,
+                                                                    columnNumber: 27
+                                                                }, this),
+                                                                person.contact_info?.address && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "detail-row",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: "label",
+                                                                            children: "Address:"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/MagicSearchModal.tsx",
+                                                                            lineNumber: 326,
+                                                                            columnNumber: 29
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: "value",
+                                                                            children: person.contact_info.address
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/MagicSearchModal.tsx",
+                                                                            lineNumber: 327,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/components/MagicSearchModal.tsx",
+                                                                    lineNumber: 325,
+                                                                    columnNumber: 27
+                                                                }, this),
+                                                                person.contact_info?.email && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "detail-row",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: "label",
+                                                                            children: "Email:"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/MagicSearchModal.tsx",
+                                                                            lineNumber: 332,
+                                                                            columnNumber: 29
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: "value",
+                                                                            children: person.contact_info.email
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/MagicSearchModal.tsx",
+                                                                            lineNumber: 333,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/components/MagicSearchModal.tsx",
+                                                                    lineNumber: 331,
+                                                                    columnNumber: 27
+                                                                }, this),
+                                                                person.indicators && person.indicators.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "detail-row",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: "label",
+                                                                            children: "Indicators:"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/MagicSearchModal.tsx",
+                                                                            lineNumber: 338,
+                                                                            columnNumber: 29
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                            className: "value",
+                                                                            children: person.indicators.join(', ')
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/MagicSearchModal.tsx",
+                                                                            lineNumber: 339,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/components/MagicSearchModal.tsx",
+                                                                    lineNumber: 337,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                                            lineNumber: 251,
+                                                            lineNumber: 303,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "incident-actions",
+                                                            className: "person-actions",
                                                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                                onClick: ()=>handleSelectIncident(incident),
+                                                                onClick: ()=>handleSelectPerson(person),
                                                                 className: "action-btn primary",
                                                                 children: [
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                         className: "icon",
-                                                                        children: "download"
+                                                                        children: "person_add"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                        lineNumber: 289,
+                                                                        lineNumber: 349,
                                                                         columnNumber: 27
                                                                     }, this),
-                                                                    "Import Case Data"
+                                                                    "Select Person"
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/components/MagicSearchModal.tsx",
-                                                                lineNumber: 285,
+                                                                lineNumber: 345,
                                                                 columnNumber: 25
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                                            lineNumber: 284,
+                                                            lineNumber: 344,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
-                                                }, incident.incident_number, true, {
+                                                }, person.person_id, true, {
                                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                                    lineNumber: 241,
+                                                    lineNumber: 293,
                                                     columnNumber: 21
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                            lineNumber: 239,
+                                            lineNumber: 291,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                    lineNumber: 237,
+                                    lineNumber: 289,
                                     columnNumber: 15
                                 }, this),
                                 searchQuery.length < 2 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1182,68 +1297,68 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
                                             children: "info"
                                         }, void 0, false, {
                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                            lineNumber: 301,
+                                            lineNumber: 361,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                            children: "Search JARVIS Incidents"
+                                            children: "Search for People Matches"
                                         }, void 0, false, {
                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                            lineNumber: 302,
+                                            lineNumber: 362,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            children: "Enter an incident number to search for cases from the JARVIS intake system. The Magic Button will pull in all relevant case information to help with your case setup."
+                                            children: "Enter details about a person to search for them across JARVIS and VISION."
                                         }, void 0, false, {
                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                            lineNumber: 303,
+                                            lineNumber: 363,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                                                    children: "Start typing an incident number (minimum 2 characters)"
+                                                    children: "Add a person's name and date of birth to begin identifying matches"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                                    lineNumber: 305,
+                                                    lineNumber: 365,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                                     children: "Use advanced search for more specific criteria"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                                    lineNumber: 306,
+                                                    lineNumber: 366,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                                                    children: "Select an incident to import all case data automatically"
+                                                    children: "Select a person to import their information into the case automatically"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                                    lineNumber: 307,
+                                                    lineNumber: 367,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/MagicSearchModal.tsx",
-                                            lineNumber: 304,
+                                            lineNumber: 364,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/MagicSearchModal.tsx",
-                                    lineNumber: 300,
+                                    lineNumber: 360,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/MagicSearchModal.tsx",
-                            lineNumber: 213,
+                            lineNumber: 265,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/MagicSearchModal.tsx",
-                    lineNumber: 100,
+                    lineNumber: 122,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1256,32 +1371,32 @@ function MagicSearchModal({ isOpen, onClose, onSelectIncident }) {
                             children: "Cancel"
                         }, void 0, false, {
                             fileName: "[project]/components/MagicSearchModal.tsx",
-                            lineNumber: 316,
+                            lineNumber: 376,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/MagicSearchModal.tsx",
-                        lineNumber: 315,
+                        lineNumber: 375,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/MagicSearchModal.tsx",
-                    lineNumber: 314,
+                    lineNumber: 374,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/MagicSearchModal.tsx",
-            lineNumber: 86,
+            lineNumber: 108,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/MagicSearchModal.tsx",
-        lineNumber: 85,
+        lineNumber: 107,
         columnNumber: 5
     }, this);
 }
-_s(MagicSearchModal, "/gySM7BmOFbVRKn0vN+WVGdFzL8=");
+_s(MagicSearchModal, "padNcsKPdBJAynyCkPI1/jPVOFU=");
 _c = MagicSearchModal;
 var _c;
 __turbopack_refresh__.register(_c, "MagicSearchModal");
@@ -1299,10 +1414,12 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/link.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ChevronStepper$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/components/ChevronStepper.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$MagicSearchModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/components/MagicSearchModal.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$LivingArrangementsTable$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/components/LivingArrangementsTable.tsx [app-client] (ecmascript)");
 "__TURBOPACK__ecmascript__hoisting__location__";
 ;
 var _s = __turbopack_refresh__.signature();
 'use client';
+;
 ;
 ;
 ;
@@ -1353,6 +1470,14 @@ function CaseSetupView({ case_, onProgressUpdate }) {
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [isSearchModalOpen, setIsSearchModalOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [searchModalType, setSearchModalType] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('case-members');
+    const [showAddPersonForm, setShowAddPersonForm] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [addPersonType, setAddPersonType] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('case-members');
+    const [newPersonData, setNewPersonData] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
+        first_name: '',
+        last_name: '',
+        role: 'Parent',
+        state_id: ''
+    });
     // Load progress from localStorage
     const loadProgress = ()=>{
         try {
@@ -1412,15 +1537,53 @@ function CaseSetupView({ case_, onProgressUpdate }) {
                 'Emergency Contact'
             ].includes(person.role));
     };
-    // Handle adding a person
-    const handleAddPerson = (type)=>{
+    // Handle adding a person via form
+    const handleAddPersonForm = (type)=>{
+        setAddPersonType(type);
+        setShowAddPersonForm(true);
+        setNewPersonData({
+            first_name: '',
+            last_name: '',
+            role: type === 'case-members' ? 'Parent' : 'Relative',
+            state_id: ''
+        });
+    };
+    // Handle person search
+    const handlePersonSearch = (type)=>{
         setSearchModalType(type);
         setIsSearchModalOpen(true);
     };
-    // Handle incident selection from search modal
-    const handleIncidentSelected = (incident)=>{
-        // TODO: Extract person data from incident and add to case
-        console.log('Selected incident:', incident, 'for type:', searchModalType);
+    // Handle saving new person
+    const handleSaveNewPerson = ()=>{
+        // TODO: Add person to case
+        console.log('Adding new person:', newPersonData, 'to type:', addPersonType);
+        setShowAddPersonForm(false);
+    };
+    // Handle canceling add person form
+    const handleCancelAddPerson = ()=>{
+        setShowAddPersonForm(false);
+        setNewPersonData({
+            first_name: '',
+            last_name: '',
+            role: 'Parent',
+            state_id: ''
+        });
+    };
+    // Handle role change
+    const handleRoleChange = (personId, newRole)=>{
+        // TODO: Update person role
+        console.log('Updating role for person:', personId, 'to:', newRole);
+    };
+    // Handle retrieve state ID
+    const handleRetrieveStateId = (personId)=>{
+        // TODO: Open DMV website or retrieve state ID
+        console.log('Retrieving state ID for person:', personId);
+        window.open('https://dmv.example.com', '_blank');
+    };
+    // Handle person selection from search modal
+    const handlePersonSelected = (person)=>{
+        // TODO: Add selected person to case with appropriate role
+        console.log('Selected person:', person, 'for type:', searchModalType);
         setIsSearchModalOpen(false);
     };
     // Handle removing a person
@@ -1439,39 +1602,39 @@ function CaseSetupView({ case_, onProgressUpdate }) {
         case_.case_id
     ]);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "jsx-237839d362e72b53" + " " + "case-setup-view",
+        className: "jsx-2f8692ae072eb766" + " " + "case-setup-view",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "jsx-237839d362e72b53" + " " + "setup-header",
+                className: "jsx-2f8692ae072eb766" + " " + "setup-header",
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "jsx-237839d362e72b53" + " " + "header-content",
+                    className: "jsx-2f8692ae072eb766" + " " + "header-content",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "jsx-237839d362e72b53" + " " + "case-info",
+                            className: "jsx-2f8692ae072eb766" + " " + "case-info",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                                    className: "jsx-237839d362e72b53",
+                                    className: "jsx-2f8692ae072eb766",
                                     children: case_.case_display_name || case_.family_name
                                 }, void 0, false, {
                                     fileName: "[project]/components/CaseSetupView.tsx",
-                                    lineNumber: 161,
+                                    lineNumber: 213,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                    className: "jsx-237839d362e72b53",
+                                    className: "jsx-2f8692ae072eb766",
                                     children: [
                                         case_.case_number,
                                         " • Case Setup"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/CaseSetupView.tsx",
-                                    lineNumber: 162,
+                                    lineNumber: 214,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/CaseSetupView.tsx",
-                            lineNumber: 160,
+                            lineNumber: 212,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1479,33 +1642,33 @@ function CaseSetupView({ case_, onProgressUpdate }) {
                             className: "action-btn secondary",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                    className: "jsx-237839d362e72b53" + " " + "icon",
+                                    className: "jsx-2f8692ae072eb766" + " " + "icon",
                                     children: "arrow_back"
                                 }, void 0, false, {
                                     fileName: "[project]/components/CaseSetupView.tsx",
-                                    lineNumber: 165,
+                                    lineNumber: 217,
                                     columnNumber: 13
                                 }, this),
                                 "Back to Dashboard"
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/CaseSetupView.tsx",
-                            lineNumber: 164,
+                            lineNumber: 216,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/CaseSetupView.tsx",
-                    lineNumber: 159,
+                    lineNumber: 211,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/CaseSetupView.tsx",
-                lineNumber: 158,
+                lineNumber: 210,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "jsx-237839d362e72b53" + " " + "setup-stepper",
+                className: "jsx-2f8692ae072eb766" + " " + "setup-stepper",
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ChevronStepper$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                     steps: milestones.map((milestone)=>({
                             id: milestone.id,
@@ -1518,562 +1681,1185 @@ function CaseSetupView({ case_, onProgressUpdate }) {
                     className: "full-width"
                 }, void 0, false, {
                     fileName: "[project]/components/CaseSetupView.tsx",
-                    lineNumber: 173,
+                    lineNumber: 225,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/CaseSetupView.tsx",
-                lineNumber: 172,
+                lineNumber: 224,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "jsx-237839d362e72b53" + " " + "setup-content",
+                className: "jsx-2f8692ae072eb766" + " " + "setup-content",
                 children: [
                     currentStep === 'associations' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "jsx-237839d362e72b53" + " " + "associations-step",
+                        className: "jsx-2f8692ae072eb766" + " " + "associations-step",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "jsx-237839d362e72b53" + " " + "step-header",
+                                className: "jsx-2f8692ae072eb766" + " " + "step-header",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                        className: "jsx-237839d362e72b53",
+                                        className: "jsx-2f8692ae072eb766",
                                         children: "Associations"
                                     }, void 0, false, {
                                         fileName: "[project]/components/CaseSetupView.tsx",
-                                        lineNumber: 191,
+                                        lineNumber: 243,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                        className: "jsx-237839d362e72b53",
+                                        className: "jsx-2f8692ae072eb766",
                                         children: "Manage family associations and relationships for this case."
                                     }, void 0, false, {
                                         fileName: "[project]/components/CaseSetupView.tsx",
-                                        lineNumber: 192,
+                                        lineNumber: 244,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/CaseSetupView.tsx",
-                                lineNumber: 190,
+                                lineNumber: 242,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "jsx-237839d362e72b53" + " " + "associations-grid",
+                                className: "jsx-2f8692ae072eb766" + " " + "associations-container",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "jsx-237839d362e72b53" + " " + "association-box",
+                                        className: "jsx-2f8692ae072eb766" + " " + "association-box",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "jsx-237839d362e72b53" + " " + "box-header",
+                                                className: "jsx-2f8692ae072eb766" + " " + "box-header",
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                                        className: "jsx-237839d362e72b53",
+                                                        className: "jsx-2f8692ae072eb766",
                                                         children: "Case Members"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/CaseSetupView.tsx",
-                                                        lineNumber: 199,
+                                                        lineNumber: 251,
                                                         columnNumber: 19
                                                     }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                        onClick: ()=>handleAddPerson('case-members'),
-                                                        className: "jsx-237839d362e72b53" + " " + "action-btn primary",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "jsx-237839d362e72b53" + " " + "icon",
-                                                                children: "person_add"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/CaseSetupView.tsx",
-                                                                lineNumber: 204,
-                                                                columnNumber: 21
-                                                            }, this),
-                                                            "Add Person"
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/components/CaseSetupView.tsx",
-                                                        lineNumber: 200,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/components/CaseSetupView.tsx",
-                                                lineNumber: 198,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "jsx-237839d362e72b53" + " " + "people-list",
-                                                children: [
-                                                    getCaseMembers().map((person)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "jsx-237839d362e72b53" + " " + "person-item",
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "jsx-2f8692ae072eb766" + " " + "header-actions",
+                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                            onClick: ()=>handlePersonSearch('case-members'),
+                                                            className: "jsx-2f8692ae072eb766" + " " + "action-btn primary",
                                                             children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                    className: "jsx-237839d362e72b53" + " " + "person-info",
-                                                                    children: [
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                                            className: "jsx-237839d362e72b53",
-                                                                            children: [
-                                                                                person.first_name,
-                                                                                " ",
-                                                                                person.last_name
-                                                                            ]
-                                                                        }, void 0, true, {
-                                                                            fileName: "[project]/components/CaseSetupView.tsx",
-                                                                            lineNumber: 212,
-                                                                            columnNumber: 25
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                            className: "jsx-237839d362e72b53" + " " + "person-role",
-                                                                            children: person.role
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/components/CaseSetupView.tsx",
-                                                                            lineNumber: 213,
-                                                                            columnNumber: 25
-                                                                        }, this)
-                                                                    ]
-                                                                }, void 0, true, {
-                                                                    fileName: "[project]/components/CaseSetupView.tsx",
-                                                                    lineNumber: 211,
-                                                                    columnNumber: 23
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                    className: "jsx-237839d362e72b53" + " " + "person-actions",
-                                                                    children: [
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                                            onClick: ()=>handleEditPerson(person),
-                                                                            className: "jsx-237839d362e72b53" + " " + "action-btn small secondary",
-                                                                            children: [
-                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                    className: "jsx-237839d362e72b53" + " " + "icon",
-                                                                                    children: "edit"
-                                                                                }, void 0, false, {
-                                                                                    fileName: "[project]/components/CaseSetupView.tsx",
-                                                                                    lineNumber: 220,
-                                                                                    columnNumber: 27
-                                                                                }, this),
-                                                                                "Edit"
-                                                                            ]
-                                                                        }, void 0, true, {
-                                                                            fileName: "[project]/components/CaseSetupView.tsx",
-                                                                            lineNumber: 216,
-                                                                            columnNumber: 25
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                                            onClick: ()=>handleRemovePerson(person.person_id),
-                                                                            className: "jsx-237839d362e72b53" + " " + "action-btn small error",
-                                                                            children: [
-                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                    className: "jsx-237839d362e72b53" + " " + "icon",
-                                                                                    children: "delete"
-                                                                                }, void 0, false, {
-                                                                                    fileName: "[project]/components/CaseSetupView.tsx",
-                                                                                    lineNumber: 227,
-                                                                                    columnNumber: 27
-                                                                                }, this),
-                                                                                "Remove"
-                                                                            ]
-                                                                        }, void 0, true, {
-                                                                            fileName: "[project]/components/CaseSetupView.tsx",
-                                                                            lineNumber: 223,
-                                                                            columnNumber: 25
-                                                                        }, this)
-                                                                    ]
-                                                                }, void 0, true, {
-                                                                    fileName: "[project]/components/CaseSetupView.tsx",
-                                                                    lineNumber: 215,
-                                                                    columnNumber: 23
-                                                                }, this)
-                                                            ]
-                                                        }, person.person_id, true, {
-                                                            fileName: "[project]/components/CaseSetupView.tsx",
-                                                            lineNumber: 210,
-                                                            columnNumber: 21
-                                                        }, this)),
-                                                    getCaseMembers().length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "jsx-237839d362e72b53" + " " + "empty-state",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "jsx-237839d362e72b53" + " " + "icon",
-                                                                children: "people"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/CaseSetupView.tsx",
-                                                                lineNumber: 235,
-                                                                columnNumber: 23
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                                className: "jsx-237839d362e72b53",
-                                                                children: "No case members added yet"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/CaseSetupView.tsx",
-                                                                lineNumber: 236,
-                                                                columnNumber: 23
-                                                            }, this)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/components/CaseSetupView.tsx",
-                                                        lineNumber: 234,
-                                                        columnNumber: 21
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/components/CaseSetupView.tsx",
-                                                lineNumber: 208,
-                                                columnNumber: 17
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/components/CaseSetupView.tsx",
-                                        lineNumber: 197,
-                                        columnNumber: 15
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "jsx-237839d362e72b53" + " " + "association-box",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "jsx-237839d362e72b53" + " " + "box-header",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                                        className: "jsx-237839d362e72b53",
-                                                        children: "Relatives/Family Supports"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/CaseSetupView.tsx",
-                                                        lineNumber: 245,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                        onClick: ()=>handleAddPerson('relatives'),
-                                                        className: "jsx-237839d362e72b53" + " " + "action-btn primary",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "jsx-237839d362e72b53" + " " + "icon",
-                                                                children: "person_add"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/components/CaseSetupView.tsx",
-                                                                lineNumber: 250,
-                                                                columnNumber: 21
-                                                            }, this),
-                                                            "Add Person"
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/components/CaseSetupView.tsx",
-                                                        lineNumber: 246,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/components/CaseSetupView.tsx",
-                                                lineNumber: 244,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "jsx-237839d362e72b53" + " " + "people-list",
-                                                children: [
-                                                    getRelatives().map((person)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "jsx-237839d362e72b53" + " " + "person-item",
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                    className: "jsx-237839d362e72b53" + " " + "person-info",
-                                                                    children: [
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                                            className: "jsx-237839d362e72b53",
-                                                                            children: [
-                                                                                person.first_name,
-                                                                                " ",
-                                                                                person.last_name
-                                                                            ]
-                                                                        }, void 0, true, {
-                                                                            fileName: "[project]/components/CaseSetupView.tsx",
-                                                                            lineNumber: 258,
-                                                                            columnNumber: 25
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                            className: "jsx-237839d362e72b53" + " " + "person-role",
-                                                                            children: person.role
-                                                                        }, void 0, false, {
-                                                                            fileName: "[project]/components/CaseSetupView.tsx",
-                                                                            lineNumber: 259,
-                                                                            columnNumber: 25
-                                                                        }, this)
-                                                                    ]
-                                                                }, void 0, true, {
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    className: "jsx-2f8692ae072eb766" + " " + "icon",
+                                                                    children: "person_add"
+                                                                }, void 0, false, {
                                                                     fileName: "[project]/components/CaseSetupView.tsx",
                                                                     lineNumber: 257,
                                                                     columnNumber: 23
                                                                 }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                    className: "jsx-237839d362e72b53" + " " + "person-actions",
-                                                                    children: [
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                                            onClick: ()=>handleEditPerson(person),
-                                                                            className: "jsx-237839d362e72b53" + " " + "action-btn small secondary",
-                                                                            children: [
-                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                    className: "jsx-237839d362e72b53" + " " + "icon",
-                                                                                    children: "edit"
-                                                                                }, void 0, false, {
-                                                                                    fileName: "[project]/components/CaseSetupView.tsx",
-                                                                                    lineNumber: 266,
-                                                                                    columnNumber: 27
-                                                                                }, this),
-                                                                                "Edit"
-                                                                            ]
-                                                                        }, void 0, true, {
-                                                                            fileName: "[project]/components/CaseSetupView.tsx",
-                                                                            lineNumber: 262,
-                                                                            columnNumber: 25
-                                                                        }, this),
-                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                                            onClick: ()=>handleRemovePerson(person.person_id),
-                                                                            className: "jsx-237839d362e72b53" + " " + "action-btn small error",
-                                                                            children: [
-                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                    className: "jsx-237839d362e72b53" + " " + "icon",
-                                                                                    children: "delete"
-                                                                                }, void 0, false, {
-                                                                                    fileName: "[project]/components/CaseSetupView.tsx",
-                                                                                    lineNumber: 273,
-                                                                                    columnNumber: 27
-                                                                                }, this),
-                                                                                "Remove"
-                                                                            ]
-                                                                        }, void 0, true, {
-                                                                            fileName: "[project]/components/CaseSetupView.tsx",
-                                                                            lineNumber: 269,
-                                                                            columnNumber: 25
-                                                                        }, this)
-                                                                    ]
-                                                                }, void 0, true, {
-                                                                    fileName: "[project]/components/CaseSetupView.tsx",
-                                                                    lineNumber: 261,
-                                                                    columnNumber: 23
-                                                                }, this)
+                                                                "Add Person"
                                                             ]
-                                                        }, person.person_id, true, {
+                                                        }, void 0, true, {
                                                             fileName: "[project]/components/CaseSetupView.tsx",
-                                                            lineNumber: 256,
+                                                            lineNumber: 253,
                                                             columnNumber: 21
-                                                        }, this)),
-                                                    getRelatives().length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "jsx-237839d362e72b53" + " " + "empty-state",
+                                                        }, this)
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                        lineNumber: 252,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                lineNumber: 250,
+                                                columnNumber: 17
+                                            }, this),
+                                            showAddPersonForm && addPersonType === 'case-members' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "jsx-2f8692ae072eb766" + " " + "add-person-form",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
+                                                        className: "jsx-2f8692ae072eb766",
+                                                        children: "Add New Person"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                        lineNumber: 265,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "jsx-2f8692ae072eb766" + " " + "form-grid",
                                                         children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "jsx-237839d362e72b53" + " " + "icon",
-                                                                children: "family_restroom"
-                                                            }, void 0, false, {
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "jsx-2f8692ae072eb766" + " " + "form-group",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                        className: "jsx-2f8692ae072eb766",
+                                                                        children: "First Name *"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 268,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                        type: "text",
+                                                                        value: newPersonData.first_name,
+                                                                        onChange: (e)=>setNewPersonData({
+                                                                                ...newPersonData,
+                                                                                first_name: e.target.value
+                                                                            }),
+                                                                        placeholder: "Enter first name",
+                                                                        className: "jsx-2f8692ae072eb766"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 269,
+                                                                        columnNumber: 25
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
                                                                 fileName: "[project]/components/CaseSetupView.tsx",
-                                                                lineNumber: 281,
+                                                                lineNumber: 267,
                                                                 columnNumber: 23
                                                             }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                                className: "jsx-237839d362e72b53",
-                                                                children: "No relatives or family supports added yet"
-                                                            }, void 0, false, {
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "jsx-2f8692ae072eb766" + " " + "form-group",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                        className: "jsx-2f8692ae072eb766",
+                                                                        children: "Last Name *"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 277,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                        type: "text",
+                                                                        value: newPersonData.last_name,
+                                                                        onChange: (e)=>setNewPersonData({
+                                                                                ...newPersonData,
+                                                                                last_name: e.target.value
+                                                                            }),
+                                                                        placeholder: "Enter last name",
+                                                                        className: "jsx-2f8692ae072eb766"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 278,
+                                                                        columnNumber: 25
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
                                                                 fileName: "[project]/components/CaseSetupView.tsx",
-                                                                lineNumber: 282,
+                                                                lineNumber: 276,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "jsx-2f8692ae072eb766" + " " + "form-group",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                        className: "jsx-2f8692ae072eb766",
+                                                                        children: "Role *"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 286,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                                                        value: newPersonData.role,
+                                                                        onChange: (e)=>setNewPersonData({
+                                                                                ...newPersonData,
+                                                                                role: e.target.value
+                                                                            }),
+                                                                        className: "jsx-2f8692ae072eb766",
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                value: "Parent",
+                                                                                className: "jsx-2f8692ae072eb766",
+                                                                                children: "Parent"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                lineNumber: 291,
+                                                                                columnNumber: 27
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                value: "Non-Resident Parent",
+                                                                                className: "jsx-2f8692ae072eb766",
+                                                                                children: "Non-Resident Parent"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                lineNumber: 292,
+                                                                                columnNumber: 27
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                value: "Client",
+                                                                                className: "jsx-2f8692ae072eb766",
+                                                                                children: "Client"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                lineNumber: 293,
+                                                                                columnNumber: 27
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                value: "Guardian",
+                                                                                className: "jsx-2f8692ae072eb766",
+                                                                                children: "Guardian"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                lineNumber: 294,
+                                                                                columnNumber: 27
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                value: "Relative",
+                                                                                className: "jsx-2f8692ae072eb766",
+                                                                                children: "Relative"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                lineNumber: 295,
+                                                                                columnNumber: 27
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                value: "Family Support",
+                                                                                className: "jsx-2f8692ae072eb766",
+                                                                                children: "Family Support"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                lineNumber: 296,
+                                                                                columnNumber: 27
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 287,
+                                                                        columnNumber: 25
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                lineNumber: 285,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "jsx-2f8692ae072eb766" + " " + "form-group",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                        className: "jsx-2f8692ae072eb766",
+                                                                        children: "State ID"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 300,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                        type: "text",
+                                                                        value: newPersonData.state_id,
+                                                                        onChange: (e)=>setNewPersonData({
+                                                                                ...newPersonData,
+                                                                                state_id: e.target.value
+                                                                            }),
+                                                                        placeholder: "Enter state ID",
+                                                                        className: "jsx-2f8692ae072eb766"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 301,
+                                                                        columnNumber: 25
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                lineNumber: 299,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/CaseSetupView.tsx",
-                                                        lineNumber: 280,
+                                                        lineNumber: 266,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "jsx-2f8692ae072eb766" + " " + "form-actions",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                onClick: handleSaveNewPerson,
+                                                                className: "jsx-2f8692ae072eb766" + " " + "action-btn primary",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                        className: "jsx-2f8692ae072eb766" + " " + "icon",
+                                                                        children: "save"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 311,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    "Save Person"
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                lineNumber: 310,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                onClick: handleCancelAddPerson,
+                                                                className: "jsx-2f8692ae072eb766" + " " + "action-btn secondary",
+                                                                children: "Cancel"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                lineNumber: 314,
+                                                                columnNumber: 23
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                        lineNumber: 309,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/CaseSetupView.tsx",
-                                                lineNumber: 254,
+                                                lineNumber: 264,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "jsx-2f8692ae072eb766" + " " + "people-table",
+                                                children: getCaseMembers().length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
+                                                    className: "jsx-2f8692ae072eb766" + " " + "data-table",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("thead", {
+                                                            className: "jsx-2f8692ae072eb766",
+                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                                                className: "jsx-2f8692ae072eb766",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                        className: "jsx-2f8692ae072eb766",
+                                                                        children: "Name"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 326,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                        className: "jsx-2f8692ae072eb766",
+                                                                        children: "Role"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 327,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                        className: "jsx-2f8692ae072eb766",
+                                                                        children: "State ID"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 328,
+                                                                        columnNumber: 27
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                lineNumber: 325,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/CaseSetupView.tsx",
+                                                            lineNumber: 324,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
+                                                            className: "jsx-2f8692ae072eb766",
+                                                            children: getCaseMembers().map((person)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                                                    className: "jsx-2f8692ae072eb766",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                            className: "jsx-2f8692ae072eb766",
+                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                className: "jsx-2f8692ae072eb766" + " " + "person-name",
+                                                                                children: [
+                                                                                    person.role === 'Alleged Perpetrator' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                        title: "Perpetrator",
+                                                                                        className: "jsx-2f8692ae072eb766" + " " + "perpetrator-flag icon",
+                                                                                        children: "flag"
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                        lineNumber: 337,
+                                                                                        columnNumber: 35
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                                                        className: "jsx-2f8692ae072eb766",
+                                                                                        children: [
+                                                                                            person.first_name,
+                                                                                            " ",
+                                                                                            person.last_name
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                        lineNumber: 339,
+                                                                                        columnNumber: 33
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                lineNumber: 335,
+                                                                                columnNumber: 31
+                                                                            }, this)
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/CaseSetupView.tsx",
+                                                                            lineNumber: 334,
+                                                                            columnNumber: 29
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                            className: "jsx-2f8692ae072eb766",
+                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                                                                value: person.role,
+                                                                                onChange: (e)=>handleRoleChange(person.person_id, e.target.value),
+                                                                                className: "jsx-2f8692ae072eb766" + " " + "role-dropdown",
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                        value: "Parent",
+                                                                                        className: "jsx-2f8692ae072eb766",
+                                                                                        children: "Parent"
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                        lineNumber: 348,
+                                                                                        columnNumber: 33
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                        value: "Non-Resident Parent",
+                                                                                        className: "jsx-2f8692ae072eb766",
+                                                                                        children: "Non-Resident Parent"
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                        lineNumber: 349,
+                                                                                        columnNumber: 33
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                        value: "Client",
+                                                                                        className: "jsx-2f8692ae072eb766",
+                                                                                        children: "Client"
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                        lineNumber: 350,
+                                                                                        columnNumber: 33
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                        value: "Guardian",
+                                                                                        className: "jsx-2f8692ae072eb766",
+                                                                                        children: "Guardian"
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                        lineNumber: 351,
+                                                                                        columnNumber: 33
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                        value: "Relative",
+                                                                                        className: "jsx-2f8692ae072eb766",
+                                                                                        children: "Relative"
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                        lineNumber: 352,
+                                                                                        columnNumber: 33
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                        value: "Family Support",
+                                                                                        className: "jsx-2f8692ae072eb766",
+                                                                                        children: "Family Support"
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                        lineNumber: 353,
+                                                                                        columnNumber: 33
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                lineNumber: 343,
+                                                                                columnNumber: 31
+                                                                            }, this)
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/CaseSetupView.tsx",
+                                                                            lineNumber: 342,
+                                                                            columnNumber: 29
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                            className: "jsx-2f8692ae072eb766",
+                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                className: "jsx-2f8692ae072eb766" + " " + "state-id-cell",
+                                                                                children: person.state_id ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                    className: "jsx-2f8692ae072eb766" + " " + "state-id",
+                                                                                    children: person.state_id
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                    lineNumber: 359,
+                                                                                    columnNumber: 35
+                                                                                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                                    onClick: ()=>handleRetrieveStateId(person.person_id),
+                                                                                    className: "jsx-2f8692ae072eb766" + " " + "action-btn small secondary",
+                                                                                    children: [
+                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                            className: "jsx-2f8692ae072eb766" + " " + "icon",
+                                                                                            children: "search"
+                                                                                        }, void 0, false, {
+                                                                                            fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                            lineNumber: 365,
+                                                                                            columnNumber: 37
+                                                                                        }, this),
+                                                                                        "Retrieve State ID"
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                    lineNumber: 361,
+                                                                                    columnNumber: 35
+                                                                                }, this)
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                lineNumber: 357,
+                                                                                columnNumber: 31
+                                                                            }, this)
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/CaseSetupView.tsx",
+                                                                            lineNumber: 356,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    ]
+                                                                }, person.person_id, true, {
+                                                                    fileName: "[project]/components/CaseSetupView.tsx",
+                                                                    lineNumber: 333,
+                                                                    columnNumber: 27
+                                                                }, this))
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/CaseSetupView.tsx",
+                                                            lineNumber: 331,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/CaseSetupView.tsx",
+                                                    lineNumber: 323,
+                                                    columnNumber: 21
+                                                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "jsx-2f8692ae072eb766" + " " + "empty-state",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "jsx-2f8692ae072eb766" + " " + "icon",
+                                                            children: "people"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/CaseSetupView.tsx",
+                                                            lineNumber: 377,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                            className: "jsx-2f8692ae072eb766",
+                                                            children: "No case members added yet"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/CaseSetupView.tsx",
+                                                            lineNumber: 378,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/CaseSetupView.tsx",
+                                                    lineNumber: 376,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                lineNumber: 321,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/CaseSetupView.tsx",
-                                        lineNumber: 243,
+                                        lineNumber: 249,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "jsx-2f8692ae072eb766" + " " + "association-box",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "jsx-2f8692ae072eb766" + " " + "box-header",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                        className: "jsx-2f8692ae072eb766",
+                                                        children: "Family Supports"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                        lineNumber: 387,
+                                                        columnNumber: 19
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "jsx-2f8692ae072eb766" + " " + "header-actions",
+                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                            onClick: ()=>handlePersonSearch('relatives'),
+                                                            className: "jsx-2f8692ae072eb766" + " " + "action-btn primary",
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    className: "jsx-2f8692ae072eb766" + " " + "icon",
+                                                                    children: "person_add"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/components/CaseSetupView.tsx",
+                                                                    lineNumber: 393,
+                                                                    columnNumber: 23
+                                                                }, this),
+                                                                "Add Person"
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/components/CaseSetupView.tsx",
+                                                            lineNumber: 389,
+                                                            columnNumber: 21
+                                                        }, this)
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                        lineNumber: 388,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                lineNumber: 386,
+                                                columnNumber: 17
+                                            }, this),
+                                            showAddPersonForm && addPersonType === 'relatives' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "jsx-2f8692ae072eb766" + " " + "add-person-form",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
+                                                        className: "jsx-2f8692ae072eb766",
+                                                        children: "Add New Person"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                        lineNumber: 401,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "jsx-2f8692ae072eb766" + " " + "form-grid",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "jsx-2f8692ae072eb766" + " " + "form-group",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                        className: "jsx-2f8692ae072eb766",
+                                                                        children: "First Name *"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 404,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                        type: "text",
+                                                                        value: newPersonData.first_name,
+                                                                        onChange: (e)=>setNewPersonData({
+                                                                                ...newPersonData,
+                                                                                first_name: e.target.value
+                                                                            }),
+                                                                        placeholder: "Enter first name",
+                                                                        className: "jsx-2f8692ae072eb766"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 405,
+                                                                        columnNumber: 25
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                lineNumber: 403,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "jsx-2f8692ae072eb766" + " " + "form-group",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                        className: "jsx-2f8692ae072eb766",
+                                                                        children: "Last Name *"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 413,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                        type: "text",
+                                                                        value: newPersonData.last_name,
+                                                                        onChange: (e)=>setNewPersonData({
+                                                                                ...newPersonData,
+                                                                                last_name: e.target.value
+                                                                            }),
+                                                                        placeholder: "Enter last name",
+                                                                        className: "jsx-2f8692ae072eb766"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 414,
+                                                                        columnNumber: 25
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                lineNumber: 412,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "jsx-2f8692ae072eb766" + " " + "form-group",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                        className: "jsx-2f8692ae072eb766",
+                                                                        children: "Role *"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 422,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                                                        value: newPersonData.role,
+                                                                        onChange: (e)=>setNewPersonData({
+                                                                                ...newPersonData,
+                                                                                role: e.target.value
+                                                                            }),
+                                                                        className: "jsx-2f8692ae072eb766",
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                value: "Relative",
+                                                                                className: "jsx-2f8692ae072eb766",
+                                                                                children: "Relative"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                lineNumber: 427,
+                                                                                columnNumber: 27
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                value: "Family Support",
+                                                                                className: "jsx-2f8692ae072eb766",
+                                                                                children: "Family Support"
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                lineNumber: 428,
+                                                                                columnNumber: 27
+                                                                            }, this)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 423,
+                                                                        columnNumber: 25
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                lineNumber: 421,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "jsx-2f8692ae072eb766" + " " + "form-group",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                        className: "jsx-2f8692ae072eb766",
+                                                                        children: "State ID"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 432,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                        type: "text",
+                                                                        value: newPersonData.state_id,
+                                                                        onChange: (e)=>setNewPersonData({
+                                                                                ...newPersonData,
+                                                                                state_id: e.target.value
+                                                                            }),
+                                                                        placeholder: "Enter state ID",
+                                                                        className: "jsx-2f8692ae072eb766"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 433,
+                                                                        columnNumber: 25
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                lineNumber: 431,
+                                                                columnNumber: 23
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                        lineNumber: 402,
+                                                        columnNumber: 21
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "jsx-2f8692ae072eb766" + " " + "form-actions",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                onClick: handleSaveNewPerson,
+                                                                className: "jsx-2f8692ae072eb766" + " " + "action-btn primary",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                        className: "jsx-2f8692ae072eb766" + " " + "icon",
+                                                                        children: "save"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 443,
+                                                                        columnNumber: 25
+                                                                    }, this),
+                                                                    "Save Person"
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                lineNumber: 442,
+                                                                columnNumber: 23
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                onClick: handleCancelAddPerson,
+                                                                className: "jsx-2f8692ae072eb766" + " " + "action-btn secondary",
+                                                                children: "Cancel"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                lineNumber: 446,
+                                                                columnNumber: 23
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                        lineNumber: 441,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                lineNumber: 400,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "jsx-2f8692ae072eb766" + " " + "people-table",
+                                                children: getRelatives().length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
+                                                    className: "jsx-2f8692ae072eb766" + " " + "data-table",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("thead", {
+                                                            className: "jsx-2f8692ae072eb766",
+                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                                                className: "jsx-2f8692ae072eb766",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                        className: "jsx-2f8692ae072eb766",
+                                                                        children: "Name"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 458,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                        className: "jsx-2f8692ae072eb766",
+                                                                        children: "Role"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 459,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                                        className: "jsx-2f8692ae072eb766",
+                                                                        children: "State ID"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                        lineNumber: 460,
+                                                                        columnNumber: 27
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                lineNumber: 457,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/CaseSetupView.tsx",
+                                                            lineNumber: 456,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
+                                                            className: "jsx-2f8692ae072eb766",
+                                                            children: getRelatives().map((person)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                                                    className: "jsx-2f8692ae072eb766",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                            className: "jsx-2f8692ae072eb766",
+                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                                                className: "jsx-2f8692ae072eb766",
+                                                                                children: [
+                                                                                    person.first_name,
+                                                                                    " ",
+                                                                                    person.last_name
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                lineNumber: 467,
+                                                                                columnNumber: 31
+                                                                            }, this)
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/CaseSetupView.tsx",
+                                                                            lineNumber: 466,
+                                                                            columnNumber: 29
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                            className: "jsx-2f8692ae072eb766",
+                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                                                                value: person.role,
+                                                                                onChange: (e)=>handleRoleChange(person.person_id, e.target.value),
+                                                                                className: "jsx-2f8692ae072eb766" + " " + "role-dropdown",
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                        value: "Relative",
+                                                                                        className: "jsx-2f8692ae072eb766",
+                                                                                        children: "Relative"
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                        lineNumber: 475,
+                                                                                        columnNumber: 33
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                                                        value: "Family Support",
+                                                                                        className: "jsx-2f8692ae072eb766",
+                                                                                        children: "Family Support"
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                        lineNumber: 476,
+                                                                                        columnNumber: 33
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                lineNumber: 470,
+                                                                                columnNumber: 31
+                                                                            }, this)
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/CaseSetupView.tsx",
+                                                                            lineNumber: 469,
+                                                                            columnNumber: 29
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                                            className: "jsx-2f8692ae072eb766",
+                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                className: "jsx-2f8692ae072eb766" + " " + "state-id-cell",
+                                                                                children: person.state_id ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                    className: "jsx-2f8692ae072eb766" + " " + "state-id",
+                                                                                    children: person.state_id
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                    lineNumber: 482,
+                                                                                    columnNumber: 35
+                                                                                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                                    onClick: ()=>handleRetrieveStateId(person.person_id),
+                                                                                    className: "jsx-2f8692ae072eb766" + " " + "action-btn small secondary",
+                                                                                    children: [
+                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                            className: "jsx-2f8692ae072eb766" + " " + "icon",
+                                                                                            children: "search"
+                                                                                        }, void 0, false, {
+                                                                                            fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                            lineNumber: 488,
+                                                                                            columnNumber: 37
+                                                                                        }, this),
+                                                                                        "Retrieve State ID"
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                    lineNumber: 484,
+                                                                                    columnNumber: 35
+                                                                                }, this)
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                                                lineNumber: 480,
+                                                                                columnNumber: 31
+                                                                            }, this)
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/components/CaseSetupView.tsx",
+                                                                            lineNumber: 479,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    ]
+                                                                }, person.person_id, true, {
+                                                                    fileName: "[project]/components/CaseSetupView.tsx",
+                                                                    lineNumber: 465,
+                                                                    columnNumber: 27
+                                                                }, this))
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/CaseSetupView.tsx",
+                                                            lineNumber: 463,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/CaseSetupView.tsx",
+                                                    lineNumber: 455,
+                                                    columnNumber: 21
+                                                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "jsx-2f8692ae072eb766" + " " + "empty-state",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            className: "jsx-2f8692ae072eb766" + " " + "icon",
+                                                            children: "family_restroom"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/CaseSetupView.tsx",
+                                                            lineNumber: 500,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                            className: "jsx-2f8692ae072eb766",
+                                                            children: "No family supports added yet"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/components/CaseSetupView.tsx",
+                                                            lineNumber: 501,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/components/CaseSetupView.tsx",
+                                                    lineNumber: 499,
+                                                    columnNumber: 21
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/components/CaseSetupView.tsx",
+                                                lineNumber: 453,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/components/CaseSetupView.tsx",
+                                        lineNumber: 385,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/CaseSetupView.tsx",
-                                lineNumber: 195,
+                                lineNumber: 247,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/CaseSetupView.tsx",
-                        lineNumber: 189,
+                        lineNumber: 241,
                         columnNumber: 11
                     }, this),
                     currentStep === 'living_arrangements' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "jsx-237839d362e72b53" + " " + "living-arrangements-step",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "jsx-237839d362e72b53" + " " + "step-header",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                        className: "jsx-237839d362e72b53",
-                                        children: "Living Arrangements"
-                                    }, void 0, false, {
-                                        fileName: "[project]/components/CaseSetupView.tsx",
-                                        lineNumber: 294,
-                                        columnNumber: 15
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                        className: "jsx-237839d362e72b53",
-                                        children: "Document current living arrangements for all children in this case."
-                                    }, void 0, false, {
-                                        fileName: "[project]/components/CaseSetupView.tsx",
-                                        lineNumber: 295,
-                                        columnNumber: 15
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/components/CaseSetupView.tsx",
-                                lineNumber: 293,
-                                columnNumber: 13
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "jsx-237839d362e72b53" + " " + "placeholder-content",
-                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                    className: "jsx-237839d362e72b53",
-                                    children: "Living arrangements content will be implemented next."
-                                }, void 0, false, {
-                                    fileName: "[project]/components/CaseSetupView.tsx",
-                                    lineNumber: 298,
-                                    columnNumber: 15
-                                }, this)
-                            }, void 0, false, {
-                                fileName: "[project]/components/CaseSetupView.tsx",
-                                lineNumber: 297,
-                                columnNumber: 13
-                            }, this)
-                        ]
-                    }, void 0, true, {
+                        className: "jsx-2f8692ae072eb766" + " " + "living-arrangements-step",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$LivingArrangementsTable$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                            case_: case_
+                        }, void 0, false, {
+                            fileName: "[project]/components/CaseSetupView.tsx",
+                            lineNumber: 512,
+                            columnNumber: 13
+                        }, this)
+                    }, void 0, false, {
                         fileName: "[project]/components/CaseSetupView.tsx",
-                        lineNumber: 292,
+                        lineNumber: 511,
                         columnNumber: 11
                     }, this),
                     currentStep === 'services' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "jsx-237839d362e72b53" + " " + "services-step",
+                        className: "jsx-2f8692ae072eb766" + " " + "services-step",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "jsx-237839d362e72b53" + " " + "step-header",
+                                className: "jsx-2f8692ae072eb766" + " " + "step-header",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                        className: "jsx-237839d362e72b53",
+                                        className: "jsx-2f8692ae072eb766",
                                         children: "Services"
                                     }, void 0, false, {
                                         fileName: "[project]/components/CaseSetupView.tsx",
-                                        lineNumber: 306,
+                                        lineNumber: 519,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                        className: "jsx-237839d362e72b53",
+                                        className: "jsx-2f8692ae072eb766",
                                         children: "Set up and manage case services and support programs."
                                     }, void 0, false, {
                                         fileName: "[project]/components/CaseSetupView.tsx",
-                                        lineNumber: 307,
+                                        lineNumber: 520,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/CaseSetupView.tsx",
-                                lineNumber: 305,
+                                lineNumber: 518,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "jsx-237839d362e72b53" + " " + "placeholder-content",
+                                className: "jsx-2f8692ae072eb766" + " " + "placeholder-content",
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                    className: "jsx-237839d362e72b53",
+                                    className: "jsx-2f8692ae072eb766",
                                     children: "Services content will be implemented next."
                                 }, void 0, false, {
                                     fileName: "[project]/components/CaseSetupView.tsx",
-                                    lineNumber: 310,
+                                    lineNumber: 523,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/CaseSetupView.tsx",
-                                lineNumber: 309,
+                                lineNumber: 522,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/CaseSetupView.tsx",
-                        lineNumber: 304,
+                        lineNumber: 517,
                         columnNumber: 11
                     }, this),
                     currentStep === 'court' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "jsx-237839d362e72b53" + " " + "court-step",
+                        className: "jsx-2f8692ae072eb766" + " " + "court-step",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "jsx-237839d362e72b53" + " " + "step-header",
+                                className: "jsx-2f8692ae072eb766" + " " + "step-header",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                        className: "jsx-237839d362e72b53",
+                                        className: "jsx-2f8692ae072eb766",
                                         children: "Court"
                                     }, void 0, false, {
                                         fileName: "[project]/components/CaseSetupView.tsx",
-                                        lineNumber: 318,
+                                        lineNumber: 531,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                        className: "jsx-237839d362e72b53",
+                                        className: "jsx-2f8692ae072eb766",
                                         children: "Manage court information and legal documents for this case."
                                     }, void 0, false, {
                                         fileName: "[project]/components/CaseSetupView.tsx",
-                                        lineNumber: 319,
+                                        lineNumber: 532,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/CaseSetupView.tsx",
-                                lineNumber: 317,
+                                lineNumber: 530,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "jsx-237839d362e72b53" + " " + "placeholder-content",
+                                className: "jsx-2f8692ae072eb766" + " " + "placeholder-content",
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                    className: "jsx-237839d362e72b53",
+                                    className: "jsx-2f8692ae072eb766",
                                     children: "Court content will be implemented next."
                                 }, void 0, false, {
                                     fileName: "[project]/components/CaseSetupView.tsx",
-                                    lineNumber: 322,
+                                    lineNumber: 535,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/CaseSetupView.tsx",
-                                lineNumber: 321,
+                                lineNumber: 534,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/CaseSetupView.tsx",
-                        lineNumber: 316,
+                        lineNumber: 529,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/CaseSetupView.tsx",
-                lineNumber: 187,
+                lineNumber: 239,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$MagicSearchModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                 isOpen: isSearchModalOpen,
                 onClose: ()=>setIsSearchModalOpen(false),
-                onSelectIncident: handleIncidentSelected
+                onSelectPerson: handlePersonSelected
             }, void 0, false, {
                 fileName: "[project]/components/CaseSetupView.tsx",
-                lineNumber: 329,
+                lineNumber: 542,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$styled$2d$jsx$2f$style$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                id: "237839d362e72b53",
-                children: ".case-setup-view.jsx-237839d362e72b53{background-color:var(--background);min-height:100vh}.setup-header.jsx-237839d362e72b53{padding:var(--unit-4)var(--unit-6);border-bottom:1px solid var(--outline-variant);background-color:var(--surface)}.header-content.jsx-237839d362e72b53{justify-content:space-between;align-items:center;display:flex}.header-content.jsx-237839d362e72b53 .action-btn.jsx-237839d362e72b53{flex-shrink:0;width:auto;min-width:160px;max-width:200px}.case-info.jsx-237839d362e72b53 h1.jsx-237839d362e72b53{color:var(--on-surface);margin:0;font-size:1.5rem;font-weight:600}.case-info.jsx-237839d362e72b53 p.jsx-237839d362e72b53{color:var(--on-surface-variant);margin:4px 0 0;font-size:.875rem}.setup-stepper.jsx-237839d362e72b53{padding:var(--unit-4)var(--unit-6);background-color:var(--surface-container-low);border-bottom:1px solid var(--outline-variant)}.setup-content.jsx-237839d362e72b53{padding:var(--unit-6)}.step-header.jsx-237839d362e72b53{margin-bottom:var(--unit-6)}.step-header.jsx-237839d362e72b53 h2.jsx-237839d362e72b53{margin:0 0 var(--unit-2)0;color:var(--on-surface);font-size:1.5rem;font-weight:600}.step-header.jsx-237839d362e72b53 p.jsx-237839d362e72b53{color:var(--on-surface-variant);margin:0;font-size:1rem}.associations-grid.jsx-237839d362e72b53{gap:var(--unit-6);grid-template-columns:1fr 1fr;display:grid}.association-box.jsx-237839d362e72b53{background-color:var(--surface-container-low);border:1px solid var(--outline-variant);border-radius:var(--unit-3);padding:var(--unit-5)}.box-header.jsx-237839d362e72b53{margin-bottom:var(--unit-4);justify-content:space-between;align-items:center;display:flex}.box-header.jsx-237839d362e72b53 h3.jsx-237839d362e72b53{color:var(--on-surface);margin:0;font-size:1.125rem;font-weight:600}.box-header.jsx-237839d362e72b53 .action-btn.jsx-237839d362e72b53{flex-shrink:0;width:auto;min-width:120px;max-width:150px}.people-list.jsx-237839d362e72b53{gap:var(--unit-3);flex-direction:column;display:flex}.person-item.jsx-237839d362e72b53{padding:var(--unit-3);background-color:var(--surface);border:1px solid var(--outline-variant);border-radius:var(--unit-2);justify-content:space-between;align-items:center;display:flex}.person-info.jsx-237839d362e72b53{gap:var(--unit-1);flex-direction:column;display:flex}.person-info.jsx-237839d362e72b53 strong.jsx-237839d362e72b53{color:var(--on-surface);font-size:.875rem;font-weight:600}.person-role.jsx-237839d362e72b53{color:var(--primary);text-transform:uppercase;letter-spacing:.5px;font-size:.75rem;font-weight:500}.person-actions.jsx-237839d362e72b53{gap:var(--unit-2);display:flex}.person-actions.jsx-237839d362e72b53 .action-btn.jsx-237839d362e72b53{flex-shrink:0;width:auto;min-width:70px;max-width:90px}.empty-state.jsx-237839d362e72b53{align-items:center;gap:var(--unit-3);padding:var(--unit-6);color:var(--on-surface-variant);text-align:center;flex-direction:column;display:flex}.empty-state.jsx-237839d362e72b53 .icon.jsx-237839d362e72b53{font-family:var(--font-icon);color:var(--outline);font-size:2rem}.empty-state.jsx-237839d362e72b53 p.jsx-237839d362e72b53{margin:0;font-size:.875rem}.placeholder-content.jsx-237839d362e72b53{text-align:center;padding:var(--unit-8);color:var(--on-surface-variant)}@media (width<=768px){.associations-grid.jsx-237839d362e72b53{grid-template-columns:1fr}.header-content.jsx-237839d362e72b53{gap:var(--unit-3);flex-direction:column;align-items:stretch}.header-content.jsx-237839d362e72b53 .action-btn.jsx-237839d362e72b53{width:100%;max-width:none}.person-item.jsx-237839d362e72b53{align-items:flex-start;gap:var(--unit-3);flex-direction:column}.person-actions.jsx-237839d362e72b53{align-self:flex-end}.box-header.jsx-237839d362e72b53 .action-btn.jsx-237839d362e72b53{width:100%;max-width:none}}"
+                id: "2f8692ae072eb766",
+                children: ".case-setup-view.jsx-2f8692ae072eb766{background-color:var(--background);min-height:100vh}.setup-header.jsx-2f8692ae072eb766{padding:var(--unit-4)var(--unit-6);border-bottom:1px solid var(--outline-variant);background-color:var(--surface)}.header-content.jsx-2f8692ae072eb766{justify-content:space-between;align-items:center;display:flex}.header-content.jsx-2f8692ae072eb766 .action-btn.jsx-2f8692ae072eb766{flex-shrink:0;width:auto;min-width:140px;max-width:160px;margin-left:auto}.case-info.jsx-2f8692ae072eb766 h1.jsx-2f8692ae072eb766{color:var(--on-surface);margin:0;font-size:1.5rem;font-weight:600}.case-info.jsx-2f8692ae072eb766 p.jsx-2f8692ae072eb766{color:var(--on-surface-variant);margin:4px 0 0;font-size:.875rem}.setup-stepper.jsx-2f8692ae072eb766{padding:var(--unit-4)var(--unit-6);background-color:var(--surface-container-low);border-bottom:1px solid var(--outline-variant)}.setup-content.jsx-2f8692ae072eb766{padding:var(--unit-6)}.step-header.jsx-2f8692ae072eb766{margin-bottom:var(--unit-6)}.step-header.jsx-2f8692ae072eb766 h2.jsx-2f8692ae072eb766{margin:0 0 var(--unit-2)0;color:var(--on-surface);font-size:1.5rem;font-weight:600}.step-header.jsx-2f8692ae072eb766 p.jsx-2f8692ae072eb766{color:var(--on-surface-variant);margin:0;font-size:1rem}.associations-container.jsx-2f8692ae072eb766{gap:var(--unit-6);flex-direction:column;display:flex}.header-actions.jsx-2f8692ae072eb766{gap:var(--unit-2);display:flex}.add-person-form.jsx-2f8692ae072eb766{background-color:var(--surface-container);border:1px solid var(--outline-variant);border-radius:var(--unit-3);padding:var(--unit-4);margin-bottom:var(--unit-4)}.add-person-form.jsx-2f8692ae072eb766 h4.jsx-2f8692ae072eb766{margin:0 0 var(--unit-3)0;color:var(--on-surface);font-size:1rem;font-weight:600}.form-grid.jsx-2f8692ae072eb766{gap:var(--unit-3);margin-bottom:var(--unit-4);grid-template-columns:repeat(auto-fit,minmax(200px,1fr));display:grid}.form-group.jsx-2f8692ae072eb766{gap:var(--unit-1);flex-direction:column;display:flex}.form-group.jsx-2f8692ae072eb766 label.jsx-2f8692ae072eb766{color:var(--on-surface-variant);font-size:.875rem;font-weight:600}.form-group.jsx-2f8692ae072eb766 input.jsx-2f8692ae072eb766,.form-group.jsx-2f8692ae072eb766 select.jsx-2f8692ae072eb766{padding:var(--unit-2);border:1px solid var(--outline-variant);border-radius:var(--unit-1);background-color:var(--surface);color:var(--on-surface);font-size:.875rem;font-family:var(--font)}.form-group.jsx-2f8692ae072eb766 input.jsx-2f8692ae072eb766:focus,.form-group.jsx-2f8692ae072eb766 select.jsx-2f8692ae072eb766:focus{border-color:var(--primary);outline:none}.form-actions.jsx-2f8692ae072eb766{gap:var(--unit-2);justify-content:flex-end;display:flex}.people-table.jsx-2f8692ae072eb766{margin-top:var(--unit-4)}.people-table.jsx-2f8692ae072eb766 .data-table.jsx-2f8692ae072eb766{border-collapse:collapse;background-color:var(--surface);border-radius:var(--unit-2);width:100%;overflow:hidden}.people-table.jsx-2f8692ae072eb766 .data-table.jsx-2f8692ae072eb766 th.jsx-2f8692ae072eb766{background-color:var(--surface-container);color:var(--on-surface-variant);text-align:left;padding:var(--unit-3);border-bottom:1px solid var(--outline-variant);font-size:.875rem;font-weight:600}.people-table.jsx-2f8692ae072eb766 .data-table.jsx-2f8692ae072eb766 td.jsx-2f8692ae072eb766{padding:var(--unit-3);border-bottom:1px solid var(--outline-variant);color:var(--on-surface);vertical-align:top}.people-table.jsx-2f8692ae072eb766 .data-table.jsx-2f8692ae072eb766 tr.jsx-2f8692ae072eb766:hover{background-color:var(--surface-container-low)}.person-name.jsx-2f8692ae072eb766{align-items:center;gap:var(--unit-2);display:flex}.perpetrator-flag.jsx-2f8692ae072eb766{font-family:var(--font-icon);color:var(--error);font-size:1rem}.role-dropdown.jsx-2f8692ae072eb766{width:100%;min-width:150px}.state-id-cell.jsx-2f8692ae072eb766{align-items:center;display:flex}.state-id.jsx-2f8692ae072eb766{color:var(--on-surface);font-family:monospace;font-weight:600}.association-box.jsx-2f8692ae072eb766{background-color:var(--surface-container-low);border:1px solid var(--outline-variant);border-radius:var(--unit-3);padding:var(--unit-5)}.box-header.jsx-2f8692ae072eb766{margin-bottom:var(--unit-4);justify-content:space-between;align-items:center;display:flex}.box-header.jsx-2f8692ae072eb766 h3.jsx-2f8692ae072eb766{color:var(--on-surface);margin:0;font-size:1.125rem;font-weight:600}.box-header.jsx-2f8692ae072eb766 .action-btn.jsx-2f8692ae072eb766{flex-shrink:0;width:auto;min-width:120px;max-width:150px}.people-list.jsx-2f8692ae072eb766{gap:var(--unit-3);flex-direction:column;display:flex}.person-item.jsx-2f8692ae072eb766{padding:var(--unit-3);background-color:var(--surface);border:1px solid var(--outline-variant);border-radius:var(--unit-2);justify-content:space-between;align-items:center;display:flex}.person-info.jsx-2f8692ae072eb766{gap:var(--unit-1);flex-direction:column;display:flex}.person-info.jsx-2f8692ae072eb766 strong.jsx-2f8692ae072eb766{color:var(--on-surface);font-size:.875rem;font-weight:600}.person-role.jsx-2f8692ae072eb766{color:var(--primary);text-transform:uppercase;letter-spacing:.5px;font-size:.75rem;font-weight:500}.person-actions.jsx-2f8692ae072eb766{gap:var(--unit-2);display:flex}.person-actions.jsx-2f8692ae072eb766 .action-btn.jsx-2f8692ae072eb766{flex-shrink:0;width:auto;min-width:70px;max-width:90px}.empty-state.jsx-2f8692ae072eb766{align-items:center;gap:var(--unit-3);padding:var(--unit-6);color:var(--on-surface-variant);text-align:center;flex-direction:column;display:flex}.empty-state.jsx-2f8692ae072eb766 .icon.jsx-2f8692ae072eb766{font-family:var(--font-icon);color:var(--outline);font-size:2rem}.empty-state.jsx-2f8692ae072eb766 p.jsx-2f8692ae072eb766{margin:0;font-size:.875rem}.placeholder-content.jsx-2f8692ae072eb766{text-align:center;padding:var(--unit-8);color:var(--on-surface-variant)}@media (width<=768px){.associations-grid.jsx-2f8692ae072eb766{grid-template-columns:1fr}.header-content.jsx-2f8692ae072eb766{gap:var(--unit-3);flex-direction:column;align-items:stretch}.header-content.jsx-2f8692ae072eb766 .action-btn.jsx-2f8692ae072eb766{width:100%;max-width:none}.person-item.jsx-2f8692ae072eb766{align-items:flex-start;gap:var(--unit-3);flex-direction:column}.person-actions.jsx-2f8692ae072eb766{align-self:flex-end}.box-header.jsx-2f8692ae072eb766 .action-btn.jsx-2f8692ae072eb766{width:100%;max-width:none}}"
             }, void 0, false, void 0, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/CaseSetupView.tsx",
-        lineNumber: 156,
+        lineNumber: 208,
         columnNumber: 5
     }, this);
 }
-_s(CaseSetupView, "TZlO/VB6XJYhdDwA8cz6PlMuHSs=");
+_s(CaseSetupView, "EFDB7l4dygNloG75RM5hQ7Tyvyk=");
 _c = CaseSetupView;
 var _c;
 __turbopack_refresh__.register(_c, "CaseSetupView");

@@ -168,11 +168,11 @@ export default function CaseDetailPage() {
             </div>
           </div>
           <div style={{ display: 'flex', gap: 'var(--unit-2)' }}>
-            <Link href="/" className="action-btn secondary">
+            <Link href="/" className="action-btn secondary" style={{ width: '160px', flexShrink: 0 }}>
               <span className="icon">arrow_back</span>
               Back to Dashboard
             </Link>
-            <button className="action-btn primary">
+            <button className="action-btn primary" style={{ width: '120px', flexShrink: 0 }}>
               <span className="icon">edit</span>
               Edit Case
             </button>

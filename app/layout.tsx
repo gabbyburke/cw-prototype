@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import './globals.css'
+import ClientLayout from '../components/ClientLayout'
 
 export const metadata: Metadata = {
   title: 'VISION - Child Welfare Information System',
@@ -75,6 +76,7 @@ export default function RootLayout({
             </main>
           </div>
         </div>
+        <ClientLayout />
       </body>
     </html>
   )

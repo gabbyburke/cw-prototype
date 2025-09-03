@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Case, Person, updateCase, searchPersons } from '../lib/api'
+import MagicSearchModal from './MagicSearchModal'
 
 interface RequestSWCMAssignmentModalProps {
   isOpen: boolean
@@ -356,7 +357,7 @@ export default function RequestSWCMAssignmentModal({ isOpen, onClose, case_, onS
 
   return (
     <div className="modal-overlay" onClick={handleOverlayClick}>
-      <div className="modal-container large scrollable">
+      <div className="modal-container large scrollable" style={{ maxHeight: '90vh', overflow: 'hidden' }}>
         <div className="modal-header">
           <h2>Request SWCM Assignment - {case_.case_display_name || `Case ${case_.case_id}`}</h2>
           <button onClick={onClose} className="modal-close">
@@ -365,39 +366,22 @@ export default function RequestSWCMAssignmentModal({ isOpen, onClose, case_, onS
         </div>
 
         <div className="modal-body">
-          {/* Progress Bar */}
-          <div className="progress-bar-container">
-            <div className="progress-bar">
-              <div 
-                className="progress-fill" 
-                style={{ width: `${(currentStep / steps.length) * 100}%` }}
-              ></div>
-            </div>
-            <div className="progress-text">
-              Step {currentStep} of {steps.length}: {steps[currentStep - 1]?.title}
-            </div>
-          </div>
-
-          {/* Progress Steps */}
-          <div className="setup-progress">
+          {/* Compact Step Navigation */}
+          <div className="compact-step-nav">
             {steps.map((step) => (
-              <div 
-                key={step.id} 
-                className={`progress-step ${currentStep === step.id ? 'active' : ''} ${step.completed ? 'completed' : ''} clickable`}
+              <button
+                key={step.id}
+                className={`compact-step ${currentStep === step.id ? 'active' : ''} ${step.completed ? 'completed' : ''}`}
                 onClick={() => setCurrentStep(step.id)}
               >
                 <div className="step-number">
                   {step.completed ? <span className="icon">check</span> : step.id}
                 </div>
-                <div className="step-info">
-                  <h4>{step.title}</h4>
-                  <p>{step.description}</p>
-                </div>
-              </div>
+                <span className="step-title">{step.title}</span>
+              </button>
             ))}
           </div>
 
-          <div className="modal-content">
           {error && (
             <div className="error-message">
               <span className="icon">error</span>
@@ -940,7 +924,6 @@ export default function RequestSWCMAssignmentModal({ isOpen, onClose, case_, onS
               </div>
             </div>
           )}
-          </div>
         </div>
 
         <div className="modal-footer">
