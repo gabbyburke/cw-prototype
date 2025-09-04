@@ -5,8 +5,9 @@ import Link from 'next/link'
 import { Case, getCasesByWorker, updateCase } from '../lib/api'
 import { getCurrentUser } from '../lib/mockData'
 import AddCaseNoteModal from '../components/AddCaseNoteModal'
+import { CaseDataProvider, useCaseData } from '../contexts/CaseDataContext'
 
-export default function SWCMDashboard() {
+function SWCMDashboardContent() {
   const [cases, setCases] = useState<Case[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -14,6 +15,7 @@ export default function SWCMDashboard() {
   const [isAddNoteModalOpen, setIsAddNoteModalOpen] = useState(false)
   const [editingCase, setEditingCase] = useState<string | null>(null)
   const [editValues, setEditValues] = useState<{[key: string]: any}>({})
+  const { setAllCases } = useCaseData()
 
   useEffect(() => {
     loadCases()
@@ -30,6 +32,8 @@ export default function SWCMDashboard() {
       setError(response.error)
     } else if (response.data) {
       setCases(response.data.cases)
+      // Store all cases in context for global access
+      setAllCases(response.data.cases)
     }
     
     setLoading(false)
@@ -52,13 +56,14 @@ export default function SWCMDashboard() {
         setError(response.error)
       } else {
         // Update local state
-        setCases(prevCases => 
-          prevCases.map(case_ => 
-            case_.case_id === caseId 
-              ? { ...case_, ...editValues }
-              : case_
-          )
+        const updatedCases = cases.map(case_ => 
+          case_.case_id === caseId 
+            ? { ...case_, ...editValues }
+            : case_
         )
+        setCases(updatedCases)
+        // Also update context with the modified cases
+        setAllCases(updatedCases)
         setEditingCase(null)
         setEditValues({})
       }
@@ -426,5 +431,13 @@ export default function SWCMDashboard() {
         onSuccess={handleAddNoteSuccess}
       />
     </div>
+  )
+}
+
+export default function SWCMDashboard() {
+  return (
+    <CaseDataProvider>
+      <SWCMDashboardContent />
+    </CaseDataProvider>
   )
 }
