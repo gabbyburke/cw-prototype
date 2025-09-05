@@ -18,7 +18,7 @@ import { VertexAI } from '@google-cloud/vertexai';
 
 const PROJECT_ID = process.env.GCP_PROJECT_ID;
 const LOCATION = process.env.GCP_LOCATION;
-const GEMINI_MODEL_NAME = "gemini-2.5-flash-lite";
+const GEMINI_MODEL_NAME = "gemini-2.5-flash";
 
 if (!PROJECT_ID || !LOCATION) {
   throw new Error("Google Cloud Project ID and Location must be set in environment variables.");

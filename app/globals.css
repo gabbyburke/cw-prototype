@@ -4868,3 +4868,9 @@ input[type="button"]:disabled {
   margin-right: 400px;
   transition: margin-right 0.3s ease;
 }
+
+.chatbot-sidebar .sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

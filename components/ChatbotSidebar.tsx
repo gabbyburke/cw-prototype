@@ -1,22 +1,22 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Send, Bot, User } from 'lucide-react';
 
 type Message = {
   text: string;
   isUser: boolean;
 };
 
-type ChatbotModalProps = {
+type ChatbotSidebarProps = {
   isOpen: boolean;
   onClose: () => void;
 };
 
-export default function ChatbotModal({ 
+export default function ChatbotSidebar({ 
   isOpen, 
   onClose, 
-}: ChatbotModalProps) {
+}: ChatbotSidebarProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -61,11 +61,11 @@ export default function ChatbotModal({
 
   return (
     <aside className="chatbot-sidebar">
-      <div className="flex justify-between items-center p-4 border-b">
-        <h3 className="text-xl font-semibold text-blue-600">VISION Assistant</h3>
+      <div className="sidebar-header">
+        <h3 className="sidebar-brand">VISION Assistant</h3>
         <button
           onClick={onClose}
-          className="text-gray-500 hover:text-gray-800"
+          className="action-btn secondary"
           aria-label="Close chat"
         >
           <X className="h-4 w-4" />
@@ -73,15 +73,18 @@ export default function ChatbotModal({
       </div>
       <div className="flex-grow p-4 overflow-y-auto">
         {messages.map((msg, index) => (
-          <div key={index} className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'} mb-2`}>
-            <div className={`p-2 rounded-lg ${msg.isUser ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>
+          <div key={index} className={`flex items-start gap-3 mb-4 ${msg.isUser ? 'justify-end' : 'justify-start'}`}>
+            { !msg.isUser && <Bot className="h-6 w-6 text-gray-500" /> }
+            <div className={`p-3 rounded-lg max-w-md ${msg.isUser ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-800'}`}>
               {msg.text}
             </div>
+            { msg.isUser && <User className="h-6 w-6 text-gray-500" /> }
           </div>
         ))}
         {isLoading && (
-          <div className="flex justify-start mb-2">
-            <div className="p-2 rounded-lg bg-gray-200">
+          <div className="flex items-start gap-3 mb-4">
+            <Bot className="h-6 w-6 text-gray-500" />
+            <div className="p-3 rounded-lg bg-gray-100 text-gray-800">
               ...
             </div>
           </div>
@@ -95,15 +98,15 @@ export default function ChatbotModal({
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') handleSendMessage(); }}
             placeholder="Ask a question..."
-            className="flex-grow p-2 border rounded-l-lg"
+            className="form-control"
             disabled={isLoading}
           />
           <button 
             onClick={handleSendMessage} 
-            className="bg-blue-500 text-white p-2 rounded-r-lg"
+            className="action-btn primary"
             disabled={isLoading}
           >
-            Send
+            <Send className="h-4 w-4" />
           </button>
         </div>
       </div>

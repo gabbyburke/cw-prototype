@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import FloatingActionButton from './FloatingActionButton'
 import ChatbotModal from './ChatbotSidebar'
+import ChatbotSidebar from "./ChatbotSidebar";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -22,7 +23,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     <div className={isChatbotOpen ? 'chatbot-open' : ''}>
       {children}
       <FloatingActionButton onClick={handleFabClick} />
-      <ChatbotModal 
+      <ChatbotSidebar
         isOpen={isChatbotOpen} 
         onClose={() => setIsChatbotOpen(false)} 
       />
