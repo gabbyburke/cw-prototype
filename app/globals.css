@@ -4857,7 +4857,7 @@ input[type="button"]:disabled {
   display: flex;
   flex-direction: column;
   z-index: 1000;
-  transition: right 0.3s ease;
+  transition: right 0.5s ease;
 }
 
 .chatbot-open .chatbot-sidebar {
@@ -4866,7 +4866,7 @@ input[type="button"]:disabled {
 
 .chatbot-open .app-layout {
   margin-right: 400px;
-  transition: margin-right 0.3s ease;
+  transition: margin-right 0.5s ease;
 }
 
 .chatbot-sidebar .sidebar-header {
