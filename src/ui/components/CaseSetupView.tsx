@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Case, Person, updateCase } from '@/lib/api'
+import { Case, Person, updateCase, getCaseById } from '@/lib/api'
 import ChevronStepper from './ChevronStepper'
 import MagicSearchModal from './MagicSearchModal'
 import LivingArrangementsTable from './LivingArrangementsTable'
+import CourtInformationTab from './CourtInformationTab'
 
 interface CaseSetupViewProps {
   case_: Case
@@ -67,6 +68,7 @@ export default function CaseSetupView({ case_, onProgressUpdate }: CaseSetupView
   const [searchModalType, setSearchModalType] = useState<'case-members' | 'relatives'>('case-members')
   const [showAddPersonForm, setShowAddPersonForm] = useState(false)
   const [addPersonType, setAddPersonType] = useState<'case-members' | 'relatives'>('case-members')
+  const [caseData, setCaseData] = useState<Case>(case_)
   const [newPersonData, setNewPersonData] = useState({
     first_name: '',
     last_name: '',
@@ -182,9 +184,19 @@ export default function CaseSetupView({ case_, onProgressUpdate }: CaseSetupView
   }
 
   // Handle person selection from search modal
-  const handlePersonSelected = (person: Person) => {
-    // TODO: Add selected person to case with appropriate role
-    console.log('Selected person:', person, 'for type:', searchModalType)
+  const handlePersonSelected = async (person: Person) => {
+    // Person was already associated via the MagicSearchModal
+    // Now we need to refresh the case data to show the new person
+    try {
+      const response = await getCaseById(case_.case_id)
+      if (response.data) {
+        setCaseData(response.data)
+        // Update the original case data as well
+        Object.assign(case_, response.data)
+      }
+    } catch (error) {
+      console.error('Failed to refresh case data:', error)
+    }
     setIsSearchModalOpen(false)
   }
 
@@ -527,13 +539,7 @@ export default function CaseSetupView({ case_, onProgressUpdate }: CaseSetupView
 
         {currentStep === 'court' && (
           <div className="court-step">
-            <div className="step-header">
-              <h2>Court</h2>
-              <p>Manage court information and legal documents for this case.</p>
-            </div>
-            <div className="placeholder-content">
-              <p>Court content will be implemented next.</p>
-            </div>
+            <CourtInformationTab case_={case_} />
           </div>
         )}
       </div>
@@ -543,6 +549,8 @@ export default function CaseSetupView({ case_, onProgressUpdate }: CaseSetupView
         isOpen={isSearchModalOpen}
         onClose={() => setIsSearchModalOpen(false)}
         onSelectPerson={handlePersonSelected}
+        caseId={case_.case_id}
+        defaultRole={searchModalType === 'case-members' ? 'Parent' : 'Relative'}
       />
 
       <style jsx>{`

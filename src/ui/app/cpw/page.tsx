@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Case, getCasesByWorker } from '@/lib/api'
+import { Case, getCasesByWorker, MagicButtonData, getDraftIncidents } from '@/lib/api'
 import { getCurrentUser } from '@/lib/mockData'
 import RequestSWCMAssignmentModal from '@/components/RequestSWCMAssignmentModal'
 import TaskTable from '@/components/TaskTable'
@@ -10,10 +10,12 @@ import TaskTable from '@/components/TaskTable'
 export default function CPWPage() {
   const [activeFilters, setActiveFilters] = useState<string[]>(['Draft Cases'])
   const [cases, setCases] = useState<Case[]>([])
+  const [draftIncidents, setDraftIncidents] = useState<MagicButtonData[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isSetupModalOpen, setIsSetupModalOpen] = useState(false)
   const [selectedCase, setSelectedCase] = useState<Case | null>(null)
+  const [selectedIncident, setSelectedIncident] = useState<MagicButtonData | null>(null)
   const [activeTask, setActiveTask] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -25,13 +27,27 @@ export default function CPWPage() {
     setLoading(true)
     setError(null)
     
-    // For demo: show unassigned cases since no workers are assigned yet in the workflow
-    const response = await getCasesByWorker('unassigned')
-    
-    if (response.error) {
-      setError(response.error)
-    } else if (response.data) {
-      setCases(response.data.cases)
+    try {
+      // Fetch both case setup cases and draft incidents in parallel
+      const [casesResponse, incidentsResponse] = await Promise.all([
+        getCasesByWorker('unassigned'),
+        getDraftIncidents()
+      ])
+      
+      if (casesResponse.error) {
+        setError(casesResponse.error)
+      } else if (casesResponse.data) {
+        setCases(casesResponse.data.cases)
+      }
+      
+      if (incidentsResponse.error) {
+        console.warn('Failed to load draft incidents:', incidentsResponse.error)
+      } else if (incidentsResponse.data) {
+        setDraftIncidents(incidentsResponse.data.incidents)
+      }
+    } catch (err) {
+      setError('Failed to load data')
+      console.error('Error loading cases and incidents:', err)
     }
     
     setLoading(false)
@@ -135,6 +151,7 @@ export default function CPWPage() {
   const handleCloseModal = () => {
     setIsSetupModalOpen(false)
     setSelectedCase(null)
+    setSelectedIncident(null)
   }
 
   // Handle task card clicks - toggle between showing task view and default view
@@ -314,15 +331,62 @@ export default function CPWPage() {
     )
   }
 
+  // Helper function to convert MagicButtonData to Case format for display
+  const convertIncidentToCase = (incident: MagicButtonData): Case => {
+    const childName = `${incident.child_first_names} ${incident.child_last_names}`.trim()
+    const caseName = childName || 'Unnamed Case'
+    
+    return {
+      case_id: incident.incident_number,
+      case_number: incident.incident_number,
+      case_display_name: caseName,
+      status: 'Draft',
+      priority_level: 'Medium',
+      primary_child: childName,
+      family_name: caseName,
+      allegation_type: incident.allegations || 'Unknown',
+      allegation_description: incident.allegations || '',
+      county: incident.residence_county || incident.county_of_assessment || '',
+      created_date: incident.intake_date || new Date().toISOString(),
+      last_updated: incident.intake_date || new Date().toISOString(),
+      created_by: incident.cps_worker || 'Dana Scully',
+      assigned_worker: undefined,
+      assigned_supervisor: undefined,
+      workflow_status: {
+        current_stage: 'request_assignment',
+        cpw_reviewed: false,
+        cpw_supervisor_approved: false,
+        swcm_assigned: false
+      },
+      persons: [
+        {
+          person_id: incident.person_id || `${incident.incident_number}-child`,
+          first_name: incident.child_first_names || '',
+          last_name: incident.child_last_names || '',
+          date_of_birth: incident.date_of_birth || '',
+          role: 'Client',
+          contact_info: {
+            phone: incident.phone_number || '',
+            address: incident.current_address || incident.address || ''
+          },
+          indicators: [],
+          relationship_to_primary_child: 'Self'
+        }
+      ]
+    }
+  }
+
   // Create unified task list sorted by due date
   const createTaskList = () => {
     const tasks: Array<{
       id: string
       type: 'request-assignment' | 'case-setup' | 'edits-required'
       case: Case
+      incident?: MagicButtonData
       dueDate: Date
     }> = []
 
+    // Add existing case setup tasks
     cases.forEach(case_ => {
       let taskType: 'request-assignment' | 'case-setup' | 'edits-required'
       let dueDate: Date
@@ -354,6 +418,20 @@ export default function CPWPage() {
         id: `${case_.case_id}-${taskType}`,
         type: taskType,
         case: case_,
+        dueDate
+      })
+    })
+
+    // Add magic button incidents as request-assignment tasks
+    draftIncidents.forEach(incident => {
+      const dueDate = new Date(incident.due_date || incident.intake_date || new Date())
+      const convertedCase = convertIncidentToCase(incident)
+      
+      tasks.push({
+        id: `${incident.incident_number}-request-assignment`,
+        type: 'request-assignment',
+        case: convertedCase,
+        incident: incident,
         dueDate
       })
     })
@@ -399,6 +477,10 @@ export default function CPWPage() {
   const handleTaskAction = (task: any) => {
     switch (task.type) {
       case 'request-assignment':
+        // If this is a magic button incident, set both case and incident data
+        if (task.incident) {
+          setSelectedIncident(task.incident)
+        }
         handleSetupCase(task.case)
         break
       case 'case-setup':
@@ -473,8 +555,8 @@ export default function CPWPage() {
               <table className="data-table task-table">
                 <thead>
                   <tr>
-                    <th>Case Name</th>
-                    <th>Case ID</th>
+                    <th>Case Name / ID</th>
+                    <th>Incident Number</th>
                     <th>Due Date</th>
                     <th>Progress</th>
                     <th>Action</th>
@@ -491,10 +573,13 @@ export default function CPWPage() {
                           <Link href={`/cases/${task.case.case_id}`} className="case-link">
                             <strong>{task.case.case_display_name || task.case.family_name}</strong>
                           </Link>
+                          <div className="case-id-subtitle">Case ID: {task.case.case_id}</div>
                         </div>
                       </td>
                       <td>
-                        <div className="case-number">{task.case.case_number}</div>
+                        <div className="incident-number">
+                          {task.incident ? task.incident.incident_number : task.case.case_number}
+                        </div>
                       </td>
                       <td>
                         <div className={`due-date-cell ${isOverdue(task.dueDate) ? 'overdue' : ''}`}>
@@ -554,6 +639,7 @@ export default function CPWPage() {
         isOpen={isSetupModalOpen}
         onClose={handleCloseModal}
         case_={selectedCase}
+        incident={selectedIncident}
         onSuccess={handleSetupSuccess}
       />
 

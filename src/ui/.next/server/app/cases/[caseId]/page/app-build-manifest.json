@@ -1,0 +1,23 @@
+{
+  "pages": {
+    "/cases/[caseId]/page": [
+      "static/chunks/node_modules_next_dist_8eb6ed._.js",
+      "static/chunks/_19b23a._.js",
+      "static/chunks/app_globals_73c377.css",
+      "static/chunks/app_layout_tsx_ce879e._.js",
+      "static/chunks/_68b7bf._.js",
+      "static/chunks/node_modules_next_f91242._.js",
+      "static/chunks/app_cases_[caseId]_page_tsx_422b11._.js",
+      "static/chunks/node_modules_next_dist_compiled_react_a1d82d._.js",
+      "static/chunks/node_modules_next_dist_compiled_react-dom_cjs_react-dom_development_c9a189.js",
+      "static/chunks/node_modules_next_dist_compiled_react-dom_87a050._.js",
+      "static/chunks/node_modules_next_dist_compiled_e13b54._.js",
+      "static/chunks/node_modules_next_dist_client_8bb71d._.js",
+      "static/chunks/node_modules_next_dist_091837._.js",
+      "static/chunks/node_modules_@swc_helpers_cjs_00636a._.js",
+      "static/chunks/[turbopack]_dev_client_hmr-client_ts_4da20b._.js",
+      "static/chunks/node_modules_next_dist_esm_build_templates_app-page_434a14.js",
+      "static/chunks/node_modules_next_dist_esm_build_templates_app-page_d662b2.js"
+    ]
+  }
+}

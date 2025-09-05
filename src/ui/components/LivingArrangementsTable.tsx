@@ -10,6 +10,7 @@ interface LivingArrangementsTableProps {
 interface PlacementData {
   placementType: string
   caregiverName: string
+  address: string
   startDate: string
   endDate: string
   circumstancesOfRemoval: string
@@ -51,6 +52,19 @@ const PLACEMENT_TYPES = [
 export default function LivingArrangementsTable({ case_ }: LivingArrangementsTableProps) {
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null)
   const [placementData, setPlacementData] = useState<Record<string, PlacementData>>({})
+  const [showApplyToAllForm, setShowApplyToAllForm] = useState(true)
+  const [masterPlacementData, setMasterPlacementData] = useState<PlacementData>({
+    placementType: 'Home',
+    caregiverName: '',
+    address: '',
+    startDate: '',
+    endDate: '',
+    circumstancesOfRemoval: '',
+    livingArrangementAtRemoval: '',
+    allegedSexTrafficking: false,
+    specialNeeds: false,
+    specialNeedsDetails: ''
+  })
 
   // Get children from the case
   const getChildren = () => {
@@ -69,6 +83,7 @@ export default function LivingArrangementsTable({ case_ }: LivingArrangementsTab
       initialData[child.person_id] = {
         placementType: 'Home',
         caregiverName: '',
+        address: '',
         startDate: '',
         endDate: '',
         circumstancesOfRemoval: '',
@@ -119,6 +134,27 @@ export default function LivingArrangementsTable({ case_ }: LivingArrangementsTab
     setExpandedRowId(null)
   }
 
+  const updateMasterPlacementData = (field: keyof PlacementData, value: any) => {
+    setMasterPlacementData(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  const handleApplyToAll = () => {
+    const updatedData: Record<string, PlacementData> = {}
+    children.forEach(child => {
+      updatedData[child.person_id] = { ...masterPlacementData }
+    })
+    setPlacementData(updatedData)
+    setShowApplyToAllForm(false)
+  }
+
+  const handleAddLivingArrangement = () => {
+    // TODO: Implement add living arrangement functionality
+    console.log('Add Living Arrangement clicked - placeholder functionality')
+  }
+
   if (children.length === 0) {
     return (
       <div className="empty-state">
@@ -132,16 +168,106 @@ export default function LivingArrangementsTable({ case_ }: LivingArrangementsTab
   return (
     <div className="living-arrangements-table">
       <div className="table-header">
-        <h3>Living Arrangements</h3>
-        <p>Manage current living arrangements and placement information for all children in this case.</p>
+        <div className="header-content">
+          <div className="header-text">
+            <h3>Living Arrangements</h3>
+            <p>Manage current living arrangements and placement information for all children in this case.</p>
+          </div>
+          <div className="header-actions">
+            <button 
+              onClick={() => setShowApplyToAllForm(!showApplyToAllForm)}
+              className="action-btn secondary"
+            >
+              <span className="icon">{showApplyToAllForm ? 'visibility_off' : 'content_copy'}</span>
+              {showApplyToAllForm ? 'Hide Form' : 'Show Apply to All'}
+            </button>
+            <button 
+              onClick={handleAddLivingArrangement}
+              className="action-btn primary"
+            >
+              <span className="icon">add_home</span>
+              Add Living Arrangement
+            </button>
+          </div>
+        </div>
       </div>
+
+      {/* Apply to All Form */}
+      {showApplyToAllForm && (
+        <div className="apply-to-all-form">
+          <h4>Apply Living Arrangement to All Children</h4>
+          <p>Enter the living arrangement details that will be applied to all children in this case. You can edit individual children afterwards if needed.</p>
+          
+          <div className="form-section">
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Placement Type *</label>
+                <select
+                  value={masterPlacementData.placementType}
+                  onChange={(e) => updateMasterPlacementData('placementType', e.target.value)}
+                  className="placement-type-select"
+                >
+                  {PLACEMENT_TYPES.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label>Caregiver/Facility Name</label>
+                <input
+                  type="text"
+                  value={masterPlacementData.caregiverName}
+                  onChange={(e) => updateMasterPlacementData('caregiverName', e.target.value)}
+                  placeholder="Enter caregiver or facility name"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Address</label>
+                <input
+                  type="text"
+                  value={masterPlacementData.address}
+                  onChange={(e) => updateMasterPlacementData('address', e.target.value)}
+                  placeholder="Enter placement address"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Placement Start Date</label>
+                <input
+                  type="date"
+                  value={masterPlacementData.startDate}
+                  onChange={(e) => updateMasterPlacementData('startDate', e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="form-actions">
+            <button 
+              onClick={handleApplyToAll}
+              className="action-btn primary"
+            >
+              <span className="icon">done_all</span>
+              Apply to All Children
+            </button>
+            <button 
+              onClick={() => setShowApplyToAllForm(false)}
+              className="action-btn secondary"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       <table className="arrangements-table">
         <thead>
           <tr>
             <th>Child Name</th>
             <th>Current Placement</th>
-            <th>Permanency Goal</th>
+            <th>Address</th>
             <th>Flags</th>
             <th>Actions</th>
           </tr>
@@ -172,9 +298,9 @@ export default function LivingArrangementsTable({ case_ }: LivingArrangementsTab
                   </div>
                 </td>
                 <td>
-                  <span className="permanency-goal">
-                    {getPermancencyGoal(data.placementType || 'Home')}
-                  </span>
+                  <div className="address-info">
+                    {data.address || 'No address specified'}
+                  </div>
                 </td>
                 <td>
                   <div className="flags-column">
@@ -224,6 +350,16 @@ export default function LivingArrangementsTable({ case_ }: LivingArrangementsTab
                               value={data.caregiverName || ''}
                               onChange={(e) => updatePlacementData(child.person_id, 'caregiverName', e.target.value)}
                               placeholder="Enter caregiver or facility name"
+                            />
+                          </div>
+                          
+                          <div className="form-group">
+                            <label>Address</label>
+                            <input
+                              type="text"
+                              value={data.address || ''}
+                              onChange={(e) => updatePlacementData(child.person_id, 'address', e.target.value)}
+                              placeholder="Enter placement address"
                             />
                           </div>
                           
@@ -348,15 +484,106 @@ export default function LivingArrangementsTable({ case_ }: LivingArrangementsTab
           margin-bottom: var(--unit-4);
         }
 
-        .table-header h3 {
+        .header-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: var(--unit-4);
+        }
+
+        .header-text {
+          flex: 1;
+        }
+
+        .header-text h3 {
           margin: 0 0 var(--unit-2) 0;
           font-size: 1.125rem;
           font-weight: 600;
           color: var(--on-surface);
         }
 
-        .table-header p {
+        .header-text p {
           margin: 0;
+          font-size: 0.875rem;
+          color: var(--on-surface-variant);
+        }
+
+        .header-actions {
+          display: flex;
+          gap: var(--unit-2);
+          flex-shrink: 0;
+        }
+
+        .action-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: var(--unit-1);
+          padding: var(--unit-2) var(--unit-3);
+          border: none;
+          border-radius: var(--unit-1);
+          font-size: 0.875rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          text-decoration: none;
+          font-family: var(--font);
+        }
+
+        .action-btn.primary {
+          background-color: var(--primary);
+          color: var(--on-primary);
+        }
+
+        .action-btn.primary:hover {
+          background-color: var(--primary-hover, var(--primary));
+          transform: translateY(-1px);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .action-btn.secondary {
+          background-color: var(--surface-container);
+          color: var(--on-surface);
+          border: 1px solid var(--outline-variant);
+        }
+
+        .action-btn.secondary:hover {
+          background-color: var(--surface-container-high);
+          transform: translateY(-1px);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-btn.small {
+          padding: var(--unit-1) var(--unit-2);
+          font-size: 0.75rem;
+        }
+
+        .action-btn .icon {
+          font-family: var(--font-icon);
+          font-size: 1rem;
+        }
+
+        .apply-to-all-form {
+          background-color: var(--surface-container-low);
+          border: 1px solid var(--outline-variant);
+          border-radius: var(--unit-2);
+          padding: var(--unit-4);
+          margin-bottom: var(--unit-4);
+        }
+
+        .apply-to-all-form h4 {
+          margin: 0 0 var(--unit-2) 0;
+          font-size: 1rem;
+          font-weight: 600;
+          color: var(--on-surface);
+        }
+
+        .apply-to-all-form > p {
+          margin: 0 0 var(--unit-4) 0;
+          font-size: 0.875rem;
+          color: var(--on-surface-variant);
+        }
+
+        .address-info {
           font-size: 0.875rem;
           color: var(--on-surface-variant);
         }

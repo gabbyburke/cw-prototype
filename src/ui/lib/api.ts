@@ -194,6 +194,21 @@ class ApiClient {
     return this.request<{ persons: Person[] }>(`/persons/search?q=${encodeURIComponent(query)}`)
   }
 
+  // Associate person to case
+  async associatePersonToCase(
+    caseId: string,
+    personId: string,
+    role: string
+  ): Promise<ApiResponse<{ message: string }>> {
+    return this.request<{ message: string }>(`/cases/${caseId}/persons`, {
+      method: 'POST',
+      body: JSON.stringify({
+        person_id: personId,
+        role: role,
+      }),
+    })
+  }
+
   // Get person by ID
   async getPersonById(personId: string): Promise<ApiResponse<Person>> {
     return this.request<Person>(`/persons/${personId}`)
@@ -202,6 +217,15 @@ class ApiClient {
   // Health check
   async healthCheck(): Promise<ApiResponse<{ status: string; service: string }>> {
     return this.request<{ status: string; service: string }>('/health')
+  }
+
+  // Magic Button / Draft Incidents
+  async getDraftIncidents(): Promise<ApiResponse<{ incidents: MagicButtonData[] }>> {
+    return this.request<{ incidents: MagicButtonData[] }>('/incidents/drafts')
+  }
+
+  async getMagicButtonDataByIncident(incidentNumber: string): Promise<ApiResponse<MagicButtonData>> {
+    return this.request<MagicButtonData>(`/incidents/${incidentNumber}/magic-button-data`)
   }
 }
 
@@ -221,8 +245,12 @@ export const addCaseNote = (caseId: string, noteText: string, noteType?: string)
 export const updateCase = (caseId: string, updates: Partial<Case>) => 
   apiClient.updateCase(caseId, updates)
 export const searchPersons = (query: string) => apiClient.searchPersons(query)
+export const associatePersonToCase = (caseId: string, personId: string, role: string) => 
+  apiClient.associatePersonToCase(caseId, personId, role)
 export const getPersonById = (personId: string) => apiClient.getPersonById(personId)
 export const healthCheck = () => apiClient.healthCheck()
+export const getDraftIncidents = () => apiClient.getDraftIncidents()
+export const getMagicButtonDataByIncident = (incidentNumber: string) => apiClient.getMagicButtonDataByIncident(incidentNumber)
 
 // Magic Button data interface based on BigQuery schema
 export interface MagicButtonData {
@@ -351,4 +379,124 @@ export const searchMagicButtonData = async (query: string): Promise<ApiResponse<
   )
   
   return { data: { incidents: filteredIncidents }, error: undefined }
+}
+
+// Court Document Processing API
+const COURT_PROCESSOR_URL = 'https://court-document-processor-807576987550.us-central1.run.app'
+
+export interface CourtDocumentData {
+  caseId: string
+  courtDetails: {
+    caseMembers: Array<{
+      name: string
+      courtType: string
+      docketNumber: string
+      initialCourtOrderUrl: string | null
+    }>
+  }
+  courtProfessionals: {
+    judge: {
+      name: string
+      title: string
+    }
+    countyAttorney: {
+      name: string
+      title: string
+    }
+    attorneys: Array<{
+      name: string
+      represents: string
+    }>
+    guardianAdLitem: {
+      name: string
+    }
+    intervenors: any[]
+    casas: any[]
+  }
+  courtHearingOrder: {
+    hearingDateTime: string
+    location: string
+    hearingType: string
+    reasonsForAdjudication: string[]
+    dispositionModification: string
+    permanencyGoal: string | null
+    legalStatus: string
+    legalCustody: string
+    underAppeal: boolean
+    abilityToGiveConsent: string | null
+    guardianship: string | null
+  }
+  upcomingCourtHearings: Array<{
+    nextCourtDate: string | null
+    nextHearingType: string | null
+    location: string | null
+    startTime: string | null
+    endTime: string | null
+    duration: string | null
+  }>
+  _metadata?: {
+    confidence_score: number
+    extraction_method: string
+    raw_response_length: number
+  }
+}
+
+export interface CourtProcessingResponse {
+  success: boolean
+  data: CourtDocumentData
+  metadata: {
+    processing_id: string
+    filename: string
+    file_size: number
+    mime_type: string
+    processed_at: string
+    case_id: string | null
+    ai_model: string
+  }
+  message: string
+}
+
+export async function processCourtDocument(
+  file: File,
+  caseId?: string
+): Promise<ApiResponse<CourtProcessingResponse>> {
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+    if (caseId) {
+      formData.append('case_id', caseId)
+    }
+
+    const response = await fetch(`${COURT_PROCESSOR_URL}/process-court-document`, {
+      method: 'POST',
+      body: formData,
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      return { error: data.message || 'Failed to process court document' }
+    }
+
+    return { data }
+  } catch (error) {
+    console.error('Error processing court document:', error)
+    return { error: 'Network error occurred while processing document' }
+  }
+}
+
+export async function checkCourtProcessorHealth(): Promise<ApiResponse<{ status: string; service: string }>> {
+  try {
+    const response = await fetch(`${COURT_PROCESSOR_URL}/health`)
+    const data = await response.json()
+
+    if (!response.ok) {
+      return { error: 'Court processor service is unavailable' }
+    }
+
+    return { data }
+  } catch (error) {
+    console.error('Error checking court processor health:', error)
+    return { error: 'Unable to connect to court processor service' }
+  }
 }

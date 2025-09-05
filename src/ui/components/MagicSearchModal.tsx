@@ -1,18 +1,21 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Person, searchPersons } from '@/lib/api'
+import { Person, searchPersons, associatePersonToCase } from '@/lib/api'
 
 interface MagicSearchModalProps {
   isOpen: boolean
   onClose: () => void
   onSelectPerson: (person: Person) => void
+  caseId?: string
+  defaultRole?: string
 }
 
-export default function MagicSearchModal({ isOpen, onClose, onSelectPerson }: MagicSearchModalProps) {
+export default function MagicSearchModal({ isOpen, onClose, onSelectPerson, caseId, defaultRole = 'Parent' }: MagicSearchModalProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<Person[]>([])
   const [loading, setLoading] = useState(false)
+  const [associating, setAssociating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false)
   const [advancedFilters, setAdvancedFilters] = useState({
@@ -78,9 +81,32 @@ export default function MagicSearchModal({ isOpen, onClose, onSelectPerson }: Ma
     return new Date(dateString).toLocaleDateString()
   }
 
-  const handleSelectPerson = (person: Person) => {
-    onSelectPerson(person)
-    onClose()
+  const handleSelectPerson = async (person: Person) => {
+    if (caseId) {
+      // If we have a case ID, associate the person to the case
+      setAssociating(true)
+      setError(null)
+      
+      try {
+        const response = await associatePersonToCase(caseId, person.person_id, defaultRole)
+        if (response.error) {
+          setError(response.error)
+          return
+        }
+        
+        // Success - call the callback and close modal
+        onSelectPerson(person)
+        onClose()
+      } catch (err) {
+        setError('Failed to add person to case')
+      } finally {
+        setAssociating(false)
+      }
+    } else {
+      // No case ID - just call the callback (for other use cases)
+      onSelectPerson(person)
+      onClose()
+    }
   }
 
   const calculateAge = (dateOfBirth: string) => {
@@ -345,9 +371,10 @@ export default function MagicSearchModal({ isOpen, onClose, onSelectPerson }: Ma
                         <button 
                           onClick={() => handleSelectPerson(person)}
                           className="action-btn primary"
+                          disabled={associating}
                         >
-                          <span className="icon">person_add</span>
-                          Select Person
+                          <span className="icon">{associating ? 'hourglass_empty' : 'person_add'}</span>
+                          {associating ? 'Adding Person...' : 'Select Person'}
                         </button>
                       </div>
                     </div>

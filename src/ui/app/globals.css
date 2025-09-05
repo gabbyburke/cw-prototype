@@ -495,6 +495,14 @@ a {
 .header-actions {
   display: flex;
   gap: var(--unit-2);
+  align-items: center;
+}
+
+.section-description {
+  font-size: calc(var(--size) * 0.875);
+  color: var(--on-surface-variant);
+  font-style: italic;
+  margin: 0;
 }
 
 .main-content {
@@ -4843,5 +4851,459 @@ input[type="button"]:disabled {
   
   .step-title {
     display: none;
+  }
+}
+
+/* Child Details Section Styles */
+.child-details-section {
+  margin-top: var(--unit-6);
+  padding-top: var(--unit-6);
+  border-top: 1px solid var(--outline-variant);
+}
+
+.section-header {
+  margin-bottom: var(--unit-6);
+  text-align: center;
+}
+
+.section-header h3 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--unit-3);
+  font-size: calc(var(--size) * 1.5);
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0 0 var(--unit-3) 0;
+}
+
+.section-icon {
+  font-family: var(--font-icon);
+  font-size: calc(var(--size) * 1.75);
+  color: var(--primary);
+}
+
+.section-header p {
+  font-size: calc(var(--size) * 1);
+  color: var(--on-surface-variant);
+  margin: 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+}
+
+.child-detail-card {
+  background-color: var(--surface-container-low);
+  border: 2px solid var(--outline-variant);
+  border-radius: var(--unit-4);
+  padding: var(--unit-6);
+  margin-bottom: var(--unit-5);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.child-detail-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 50%, var(--tertiary) 100%);
+}
+
+.child-detail-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 8px 24px var(--shadow);
+  transform: translateY(-2px);
+}
+
+.child-header {
+  margin-bottom: var(--unit-5);
+  padding-bottom: var(--unit-4);
+  border-bottom: 1px solid var(--outline-variant);
+}
+
+.child-info {
+  display: flex;
+  align-items: center;
+  gap: var(--unit-3);
+}
+
+.child-icon {
+  font-family: var(--font-icon);
+  font-size: calc(var(--size) * 1.5);
+  color: var(--primary);
+  width: calc(var(--unit) * 10);
+  height: calc(var(--unit) * 10);
+  border-radius: 50%;
+  background-color: var(--primary-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.child-info h4 {
+  font-size: calc(var(--size) * 1.25);
+  font-weight: 600;
+  color: var(--on-surface);
+  margin: 0 0 var(--unit-1) 0;
+}
+
+.child-age {
+  font-size: calc(var(--size) * 0.875);
+  color: var(--on-surface-variant);
+  font-weight: 500;
+  background-color: var(--surface-container);
+  padding: var(--unit-1) var(--unit-3);
+  border-radius: var(--unit-3);
+}
+
+.child-categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--unit-4);
+}
+
+.category-item {
+  background-color: var(--surface);
+  border: 2px solid var(--outline-variant);
+  border-radius: var(--unit-3);
+  padding: var(--unit-4);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.category-item:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.category-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--unit-3);
+  cursor: pointer;
+  width: 100%;
+  position: relative;
+}
+
+.category-checkbox input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.checkbox-content {
+  display: flex;
+  align-items: center;
+  gap: var(--unit-3);
+  width: 100%;
+  padding: var(--unit-2);
+  border-radius: var(--unit-2);
+  transition: all 0.3s ease;
+}
+
+.category-checkbox:hover .checkbox-content {
+  background-color: var(--surface-container-low);
+}
+
+.category-checkbox input[type="checkbox"]:checked + .checkbox-content {
+  background-color: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.category-checkbox input[type="checkbox"]:checked + .checkbox-content .category-icon {
+  color: var(--primary);
+  background-color: var(--primary);
+  color: var(--on-primary);
+  transform: scale(1.1);
+}
+
+.category-icon {
+  font-family: var(--font-icon);
+  font-size: calc(var(--size) * 1.25);
+  color: var(--on-surface-variant);
+  width: calc(var(--unit) * 8);
+  height: calc(var(--unit) * 8);
+  border-radius: 50%;
+  background-color: var(--surface-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.category-label {
+  font-size: calc(var(--size) * 0.875);
+  font-weight: 500;
+  color: var(--on-surface);
+  line-height: 1.4;
+  flex: 1;
+}
+
+.category-checkbox input[type="checkbox"]:checked + .checkbox-content .category-label {
+  color: var(--on-primary-container);
+  font-weight: 600;
+}
+
+/* Specific category icon colors */
+.category-item:nth-child(1) .category-checkbox input[type="checkbox"]:checked + .checkbox-content .category-icon {
+  background-color: var(--tertiary); /* Safe Haven - Green */
+  color: var(--on-tertiary);
+}
+
+.category-item:nth-child(2) .category-checkbox input[type="checkbox"]:checked + .checkbox-content .category-icon {
+  background-color: #8B4513; /* Native American - Brown */
+  color: white;
+}
+
+.category-item:nth-child(3) .category-checkbox input[type="checkbox"]:checked + .checkbox-content .category-icon {
+  background-color: var(--secondary); /* Voluntary Placement - Blue */
+  color: var(--on-secondary);
+}
+
+.category-item:nth-child(4) .category-checkbox input[type="checkbox"]:checked + .checkbox-content .category-icon {
+  background-color: var(--error); /* Allergies - Red */
+  color: var(--on-error);
+}
+
+.category-item:nth-child(5) .category-checkbox input[type="checkbox"]:checked + .checkbox-content .category-icon {
+  background-color: #4A148C; /* Court Involved - Purple */
+  color: white;
+}
+
+.category-item:nth-child(6) .category-checkbox input[type="checkbox"]:checked + .checkbox-content .category-icon {
+  background-color: #FF6F00; /* Infant Substances - Orange */
+  color: white;
+}
+
+.category-item:nth-child(7) .category-checkbox input[type="checkbox"]:checked + .checkbox-content .category-icon {
+  background-color: #D32F2F; /* Sex Trafficking - Dark Red */
+  color: white;
+}
+
+/* Custom checkbox styling */
+.category-checkbox input[type="checkbox"]:focus + .checkbox-content {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Animation for checked state */
+.category-checkbox input[type="checkbox"]:checked + .checkbox-content {
+  animation: checkboxPulse 0.3s ease-out;
+}
+
+@keyframes checkboxPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Mobile responsive for child details */
+@media (max-width: 768px) {
+  .child-categories-grid {
+    grid-template-columns: 1fr;
+    gap: var(--unit-3);
+  }
+  
+  .child-detail-card {
+    padding: var(--unit-4);
+    margin-bottom: var(--unit-4);
+  }
+  
+  .child-info {
+    gap: var(--unit-2);
+  }
+  
+  .child-icon {
+    width: calc(var(--unit) * 8);
+    height: calc(var(--unit) * 8);
+    font-size: calc(var(--size) * 1.25);
+  }
+  
+  .child-info h4 {
+    font-size: calc(var(--size) * 1.125);
+  }
+  
+  .section-header h3 {
+    font-size: calc(var(--size) * 1.25);
+    flex-direction: column;
+    gap: var(--unit-2);
+  }
+  
+  .section-icon {
+    font-size: calc(var(--size) * 1.5);
+  }
+}
+
+@media (max-width: 480px) {
+  .child-detail-card {
+    padding: var(--unit-3);
+  }
+  
+  .category-item {
+    padding: var(--unit-3);
+  }
+  
+  .checkbox-content {
+    gap: var(--unit-2);
+  }
+  
+  .category-icon {
+    width: calc(var(--unit) * 6);
+    height: calc(var(--unit) * 6);
+    font-size: calc(var(--size) * 1);
+  }
+  
+  .category-label {
+    font-size: calc(var(--size) * 0.8);
+  }
+  
+  .child-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--unit-2);
+  }
+  
+  .child-age {
+    align-self: flex-start;
+  }
+}
+
+/* Association Box Styles */
+.association-box {
+  background-color: var(--surface-container-low);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--unit-3);
+  padding: var(--unit-4);
+  margin-bottom: var(--unit-4);
+}
+
+.box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--unit-4);
+  padding-bottom: var(--unit-3);
+  border-bottom: 1px solid var(--outline-variant);
+}
+
+.box-header h4 {
+  font-size: calc(var(--size) * 1.125);
+  font-weight: 600;
+  color: var(--on-surface);
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: var(--unit-2);
+}
+
+.people-table {
+  background-color: var(--surface);
+  border-radius: var(--unit-2);
+  overflow: hidden;
+}
+
+.add-person-form {
+  background-color: var(--surface-container);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--unit-3);
+  padding: var(--unit-4);
+  margin-bottom: var(--unit-4);
+}
+
+.add-person-form h5 {
+  margin: 0 0 var(--unit-4) 0;
+  font-size: calc(var(--size) * 1);
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.person-name {
+  display: flex;
+  flex-direction: column;
+  gap: var(--unit-1);
+}
+
+.person-age {
+  font-size: calc(var(--size) * 0.75);
+  color: var(--on-surface-variant);
+}
+
+.perpetrator-flag {
+  color: var(--error);
+  margin-right: var(--unit-2);
+}
+
+.role-dropdown {
+  padding: var(--unit-2);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--unit-1);
+  background-color: var(--surface);
+  color: var(--on-surface);
+  font-size: calc(var(--size) * 0.875);
+  min-width: 120px;
+}
+
+.role-dropdown:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Mobile responsive for association boxes */
+@media (max-width: 768px) {
+  .box-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--unit-3);
+  }
+  
+  .header-actions {
+    justify-content: center;
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: var(--unit-2);
+    font-size: calc(var(--size) * 0.8);
+  }
+}
+
+@media (max-width: 480px) {
+  .association-box {
+    padding: var(--unit-3);
+  }
+  
+  .add-person-form {
+    padding: var(--unit-3);
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions .action-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
