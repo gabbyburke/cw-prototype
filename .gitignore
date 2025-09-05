@@ -73,3 +73,5 @@ src/ui/.env.local
 .dataconnect
 /src/ui/.env.local
 /terraform/config/dev.tfvars
+**/.next*
+
