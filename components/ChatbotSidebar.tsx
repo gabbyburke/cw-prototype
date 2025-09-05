@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { X, Send, Bot, User } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 type Message = {
   text: string;
@@ -65,7 +67,7 @@ export default function ChatbotSidebar({
         <h3 className="sidebar-brand">VISION Assistant</h3>
         <button
           onClick={onClose}
-          className="action-btn secondary"
+          className="chatbot-sidebar-close"
           aria-label="Close chat"
         >
           <X className="h-4 w-4" />
@@ -73,12 +75,25 @@ export default function ChatbotSidebar({
       </div>
       <div className="flex-grow p-4 overflow-y-auto">
         {messages.map((msg, index) => (
-          <div key={index} className={`flex items-start gap-3 mb-4 ${msg.isUser ? 'justify-end' : 'justify-start'}`}>
-            { !msg.isUser && <Bot className="h-6 w-6 text-gray-500" /> }
-            <div className={`p-3 rounded-lg max-w-md ${msg.isUser ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-800'}`}>
-              {msg.text}
+          <div
+            key={index}
+            className={`flex items-start gap-3 mb-4 ${
+              msg.isUser ? 'justify-end' : 'justify-start'
+            }`}
+          >
+            {!msg.isUser && <Bot className="h-6 w-6 text-gray-500" />}
+            <div
+              className={`p-3 rounded-lg max-w-md prose ${
+                msg.isUser
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-100 text-gray-800'
+              }`}
+            >
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {msg.text}
+              </ReactMarkdown>
             </div>
-            { msg.isUser && <User className="h-6 w-6 text-gray-500" /> }
+            {msg.isUser && <User className="h-6 w-6 text-gray-500" />}
           </div>
         ))}
         {isLoading && (
