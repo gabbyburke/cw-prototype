@@ -59,8 +59,7 @@ export default function ChatbotModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl h-full max-h-[80vh] flex flex-col">
+    <div className="chatbot-container">
         <div className="flex justify-between items-center p-4 border-b">
           <h3 className="text-xl font-semibold text-gray-800">VISION Assistant</h3>
           <button
@@ -109,7 +108,6 @@ export default function ChatbotModal({
             </button>
           </div>
         </div>
-      </div>
     </div>
   );
 }
