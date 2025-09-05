@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Send, Bot, User } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -22,6 +22,15 @@ export default function ChatbotSidebar({
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const messagesEndRef = useRef<null | HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSendMessage = async () => {
     if (inputValue.trim() === '') return;
@@ -73,7 +82,7 @@ export default function ChatbotSidebar({
           <X className="h-4 w-4" />
         </button>
       </div>
-      <div className="flex-grow p-4 overflow-y-auto">
+      <div className="chatbot-message-list">
         {messages.map((msg, index) => (
           <div
             key={index}
@@ -102,6 +111,7 @@ export default function ChatbotSidebar({
             </div>
           </div>
         )}
+        <div ref={messagesEndRef} />
       </div>
       <div className="p-4 border-t">
         <div className="flex">

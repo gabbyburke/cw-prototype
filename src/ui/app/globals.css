@@ -5362,6 +5362,13 @@ input[type="button"]:disabled {
   color: var(--on-secondary);
 }
 
+.chatbot-message-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: var(--unit-4);
+  min-height: 0;
+}
+
 .prose {
   /* Add some basic styling for markdown content */
   --tw-prose-body: var(--on-surface);
