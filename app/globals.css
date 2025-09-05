@@ -4919,3 +4919,22 @@ input[type="button"]:disabled {
   --tw-prose-th-borders: var(--outline-variant);
   --tw-prose-td-borders: var(--outline-variant);
 }
+
+/* Chat Message Styles */
+.message-card {
+  padding: var(--unit-3);
+  border-radius: var(--unit-3);
+  max-width: 95%;
+  word-wrap: break-word;
+}
+
+.user-message-card {
+  background-color: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.ai-message-card {
+  background-color: var(--surface);
+  border: 1px solid var(--outline-variant);
+  color: var(--on-surface);
+}

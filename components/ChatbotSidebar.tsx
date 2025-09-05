@@ -83,10 +83,8 @@ export default function ChatbotSidebar({
           >
             {!msg.isUser && <Bot className="h-6 w-6 text-gray-500" />}
             <div
-              className={`p-3 rounded-lg max-w-md prose ${
-                msg.isUser
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 text-gray-800'
+              className={`message-card prose ${
+                msg.isUser ? 'user-message-card' : 'ai-message-card'
               }`}
             >
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
