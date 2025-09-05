@@ -1,14 +1,10 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { useContext } from 'react'
 import FloatingActionButton from './FloatingActionButton'
-import { CaseDataContext } from '../contexts/CaseDataContext'
 
 export default function ClientLayout() {
   const pathname = usePathname()
-  // Try to get the context, but don't throw if it's not available
-  const caseDataContext = useContext(CaseDataContext)
 
   const handleFabClick = () => {
     switch (pathname) {
@@ -23,21 +19,24 @@ export default function ClientLayout() {
         break;
       case '/':
         console.log('SWCM FAB clicked!');
-        // If we have access to the case data context, log all cases as JSON
-        if (caseDataContext && caseDataContext.getAllCasesAsJSON) {
-          const casesJSON = caseDataContext.getAllCasesAsJSON();
-          console.log('=== ALL CASES DATA (JSON FORMAT) ===');
-          console.log(casesJSON);
-          console.log('=== END OF CASES DATA ===');
-          
-          // Also log a summary
-          const allCases = caseDataContext.allCases;
-          console.log(`Total cases in system: ${allCases.length}`);
-          console.log(`Active cases: ${allCases.filter(c => c.status === 'Active').length}`);
-          console.log(`Case Setup: ${allCases.filter(c => c.status === 'Case Setup').length}`);
-          console.log(`Closed cases: ${allCases.filter(c => c.status === 'Closed').length}`);
+        const allCasesData = localStorage.getItem('allCases');
+        if (allCasesData) {
+          const allCases = JSON.parse(allCasesData);
+          if (allCases && allCases.length > 0) {
+            console.log('=== ALL CASES DATA (JSON FORMAT) ===');
+            console.log(JSON.stringify(allCases, null, 2));
+            console.log('=== END OF CASES DATA ===');
+            
+            // Also log a summary
+            console.log(`Total cases in system: ${allCases.length}`);
+            console.log(`Active cases: ${allCases.filter(c => c.status === 'Active').length}`);
+            console.log(`Case Setup: ${allCases.filter(c => c.status === 'Case Setup').length}`);
+            console.log(`Closed cases: ${allCases.filter(c => c.status === 'Closed').length}`);
+          } else {
+            console.log('No cases found in the system. The case data array is empty.');
+          }
         } else {
-          console.log('Case data not available. Please ensure you are on the SWCM Dashboard page and cases have been loaded.');
+          console.log('Case data not available in local storage. Please ensure you have loaded the SWCM Dashboard page at least once.');
         }
         break;
       default:

@@ -2,12 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Case, getCasesByWorker, updateCase } from '../lib/api'
-import { getCurrentUser } from '../lib/mockData'
+import { Case, getCasesByWorker, updateCase } from '@/lib/api'
 import AddCaseNoteModal from '../components/AddCaseNoteModal'
-import { CaseDataProvider, useCaseData } from '../contexts/CaseDataContext'
 
-function SWCMDashboardContent() {
+function SWCMDashboard() {
   const [cases, setCases] = useState<Case[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -15,7 +13,6 @@ function SWCMDashboardContent() {
   const [isAddNoteModalOpen, setIsAddNoteModalOpen] = useState(false)
   const [editingCase, setEditingCase] = useState<string | null>(null)
   const [editValues, setEditValues] = useState<{[key: string]: any}>({})
-  const { setAllCases } = useCaseData()
 
   useEffect(() => {
     loadCases()
@@ -32,8 +29,8 @@ function SWCMDashboardContent() {
       setError(response.error)
     } else if (response.data) {
       setCases(response.data.cases)
-      // Store all cases in context for global access
-      setAllCases(response.data.cases)
+      // Store all cases in local storage for global access
+      localStorage.setItem('allCases', JSON.stringify(response.data.cases))
     }
     
     setLoading(false)
@@ -62,8 +59,8 @@ function SWCMDashboardContent() {
             : case_
         )
         setCases(updatedCases)
-        // Also update context with the modified cases
-        setAllCases(updatedCases)
+        // Also update local storage with the modified cases
+        localStorage.setItem('allCases', JSON.stringify(updatedCases))
         setEditingCase(null)
         setEditValues({})
       }
@@ -434,10 +431,4 @@ function SWCMDashboardContent() {
   )
 }
 
-export default function SWCMDashboard() {
-  return (
-    <CaseDataProvider>
-      <SWCMDashboardContent />
-    </CaseDataProvider>
-  )
-}
+export default SWCMDashboard
